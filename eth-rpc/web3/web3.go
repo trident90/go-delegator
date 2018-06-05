@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"strings"
 
-	common "github.com/hexoul/eth-rpc-on-aws-lambda/eth-rpc/common"
+	"bitbucket.org/coinplugin/proxy/eth-rpc/common"
 )
 
 func GetValueOfUnit(unit string) (val *big.Float, err string) {

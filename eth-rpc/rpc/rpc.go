@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 
-	ethjson "github.com/hexoul/eth-rpc-on-aws-lambda/eth-rpc/json"
+	ethjson "bitbucket.org/coinplugin/proxy/eth-rpc/json"
 )
 
 type Rpc struct {
