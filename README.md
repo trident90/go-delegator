@@ -1,9 +1,9 @@
-# Ethereum JSON-RPC on AWS Lambda
-AWS Lambda code to call and relay JSON-RPC of ethereum written in Golang.
+# Metadium Proxy on AWS Lambda
+Main functions are MetaID registration/update/recover and relaying JSON-RPC result with metadium node.
 
 In addition, this project try porting web3 to Golang.
 
-Furthermore IPFS will be applied to this project to maximize service utility by supporting token development.
+Furthermore IPFS will be applied to this project to overwhelm limited stroage in blockchain.
 
 # Prerequisite
 1. Docker
@@ -39,7 +39,7 @@ go test -v
 4. Add CloudWatch Logs
 
 # Usage
-1. JSON-RPC relay with Ethereum node
+1. JSON-RPC relay with metadium node
 2. Ecrecover
 3. Sign with encrypted private key on DynamoDB
 4. IPFS
@@ -47,9 +47,11 @@ go test -v
 
 # Documentation
 1. Execute godoc -http like below
-```shell
-godoc -http=:6060
-```
+
+  ```shell
+  godoc -http=:6060
+  ```
+  
 2. Open url
   - http://localhost:6060/pkg/bitbucket.org/coinplugin/proxy/eth-rpc/
   - If you change port at 1., it should be applied to url
