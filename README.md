@@ -17,7 +17,7 @@ Furthermore IPFS will be applied to this project to overwhelm limited stroage in
 
 # Build
 ```shell
-cd $GOPATH/src/{repo start with github.com}
+cd $GOPATH/src/{repo start with bitbucket.org}
 make
 ```
 
@@ -30,8 +30,8 @@ make
 
 # Deploy
 1. Set Lambda on AWS
-    - Function package: compressed binary file in $GOPATH/src/{repo}/eth-rpc/bin
-    - Handler: eth-rpc (binary file name, it is optional)
+    - Function package: compressed binary file in $GOPATH/src/{repo}/bin
+    - Handler: proxy (binary file name, it is optional)
     - Runtime: Go 1.x
     - (Optional) Include DynamoDB execution role to Lambda execution role
 2. Set API Gateway as proxy on AWS
@@ -51,7 +51,7 @@ make
     godoc -http=:6060
     ```  
 2. Open url
-    - http://localhost:6060/pkg/bitbucket.org/coinplugin/proxy/eth-rpc/
+    - http://localhost:6060/pkg/bitbucket.org/coinplugin/proxy/
     - If you change port at 1., it should be applied to url
 
 # Reference
