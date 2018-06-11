@@ -10,8 +10,8 @@ import (
 	"io"
 	"sync"
 
-	"bitbucket.org/coinplugin/proxy/eth-rpc/common"
-	"bitbucket.org/coinplugin/proxy/eth-rpc/db"
+	"bitbucket.org/coinplugin/proxy/common"
+	"bitbucket.org/coinplugin/proxy/db"
 
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"

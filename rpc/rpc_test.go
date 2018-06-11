@@ -3,7 +3,7 @@ package rpc
 import (
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/eth-rpc/json"
+	"bitbucket.org/coinplugin/proxy/json"
 )
 
 func TestRpc(t *testing.T) {

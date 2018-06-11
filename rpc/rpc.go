@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	ethjson "bitbucket.org/coinplugin/proxy/eth-rpc/json"
+	ethjson "bitbucket.org/coinplugin/proxy/json"
 )
 
 type Rpc struct {

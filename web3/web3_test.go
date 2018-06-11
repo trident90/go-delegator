@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/eth-rpc/common"
+	"bitbucket.org/coinplugin/proxy/common"
 )
 
 func TestUnit(t *testing.T) {
