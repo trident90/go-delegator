@@ -32,11 +32,10 @@ var once sync.Once
 // mode is MAINNET or TESTNET
 func GetInstance(_netType string) *Rpc {
 	once.Do(func() {
-		instance = &Rpc{
-			netType: _netType,
-		}
+		instance = &Rpc{}
 		instance.InitClient()
 	})
+	instance.netType = _netType
 	return instance
 }
 
@@ -98,4 +97,30 @@ func (r *Rpc) DoRpc(req interface{}) (string, error) {
 	ret := string(respBody)
 	resp.Body.Close()
 	return ret, nil
+}
+
+func (r *Rpc) Call(to, data string) (string, error) {
+	req := ethjson.RpcRequest{
+		Jsonrpc: "2.0",
+		Id:      1,
+		Method:  "eth_call",
+	}
+	params := map[string]string{
+		"to":   to,
+		"data": data,
+	}
+	req.Params = append(req.Params, params)
+	req.Params = append(req.Params, "latest")
+	return r.DoRpc(req)
+}
+
+func (r *Rpc) GetCode(addr string) (string, error) {
+	req := ethjson.RpcRequest{
+		Jsonrpc: "2.0",
+		Id:      1,
+		Method:  "eth_getCode",
+	}
+	req.Params = append(req.Params, addr)
+	req.Params = append(req.Params, "latest")
+	return r.DoRpc(req)
 }
