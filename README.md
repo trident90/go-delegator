@@ -3,7 +3,7 @@ Main functions are MetaID registration/update/recover and relaying JSON-RPC resu
 
 In addition, this project try porting web3 to Golang.
 
-Furthermore IPFS will be applied to this project to overwhelm limited stroage in blockchain.
+Furthermore it applied IPFS here to overwhelm limited stroage of blockchain.
 
 # Prerequisite
 1. Docker
