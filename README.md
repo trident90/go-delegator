@@ -7,14 +7,16 @@ Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 
 # Features
 1. JSON-RPC relay with metadium node
-2. Ecrecover
-3. Sign with encrypted private key on DynamoDB
+2. Proofs for sign and merkle tree such as Ecrecover, DeriveSha, VerifyProof and so on
+3. Sign, SignTx with encrypted private key on DynamoDB
 4. IPFS
 5. fromWei, toWei written in Golang
 
 # Prerequisite
+0. Go
+    - Install at https://golang.org/doc/install
 1. Docker
-    - Install docker (https://docs.docker.com/install/)
+    - Install at https://docs.docker.com/install
 2. xgo
     - because of C compile in go-ethereum, we need improved cross-compiler
     ```shell
