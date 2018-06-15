@@ -5,6 +5,13 @@ In addition, this project try porting web3 to Golang.
 
 Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 
+# Features
+1. JSON-RPC relay with metadium node
+2. Ecrecover
+3. Sign with encrypted private key on DynamoDB
+4. IPFS
+5. fromWei, toWei written in Golang
+
 # Prerequisite
 1. Docker
     - Install docker (https://docs.docker.com/install/)
@@ -37,13 +44,6 @@ make
 2. Set API Gateway as proxy on AWS
 3. Add API Gateway as Lambda trigger
 4. Add CloudWatch Logs
-
-# Usage
-1. JSON-RPC relay with metadium node
-2. Ecrecover
-3. Sign with encrypted private key on DynamoDB
-4. IPFS
-5. fromWei, toWei written in Golang
 
 # Documentation
 1. Execute godoc -http like below
