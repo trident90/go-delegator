@@ -19,10 +19,11 @@ Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
     - Install at https://docs.docker.com/install
 2. xgo
     - because of C compile in go-ethereum, we need improved cross-compiler
-    ```shell
-    docker pull karalabe/xgo-latest
-    go get github.com/karalabe/xgo
-    ```
+    
+```shell
+docker pull karalabe/xgo-latest
+go get github.com/karalabe/xgo
+```
 
 # Build
 ```shell
@@ -33,7 +34,7 @@ make
 # Test
 1. Move each module directory such as json, rpc and so on
 2. Run testunit
-    ```shell
+    ```
     go test -v
     ```
 
@@ -49,7 +50,7 @@ make
 
 # Documentation
 1. Execute godoc -http like below
-    ```shell
+    ```
     godoc -http=:6060
     ```  
 2. Open url
