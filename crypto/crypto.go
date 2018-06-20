@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"math/big"
 	"sync"
 
 	"bitbucket.org/coinplugin/proxy/common"
@@ -24,6 +25,8 @@ type Crypto struct {
 	nonce     string
 	privKey   string
 	Address   string
+	ChainId   *big.Int
+	signer    types.Signer
 }
 
 // For singleton
@@ -45,8 +48,11 @@ func GetInstance() *Crypto {
 		dbNonce := getConfigFromDB(DbNoncePropName)
 		dbPrivKey := getConfigFromDB(DbPrivKeyPropName)
 
-		bNonce, _ := hex.DecodeString(dbNonce)
-		nPrivKey := DecryptAes(dbPrivKey, dbSecretKey, bNonce)
+		var nPrivKey string
+		if dbSecretKey != "" && dbNonce != "" && dbPrivKey != "" {
+			bNonce, _ := hex.DecodeString(dbNonce)
+			nPrivKey = DecryptAes(dbPrivKey, dbSecretKey, bNonce)
+		}
 
 		instance = &Crypto{
 			secretKey: dbSecretKey,
@@ -72,9 +78,15 @@ func (c *Crypto) Sign(msg string) string {
 }
 
 func (c *Crypto) SignTx(tx *types.Transaction) (*types.Transaction, error) {
-	signer := types.HomesteadSigner{}
+	if c.signer != nil {
+		// Nothing to do
+	} else if c.ChainId != nil {
+		c.signer = types.NewEIP155Signer(c.ChainId)
+	} else {
+		c.signer = types.HomesteadSigner{}
+	}
 	privKey, _ := crypto.HexToECDSA(c.privKey)
-	signedTx, err := types.SignTx(tx, signer, privKey)
+	signedTx, err := types.SignTx(tx, c.signer, privKey)
 	if err != nil {
 		return nil, fmt.Errorf("tx or private key is not appropriate")
 	}
@@ -98,6 +110,10 @@ func getConfigFromDB(propVal string) string {
 	}
 
 	ret := dbHelper.GetItem(common.DbConfigTblName, common.DbConfigPropName, propVal, common.DbConfigValName)
+	if ret == nil {
+		return ""
+	}
+
 	item := common.DbConfigResult{}
 	for _, elem := range ret.Items {
 		dbHelper.UnmarshalMap(elem, &item)
