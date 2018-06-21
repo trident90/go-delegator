@@ -85,6 +85,7 @@ func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []i
 	}
 
 	c := crypto.GetInstance()
+	// TODO: atomic nonce needed about each address
 	tx := types.NewTransaction(0, common.HexToAddress(to), big.NewInt(0), uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
 	tx, err = c.SignTx(tx)
 	if err != nil {
