@@ -8,10 +8,10 @@ import (
 )
 
 func TestMetaIdRegister(t *testing.T) {
-	req := json.RpcRequest{
+	req := json.RPCRequest{
 		Jsonrpc: "2.0",
 		Method:  "register_meta_id",
-		Id:      1,
+		ID:      1,
 	}
 	param := map[string]interface{}{
 		"address": "0x961c20596e7EC441723FBb168461f4B51371D8aA",
@@ -25,7 +25,7 @@ func TestMetaIdRegister(t *testing.T) {
 	// resp, err := main.Handler(nil, events.APIGatewayProxyRequest{
 	// 	Body: req.String(),
 	// })
-	resp, err := register_meta_id(req)
+	resp, err := registerMetaID(req)
 	if resp.String() == "" || err != nil {
 		fmt.Println("Error : ", err)
 		t.Errorf("Failed to start main")

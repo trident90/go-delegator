@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"bitbucket.org/coinplugin/geth/common"
-	"bitbucket.org/coinplugin/geth/common/hexutil"
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 const (
@@ -38,7 +39,7 @@ type metaIDUpdateParams struct {
 type metaIDBackupParams struct {
 	Address   common.Address `json:"address"`
 	MetaID    hexutil.Bytes  `json:"meta_id"`
-	encData   hexutil.Bytes  `json:"enc_data"`
+	EncData   hexutil.Bytes  `json:"enc_data"`
 	Signature hexutil.Bytes  `json:"signature"` // Sign(MetaId)
 }
 
@@ -124,7 +125,7 @@ func (p *metaIDBackupParams) validate() (err Error) {
 	if len(p.MetaID) != hashSize {
 		return &invalidParamsError{"Invalid meta_id parameter."}
 	}
-	if len(p.encData) > minimumUserHashSize {
+	if len(p.EncData) > minimumUserHashSize {
 		return &invalidParamsError{"Invalid enc_data parameter."}
 	}
 	if len(p.Signature) != signatureSize {
@@ -305,17 +306,18 @@ func getParameter(method string, obj interface{}) (interface{}, Error) {
 
 }
 
-func register_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	//var reqParam interface{}
-	resp.Id = req.Id
+	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
 	tmpParams, errObj := getParameter(req.Method, req.Params[0])
 	if errObj != nil {
-
-		resp.Error.Code = errObj.ErrorCode()
-		resp.Error.Message = errObj.Error()
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
 		err = fmt.Errorf(errObj.Error())
 		return
 	}
@@ -331,8 +333,10 @@ func register_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
 	if err != nil {
 		fmt.Println("Error :", err)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
-		resp.Error.Code = errObj.ErrorCode()
-		resp.Error.Message = errObj.Error()
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
 		err = fmt.Errorf(errObj.Error())
 		return
 	}
@@ -342,8 +346,10 @@ func register_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
 	if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
-		resp.Error.Code = errObj.ErrorCode()
-		resp.Error.Message = errObj.Error()
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
 		err = fmt.Errorf(errObj.Error())
 		return
 	}
@@ -359,22 +365,22 @@ func register_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
 	return
 }
 
-func update_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func backup_user_data(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func get_user_data(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func restore_user_data(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func revoke_meta_id(req json.RpcRequest) (resp json.RpcResponse, err error) {
+func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
