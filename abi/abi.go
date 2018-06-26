@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"math/big"
 	"strings"
+	"sync"
+	"sync/atomic"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
@@ -15,6 +17,11 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/rlp"
+)
+
+var (
+	zero  = big.NewInt(0)
+	mutex = &sync.Mutex{}
 )
 
 // Pack makes packed data with inputs on ABI
@@ -43,7 +50,7 @@ func Unpack(abi abi.ABI, v interface{}, name string, output string) error {
 }
 
 // Call gets contract value with contract address and name
-func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}, outputs interface{}) (resp json.RPCResponse, err error) {
+func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}) (resp json.RPCResponse, err error) {
 	data, err := Pack(abi, name, inputs...)
 	if err != nil {
 		return
@@ -84,9 +91,16 @@ func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []i
 		return
 	}
 
+	// Get TX nonce
 	c := crypto.GetInstance()
-	// TODO: atomic nonce needed about each address
-	tx := types.NewTransaction(0, common.HexToAddress(to), big.NewInt(0), uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
+	r := rpc.GetInstance(targetNet)
+	mutex.Lock()
+	defer mutex.Unlock()
+	if c.Txnonce == 0 {
+		c.Txnonce = r.GetTransactionCount(c.Address)
+	}
+	nonce := atomic.LoadUint64(&c.Txnonce)
+	tx := types.NewTransaction(nonce, common.HexToAddress(to), zero, uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
 	tx, err = c.SignTx(tx)
 	if err != nil {
 		return
@@ -97,13 +111,15 @@ func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []i
 		return
 	}
 
-	r := rpc.GetInstance(targetNet)
 	respStr, err := r.SendRawTransaction(rlpTx)
 	if err != nil {
 		return
 	}
 
 	resp = json.GetRPCResponseFromJSON(respStr)
+	if resp.Error == nil {
+		atomic.AddUint64(&c.Txnonce, 1)
+	}
 	return
 }
 

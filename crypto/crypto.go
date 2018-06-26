@@ -27,6 +27,7 @@ type Crypto struct {
 	privKey   string
 	Address   string
 	ChainID   *big.Int
+	Txnonce   uint64
 	signer    types.Signer
 }
 
@@ -52,8 +53,10 @@ func GetInstance() *Crypto {
 		dbNonce := getConfigFromDB(DbNoncePropName)
 		dbPrivKey := getConfigFromDB(DbPrivKeyPropName)
 
+		bSuccess := false
 		var nPrivKey string
 		if dbSecretKey != "" && dbNonce != "" && dbPrivKey != "" {
+			bSuccess = true
 			bNonce, _ := hex.DecodeString(dbNonce)
 			nPrivKey = DecryptAes(dbPrivKey, dbSecretKey, bNonce)
 		}
@@ -62,6 +65,10 @@ func GetInstance() *Crypto {
 			secretKey: dbSecretKey,
 			nonce:     dbNonce,
 			privKey:   nPrivKey,
+			Txnonce:   0,
+		}
+		if bSuccess {
+			instance.Sign("0xabcdef")
 		}
 	})
 	return instance
@@ -78,6 +85,7 @@ func (c *Crypto) Sign(msg string) string {
 	ret := hexutil.Encode(sig)
 	if c.Address == "" {
 		c.Address, _ = EcRecover(msg, ret)
+		fmt.Printf("Crypto address is set to %s\n", c.Address)
 	}
 	return ret
 }
