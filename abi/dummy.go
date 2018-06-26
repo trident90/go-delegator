@@ -13,7 +13,8 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
-func DummySendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gas int) (resp json.RpcResponse, err error) {
+// DummySendTransaction invokes abi.SendTransaction with dummy of Crypto struct
+func DummySendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gas int) (resp json.RPCResponse, err error) {
 	data, err := Pack(abi, name, inputs...)
 	if err != nil {
 		return
@@ -26,11 +27,12 @@ func DummySendTransaction(abi abi.ABI, targetNet, to, name string, inputs []inte
 		return
 	}
 
-	resp = json.GetRpcResponseFromJson(respStr)
+	resp = json.GetRPCResponseFromJSON(respStr)
 	return
 }
 
-func DummySendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RpcResponse, err error) {
+// DummySendTransactionWithSign invokes abi.SendTransactionWithSign with dummy of Crypto struct
+func DummySendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RPCResponse, err error) {
 	data, err := abi.Pack(name, inputs...)
 	if err != nil {
 		return
@@ -54,6 +56,6 @@ func DummySendTransactionWithSign(abi abi.ABI, targetNet, to, name string, input
 		return
 	}
 
-	resp = json.GetRpcResponseFromJson(respStr)
+	resp = json.GetRPCResponseFromJSON(respStr)
 	return
 }

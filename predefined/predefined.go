@@ -1,4 +1,4 @@
-// Predefined functions for RPC request
+// Package predefined manages predefined functions for RPC request
 package predefined
 
 import (
@@ -9,14 +9,17 @@ import (
 	"bitbucket.org/coinplugin/proxy/web3"
 )
 
-const Targetnet = rpc.Testnet
+// Targetnet indicates target network
+var Targetnet string
 
-func foo(req json.RpcRequest) (json.RpcResponse, error) {
+// Sample
+func foo(req json.RPCRequest) (json.RPCResponse, error) {
 	fmt.Println("foo")
-	return json.RpcResponse{}, nil
+	return json.RPCResponse{}, nil
 }
 
-func getBalance(req json.RpcRequest) (json.RpcResponse, error) {
+// getBalance is a wrapper to support fromWei for eth_getBalance
+func getBalance(req json.RPCRequest) (json.RPCResponse, error) {
 	// Preprocessing
 	var unit string
 	if len(req.Params) > 2 {
@@ -25,10 +28,10 @@ func getBalance(req json.RpcRequest) (json.RpcResponse, error) {
 	}
 
 	// RPC
-	var resp json.RpcResponse
-	respBody, err := rpc.GetInstance(Targetnet).DoRpc(req)
+	var resp json.RPCResponse
+	respBody, err := rpc.GetInstance(Targetnet).DoRPC(req)
 	if err == nil {
-		resp = json.GetRpcResponseFromJson(respBody)
+		resp = json.GetRPCResponseFromJSON(respBody)
 		// Postprocessing
 		if unit != "" {
 			if val, err := web3.FromWei(resp.Result.(string), unit); err == nil {
@@ -40,17 +43,19 @@ func getBalance(req json.RpcRequest) (json.RpcResponse, error) {
 	return resp, err
 }
 
-func Forward(req json.RpcRequest) (json.RpcResponse, error) {
+// Forward delivers RPCRequest to predefined function and returns that
+func Forward(req json.RPCRequest) (json.RPCResponse, error) {
 	for k, v := range predefinedPaths {
 		if k == req.Method {
-			return v.(func(json.RpcRequest) (json.RpcResponse, error))(req)
+			return v.(func(json.RPCRequest) (json.RPCResponse, error))(req)
 		}
 	}
-	return json.RpcResponse{}, fmt.Errorf("predefined NOT FOUND")
+	return json.RPCResponse{}, fmt.Errorf("predefined NOT FOUND")
 }
 
+// Contains check if given path is in predefined or not
 func Contains(path string) bool {
-	for k, _ := range predefinedPaths {
+	for k := range predefinedPaths {
 		if k == path {
 			return true
 		}

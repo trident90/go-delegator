@@ -1,4 +1,4 @@
-// Smart contract call helper
+// Package abi implements smart contract call helper
 package abi
 
 import (
@@ -17,15 +17,16 @@ import (
 	"github.com/ethereum/go-ethereum/rlp"
 )
 
+// Pack makes packed data with inputs on ABI
 func Pack(abi abi.ABI, name string, args ...interface{}) (string, error) {
 	data, err := abi.Pack(name, args...)
 	if err != nil {
 		return "", err
-	} else {
-		return hexutil.Encode(data), nil
 	}
+	return hexutil.Encode(data), nil
 }
 
+// Unpack fills output into given ABI
 func Unpack(abi abi.ABI, v interface{}, name string, output string) error {
 	var data []byte
 	var err error
@@ -41,7 +42,8 @@ func Unpack(abi abi.ABI, v interface{}, name string, output string) error {
 	return abi.Unpack(v, name, data)
 }
 
-func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}, outputs interface{}) (resp json.RpcResponse, err error) {
+// Call gets contract value with contract address and name
+func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}, outputs interface{}) (resp json.RPCResponse, err error) {
 	data, err := Pack(abi, name, inputs...)
 	if err != nil {
 		return
@@ -53,11 +55,12 @@ func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}, outputs
 		return
 	}
 
-	resp = json.GetRpcResponseFromJson(respStr)
+	resp = json.GetRPCResponseFromJSON(respStr)
 	return
 }
 
-func SendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gas int) (resp json.RpcResponse, err error) {
+// SendTransaction calls smart contract with ABI using eth_sendTransaction
+func SendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gas int) (resp json.RPCResponse, err error) {
 	data, err := Pack(abi, name, inputs...)
 	if err != nil {
 		return
@@ -70,17 +73,19 @@ func SendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface
 		return
 	}
 
-	resp = json.GetRpcResponseFromJson(respStr)
+	resp = json.GetRPCResponseFromJSON(respStr)
 	return
 }
 
-func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RpcResponse, err error) {
+// SendTransactionWithSign calls smart contract with ABI using eth_sendRawTransaction
+func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RPCResponse, err error) {
 	data, err := abi.Pack(name, inputs...)
 	if err != nil {
 		return
 	}
 
 	c := crypto.GetInstance()
+	// TODO: atomic nonce needed about each address
 	tx := types.NewTransaction(0, common.HexToAddress(to), big.NewInt(0), uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
 	tx, err = c.SignTx(tx)
 	if err != nil {
@@ -98,11 +103,12 @@ func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []i
 		return
 	}
 
-	resp = json.GetRpcResponseFromJson(respStr)
+	resp = json.GetRPCResponseFromJSON(respStr)
 	return
 }
 
-func GetAbiFromJson(raw string) (abi.ABI, error) {
+// GetAbiFromJSON returns ABI object from JSON string
+func GetAbiFromJSON(raw string) (abi.ABI, error) {
 	return abi.JSON(strings.NewReader(raw))
 }
 
@@ -115,6 +121,6 @@ func getAbiFromAddress(targetNet, addr string) (abi abi.ABI) {
 		return
 	}
 
-	json.GetRpcResponseFromJson(respStr)
+	json.GetRPCResponseFromJSON(respStr)
 	return
 }
