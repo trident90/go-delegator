@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/crypto"
 	ethjson "bitbucket.org/coinplugin/proxy/json"
 
@@ -24,6 +25,7 @@ type RPC struct {
 	NetType    string
 	NetVersion *big.Int
 	client     *http.Client
+	GasPrice   uint64
 }
 
 const (
@@ -48,6 +50,7 @@ var (
 	httpFailCnt = make(map[string]int)
 	// NetType => available length of IP list
 	availLen = make(map[string]int)
+	zero     = big.NewInt(0)
 )
 
 // GetInstance returns the instance of Rpc
@@ -60,13 +63,10 @@ func GetInstance(_netType string) *RPC {
 		availLen[Testnet] = len(TestnetUrls)
 
 		instance.NetType = _netType
-		netVersion, err := instance.GetChainID()
-		if err == nil {
-			resp := ethjson.GetRPCResponseFromJSON(netVersion)
-			bigInt := new(big.Int)
-			instance.NetVersion, _ = bigInt.SetString(resp.Result.(string), 10)
-			crypto.GetInstance().ChainID = instance.NetVersion
-		}
+		instance.NetVersion = instance.GetChainID()
+		crypto.GetInstance().ChainID = instance.NetVersion
+
+		instance.GasPrice = instance.GetGasPrice()
 	})
 	return instance
 }
@@ -213,9 +213,44 @@ func (r *RPC) GetCode(addr string) (string, error) {
 }
 
 // GetChainID invokes RPC "net_version"
-func (r *RPC) GetChainID() (string, error) {
+func (r *RPC) GetChainID() *big.Int {
 	req := initRPCRequest("net_version")
-	return r.DoRPC(req)
+	if netVersion, err := r.DoRPC(req); err == nil {
+		resp := ethjson.GetRPCResponseFromJSON(netVersion)
+		offset, base := common.FindOffsetNBase(resp.Result.(string))
+		if chainID, ok := zero.SetString(resp.Result.(string)[offset:], base); ok {
+			return chainID
+		}
+	}
+	return nil
+}
+
+// GetGasPrice invokes RPC "eth_gasPrice"
+func (r *RPC) GetGasPrice() uint64 {
+	req := initRPCRequest("eth_gasPrice")
+	if gasPrice, err := r.DoRPC(req); err == nil {
+		resp := ethjson.GetRPCResponseFromJSON(gasPrice)
+		offset, base := common.FindOffsetNBase(resp.Result.(string))
+		if uint64GasPrice, ok := zero.SetString(resp.Result.(string)[offset:], base); ok {
+			return uint64GasPrice.Uint64()
+		}
+	}
+	return 0
+}
+
+// GetTransactionCount invokes RPC "eth_getTransactionCount"
+func (r *RPC) GetTransactionCount(addr string) uint64 {
+	req := initRPCRequest("eth_getTransactionCount")
+	req.Params = append(req.Params, addr)
+	req.Params = append(req.Params, "latest")
+	if retStr, txCntErr := r.DoRPC(req); txCntErr == nil {
+		resp := ethjson.GetRPCResponseFromJSON(retStr)
+		offset, base := common.FindOffsetNBase(resp.Result.(string))
+		if txNonce, ok := zero.SetString(resp.Result.(string)[offset:], base); ok {
+			return txNonce.Uint64()
+		}
+	}
+	return 0
 }
 
 // SendTransaction invokes RPC "eth_sendTransaction"

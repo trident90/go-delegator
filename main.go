@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	_ "bitbucket.org/coinplugin/proxy/crypto"
+	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/predefined"
 	"bitbucket.org/coinplugin/proxy/rpc"
@@ -48,9 +48,12 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	if err != nil {
 		// In case of server-side RPC fail
 		fmt.Println(err.Error())
-		resp.Error.Message = err.Error()
+		resp.Error = &json.RPCError{
+			Code:    -1,
+			Message: err.Error(),
+		}
 		retCode = 400
-	} else if resp.Error.Code != 0 {
+	} else if resp.Error != nil && resp.Error.Code != 0 {
 		// In case of ether-node-side RPC fail
 		retCode = 400
 	}
@@ -59,5 +62,6 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 func main() {
 	predefined.Targetnet = Targetnet
+	crypto.GetInstance()
 	lambda.Start(Handler)
 }

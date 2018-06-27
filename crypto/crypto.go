@@ -4,16 +4,20 @@ package crypto
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/ecdsa"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/big"
+	"os"
 	"sync"
 
 	"bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/db"
 
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ethcommon "github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -22,12 +26,11 @@ import (
 
 // Crypto manager
 type Crypto struct {
-	secretKey string
-	nonce     string
-	privKey   string
-	Address   string
-	ChainID   *big.Int
-	signer    types.Signer
+	privKey *ecdsa.PrivateKey
+	Address string
+	ChainID *big.Int
+	Txnonce uint64
+	signer  types.Signer
 }
 
 // For singleton
@@ -39,32 +42,68 @@ const (
 	DbSecretKeyPropName = "secret_key"
 	// DbNoncePropName is DB column name about nonce
 	DbNoncePropName = "nonce"
-	// DbPrivKeyPropName is DB column name about private key
-	DbPrivKeyPropName = "priv_key"
+	// DbKeyJSONPropName is DB column name about key json
+	DbKeyJSONPropName = "key_json"
+	// Passphrase means passphrase used to decrypt keystore
+	Passphrase = "passphrase"
+	// Path means a location of keyjson in file system
+	Path = "key_path"
 )
 
 // GetInstance returns pointer of Crypto instance
 // Because DB operations are needed for Crypto initiation,
 // Crypto is designed as singleton to reduce the number of DB operation units used
 func GetInstance() *Crypto {
+	if os.Getenv(Path) == "" && os.Getenv(Passphrase) == "" {
+		return instance
+	}
+
 	once.Do(func() {
-		dbSecretKey := getConfigFromDB(DbSecretKeyPropName)
-		dbNonce := getConfigFromDB(DbNoncePropName)
-		dbPrivKey := getConfigFromDB(DbPrivKeyPropName)
-
-		var nPrivKey string
-		if dbSecretKey != "" && dbNonce != "" && dbPrivKey != "" {
-			bNonce, _ := hex.DecodeString(dbNonce)
-			nPrivKey = DecryptAes(dbPrivKey, dbSecretKey, bNonce)
+		var privkey *ecdsa.PrivateKey
+		var addr string
+		if os.Getenv(Path) == "" {
+			privkey, addr = getPrivateKeyFromDB(os.Getenv(Passphrase))
+		} else {
+			privkey, addr = getPrivateKeyFromFile(os.Getenv(Path), os.Getenv(Passphrase))
 		}
-
+		//fmt.Printf("privkey %s, addr: %s\n", hex.EncodeToString(crypto.FromECDSA(privkey)), addr)
 		instance = &Crypto{
-			secretKey: dbSecretKey,
-			nonce:     dbNonce,
-			privKey:   nPrivKey,
+			privKey: privkey,
+			Address: addr,
 		}
 	})
 	return instance
+}
+
+// getPrivateKeyFromDB returns private key and address from DB
+func getPrivateKeyFromDB(passphrase string) (privkey *ecdsa.PrivateKey, addr string) {
+	dbSecretKey := getConfigFromDB(DbSecretKeyPropName)
+	dbNonce := getConfigFromDB(DbNoncePropName)
+	dbKeyJSON := getConfigFromDB(DbKeyJSONPropName)
+	if dbSecretKey == "" || dbNonce == "" || dbKeyJSON == "" {
+		return
+	}
+
+	bNonce, _ := hex.DecodeString(dbNonce)
+	keyjson := DecryptAes(dbKeyJSON, dbSecretKey, bNonce)
+	key, err := keystore.DecryptKey([]byte(keyjson), passphrase)
+	if err != nil {
+		return
+	}
+	return key.PrivateKey, key.Address.String()
+}
+
+// getPrivateKeyFromFile returns private key and address from file
+func getPrivateKeyFromFile(filepath, passphrase string) (privkey *ecdsa.PrivateKey, addr string) {
+	keyjson, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return
+	}
+	key, err := keystore.DecryptKey(keyjson, passphrase)
+	if err != nil {
+		return
+	}
+	return key.PrivateKey, key.Address.String()
 }
 
 // Sign returns signed message using own private key
@@ -77,7 +116,8 @@ func (c *Crypto) Sign(msg string) string {
 
 	ret := hexutil.Encode(sig)
 	if c.Address == "" {
-		c.Address, _ = EcRecover(msg, ret)
+		c.Address, _ = EcRecover(hexutil.Encode(crypto.Keccak256([]byte(msg))), ret)
+		fmt.Printf("Crypto address is set to %s\n", c.Address)
 	}
 	return ret
 }
@@ -91,8 +131,7 @@ func (c *Crypto) SignTx(tx *types.Transaction) (*types.Transaction, error) {
 	} else {
 		c.signer = types.HomesteadSigner{}
 	}
-	privKey, _ := crypto.HexToECDSA(c.privKey)
-	signedTx, err := types.SignTx(tx, c.signer, privKey)
+	signedTx, err := types.SignTx(tx, c.signer, c.privKey)
 	if err != nil {
 		return nil, fmt.Errorf("tx or private key is not appropriate")
 	}
@@ -100,10 +139,9 @@ func (c *Crypto) SignTx(tx *types.Transaction) (*types.Transaction, error) {
 }
 
 // Sign returns signed message using given private key
-func Sign(msg, privKey string) ([]byte, error) {
-	key, _ := crypto.HexToECDSA(privKey)
+func Sign(msg string, privKey *ecdsa.PrivateKey) ([]byte, error) {
 	bMsg := crypto.Keccak256([]byte(msg))
-	return crypto.Sign(signHash(bMsg), key)
+	return crypto.Sign(signHash(bMsg), privKey)
 }
 
 // getConfigFromDB returns value string matching given key at config table
