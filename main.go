@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
@@ -18,10 +21,46 @@ const (
 	ParamFuncName = "func"
 	// Targetnet indicates target network
 	Targetnet = rpc.Testnet
+	// IsAwsLambda decides if served as AWS lambda or not
+	IsAwsLambda = "AWS_LAMBDA"
 )
 
-// Handler handles APIGatewayProxyRequest as JSON-RPC request
-func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+var exitChan = make(chan int)
+
+func handler(req json.RPCRequest) (body string, statusCode int) {
+	var resp json.RPCResponse
+	var err error
+	if predefined.Contains(req.Method) {
+		// Forward RPC request to predefined function
+		resp, err = predefined.Forward(req)
+	} else {
+		// Forward RPC request to Ether node
+		var respBody string
+		if respBody, err = rpc.GetInstance(Targetnet).DoRPC(req); err == nil {
+			// Relay a response from the node
+			resp = json.GetRPCResponseFromJSON(respBody)
+		}
+	}
+
+	statusCode = 200
+	if err != nil {
+		// In case of server-side RPC fail
+		fmt.Println(err.Error())
+		resp.Error = &json.RPCError{
+			Code:    -1,
+			Message: err.Error(),
+		}
+		statusCode = 400
+	} else if resp.Error != nil && resp.Error.Code != 0 {
+		// In case of ether-node-side RPC fail
+		statusCode = 400
+	}
+	body = resp.String()
+	return
+}
+
+// lambdaHandler handles APIGatewayProxyRequest as JSON-RPC request
+func lambdaHandler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	// Validate RPC request
 	req := json.GetRPCRequestFromJSON(request.Body)
 	if method := request.QueryStringParameters[ParamFuncName]; method != "" {
@@ -30,38 +69,37 @@ func Handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		req.Method = method
 	}
 
-	var resp json.RPCResponse
-	var err error
-	if predefined.Contains(req.Method) {
-		// Forward RPC request to predefined function
-		resp, err = predefined.Forward(req)
-	} else {
-		// Forward RPC request to Ether node
-		respBody, err := rpc.GetInstance(Targetnet).DoRPC(req)
-		if err == nil {
-			// Relay a response from the node
-			resp = json.GetRPCResponseFromJSON(respBody)
-		}
+	respBody, statusCode := handler(req)
+	return events.APIGatewayProxyResponse{Body: respBody, StatusCode: statusCode}, nil
+}
+
+// httpHandler handles http.Request as JSON-RPC request
+func httpHandler(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
-	retCode := 200
-	if err != nil {
-		// In case of server-side RPC fail
-		fmt.Println(err.Error())
-		resp.Error = &json.RPCError{
-			Code:    -1,
-			Message: err.Error(),
-		}
-		retCode = 400
-	} else if resp.Error != nil && resp.Error.Code != 0 {
-		// In case of ether-node-side RPC fail
-		retCode = 400
-	}
-	return events.APIGatewayProxyResponse{Body: resp.String(), StatusCode: retCode}, nil
+	req := json.GetRPCRequestFromJSON(string(b))
+	respBody, statusCode := handler(req)
+	w.WriteHeader(statusCode)
+	w.Write([]byte(respBody))
 }
 
 func main() {
 	predefined.Targetnet = Targetnet
 	crypto.GetInstance()
-	lambda.Start(Handler)
+
+	if os.Getenv(IsAwsLambda) != "" {
+		fmt.Println("Ready to start Lambda")
+		lambda.Start(lambdaHandler)
+	} else {
+		fmt.Println("Ready to start HTTP/HTTPS")
+		http.HandleFunc("/", httpHandler)
+		go http.ListenAndServe(":8545", nil)
+		// go http.ListenAndServeTLS()
+		<-exitChan
+	}
 }
