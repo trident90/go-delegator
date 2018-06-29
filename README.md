@@ -1,4 +1,4 @@
-# Metadium Proxy on AWS Lambda
+# Metadium Proxy
 Main functions are MetaID registration/update/recover and relaying JSON-RPC result with metadium node.
 
 In addition, this project try porting web3 to Golang.
@@ -23,7 +23,7 @@ Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 2. Docker
     - Install at https://docs.docker.com/install
 3. xgo
-    - because of C compile in go-ethereum, we need improved cross-compiler
+    - because of compilation for C code used in go-ethereum, we need improved cross-compiler
     
 ```shell
 docker pull karalabe/xgo-latest
