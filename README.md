@@ -33,10 +33,13 @@ go get github.com/karalabe/xgo
 # Build
 1. Move to root directory of this repo
 2. Build on your preference
+
   - In case of Lambda that is cross-compile,
 `make` or `make lambda`
+
   - In case of Lambda with remote branch,
 `make branch=master remote`
+
   - In case of compile for local machine,
 `make local`
 
