@@ -1,27 +1,20 @@
 package identitymanager
 
 import (
-	"crypto/ecdsa"
 	"fmt"
 	"log"
 	"math/big"
 	"sync"
 
-	"bitbucket.org/coinplugin/geth/crypto"
-	"bitbucket.org/coinplugin/proxy/sc/nameservice"
+	"bitbucket.org/coinplugin/proxy/crypto"
+	"bitbucket.org/coinplugin/proxy/predefined/sc/nameservice"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
+	//	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
-
-func getPrivateKey() *ecdsa.PrivateKey {
-	privKey := "01b149603ca8f537bbb4e45d22e77df9054e50d826bb5f0a34e9ce460432b596"
-	key, _ := crypto.HexToECDSA(privKey)
-	return key
-
-}
 
 var once sync.Once
 var session *IdentitymanagerSession
@@ -29,7 +22,8 @@ var session *IdentitymanagerSession
 func getSession() (*IdentitymanagerSession, error) {
 	once.Do(func() {
 		service, err := getIMService()
-		auth := bind.NewKeyedTransactor(getPrivateKey())
+		//auth := bind.NewKeyedTransactor(getPrivateKey())
+		auth := crypto.GetTransactionOpts()
 		auth.Value = big.NewInt(0)
 		auth.GasLimit = uint64(300000)
 		if err != nil {
@@ -80,7 +74,9 @@ func getIMService() (*Identitymanager, error) {
 	//	}
 
 }
-func GetOwnerAddress(metaID hexutil.Bytes) (*common.Address, error) {
+
+//CallOwnerOf ownerOf function call
+func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 
 	service, err := getIMService()
 
@@ -93,16 +89,17 @@ func GetOwnerAddress(metaID hexutil.Bytes) (*common.Address, error) {
 
 	result, err := service.OwnerOf(&bind.CallOpts{}, tmpBigInt)
 	if err != nil {
+		if err.Error() == "abi: unmarshalling empty output" {
+			return nil, nil
+		}
 		log.Fatal(err)
+		return nil, err
 	}
 	fmt.Printf("Onwer Address: %x \n", result)
 	return &result, nil
 }
 
-// func (_Identitymanager *IdentitymanagerTransactor) CreateMetaID(opts *bind.TransactOpts, _metaID [32]byte, _sig []byte, _metaPackage []byte) (*types.Transaction, error) {
-// 	return _Identitymanager.contract.Transact(opts, "createMetaID", _metaID, _sig, _metaPackage)
-// }
-
+//CallCreateMetaID createMetaID function call
 func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
 	var metaPack metaPackage
 	metaPack = &metaPackageV1{
@@ -110,7 +107,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 		UserSenderAddress: userAddress,
 	}
 	pack := metaPack.Serialize()
-
+	fmt.Printf("Pack : %x", pack)
 	session, err := getSession()
 
 	if err != nil {
@@ -120,6 +117,61 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 	var id [32]byte
 	copy(id[:], metaID)
 	result, err := session.CreateMetaID(id, sig, pack)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return result, nil
+}
+
+//CallUpdateMetaID  updateMetaID function call of IentityManager Smart Contract
+func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+
+	var metaPack metaPackage
+	metaPack = &metaPackageV1{
+		Version:           1,
+		UserSenderAddress: userAddress,
+	}
+	pack := metaPack.Serialize()
+	fmt.Printf("Pack : %x", pack)
+	session, err := getSession()
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	var oldID, newID [32]byte
+	copy(oldID[:], oldMetaID)
+	copy(newID[:], newMetaID)
+	result, err := session.UpdateMetaID(oldID, newID, sig, pack)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return result, nil
+}
+
+// CallDeleteMetaID is delete MetaID
+// TODO: timestamp 파라메터 추가 필요 (Smart contract 수정/반영후, 조치 예정 )
+func CallDeleteMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+
+	var metaPack metaPackage
+	metaPack = &metaPackageV1{
+		Version:           1,
+		UserSenderAddress: userAddress,
+	}
+	pack := metaPack.Serialize()
+	fmt.Printf("Pack : %x", pack)
+	session, err := getSession()
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	var id [32]byte
+	copy(id[:], metaID)
+
+	result, err := session.DeleteMetaID(id, sig, pack)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -145,4 +197,26 @@ func (t *metaPackageV1) Serialize() []byte {
 	copy(bytes[53:85], t.Status[:])
 
 	return bytes[:]
+}
+
+//CallEcverify Ecverify function call
+func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) (bool, error) {
+
+	service, err := getIMService()
+
+	if err != nil {
+		log.Fatal(err)
+		return false, err
+	}
+	var msgBytes [32]byte
+	copy(msgBytes[:], msg)
+
+	result, err1 := service.Ecverify(&bind.CallOpts{}, msgBytes, sig, address)
+
+	if err1 != nil {
+		log.Fatal(err1)
+		return false, err1
+	}
+	fmt.Printf("Ecverfiy: %v \n", result)
+	return result, nil
 }
