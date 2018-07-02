@@ -78,8 +78,8 @@ func TestGetPrivKeyFromString(t *testing.T) {
 
 func TestGetDummy(t *testing.T) {
 	c := GetDummy()
-	if c.Address == "" {
-		t.Errorf("Failed to ecrecover in dummy")
+	if c.GetAddress() == "" {
+		t.Fatalf("Failed to ecrecover in dummy")
 	}
 }
 func TestDeriveShaFromBytes(t *testing.T) {
@@ -150,11 +150,11 @@ func TestSign(t *testing.T) {
 	msg := "test"
 	sig, err := Sign(msg, key)
 	if err != nil {
-		t.Errorf("Failed to sign %s", err)
+		t.Fatalf("Failed to sign %s", err)
 	}
 	addr, ecErr := EcRecover(hexutil.Encode(crypto.Keccak256([]byte(msg))), hexutil.Encode(sig))
 	if ecErr != nil {
-		t.Errorf("Failed to sign, ecrecover error %s", ecErr)
+		t.Fatalf("Failed to sign, ecrecover error %s", ecErr)
 	} else if addr != testaddr2 {
 		t.Errorf("Failed to sign, ecrecover mismatch have(%s) want(%s)", addr, testaddr2)
 	}

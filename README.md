@@ -1,4 +1,4 @@
-# Metadium Proxy on AWS Lambda
+# Metadium Proxy
 Main functions are MetaID registration/update/recover and relaying JSON-RPC result with metadium node.
 
 In addition, this project try porting web3 to Golang.
@@ -23,7 +23,7 @@ Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 2. Docker
     - Install at https://docs.docker.com/install
 3. xgo
-    - because of C compile in go-ethereum, we need improved cross-compiler
+    - because of compilation for C code used in go-ethereum, we need improved cross-compiler
     
 ```shell
 docker pull karalabe/xgo-latest
@@ -31,10 +31,17 @@ go get github.com/karalabe/xgo
 ```
 
 # Build
-```shell
-cd $GOPATH/src/{repo start with bitbucket.org}
-make
-```
+1. Move to root directory of this repo
+2. Build on your preference
+
+  - In case of Lambda that is cross-compile,
+`make` or `make lambda`
+
+  - In case of Lambda with remote branch,
+`make branch=master remote`
+
+  - In case of compile for local machine,
+`make local`
 
 # Test
 1. Move each module directory such as json, rpc and so on
@@ -43,7 +50,7 @@ make
     go test -v
     ```
 
-# Deploy
+# Deploy (for AWS Lambda)
 1. Set Lambda on AWS
     - Function package: compressed binary file in $GOPATH/src/{repo}/bin
     - Handler: proxy (binary file name, it is optional)
@@ -71,7 +78,7 @@ make
 
 [4] IPFS API, https://github.com/ipfs/go-ipfs-api
 
-[5] Cross compliling for ethereum, https://github.com/ethereum/go-ethereum/wiki/Cross-compiling-Ethereum
+[5] Cross compiling for ethereum, https://github.com/ethereum/go-ethereum/wiki/Cross-compiling-Ethereum
 
 [6] Xgo, https://github.com/karalabe/xgo
 

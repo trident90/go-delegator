@@ -11,6 +11,20 @@ import (
 )
 
 func TestEthClient(t *testing.T) {
+	NetType = Testnet
+	r := GetInstance()
+	client := r.GetEthClient()
+	if client == nil {
+		t.Errorf("Failed to GetEthClient")
+	}
+
+	_, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		t.Fatalf("%s", err)
+	}
+}
+
+func TestEthClientRaw(t *testing.T) {
 	//client, err := ethclient.Dial("https://rinkeby.infura.io")
 	client, err := ethclient.Dial(TestnetUrls[0])
 	if err != nil {
@@ -40,7 +54,8 @@ func BenchmarkEthClient(b *testing.B) {
 }
 
 func BenchmarkHttpClient(b *testing.B) {
-	r := GetInstance(Testnet)
+	NetType = Testnet
+	r := GetInstance()
 	req := json.RPCRequest{
 		Jsonrpc: "2.0",
 		ID:      1,
@@ -60,7 +75,8 @@ func BenchmarkHttpClient(b *testing.B) {
 }
 
 func TestRefreshUrlList(t *testing.T) {
-	r := GetInstance(Testnet)
+	NetType = Testnet
+	r := GetInstance()
 	initLen := len(TestnetUrls)
 	target := TestnetUrls[0]
 	for i := 0; i < 30; i++ {
@@ -72,7 +88,8 @@ func TestRefreshUrlList(t *testing.T) {
 }
 
 func TestCall(t *testing.T) {
-	r := GetInstance(Testnet)
+	NetType = Testnet
+	r := GetInstance()
 	if _, err := r.Call("0x11", "0x123"); err != nil {
 		t.Errorf("Failed to RPC Call")
 	}
@@ -81,7 +98,8 @@ func TestCall(t *testing.T) {
 func TestRpc(t *testing.T) {
 	testMsg := "{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[\"a\",1],\"id\":100}"
 
-	r := GetInstance(Testnet)
+	NetType = Testnet
+	r := GetInstance()
 	// Test with string param
 	if _, err := r.DoRPC(testMsg); err != nil {
 		t.Errorf("Failed to RPC with string: %s", err)
@@ -97,7 +115,8 @@ func TestRpc(t *testing.T) {
 func BenchmarkRpc(b *testing.B) {
 	testMsg := "{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[\"a\",1],\"id\":100}"
 
-	r := GetInstance(Testnet)
+	NetType = Testnet
+	r := GetInstance()
 	for i := 0; i < b.N; i++ {
 		r.DoRPC(testMsg)
 	}
