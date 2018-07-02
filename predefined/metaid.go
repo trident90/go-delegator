@@ -1,14 +1,15 @@
 package predefined
 
 import (
+	"bytes"
 	encodingJson "encoding/json"
 	"fmt"
 	"strings"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
-	"bitbucket.org/coinplugin/proxy/metaid/identitymanager"
 	"bitbucket.org/coinplugin/proxy/predefined/merkletree"
+	"bitbucket.org/coinplugin/proxy/predefined/sc/identitymanager"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -84,13 +85,13 @@ func (p *metaIDRegisterParams) validate() Error {
 	}
 	if len(p.UserHashs) < minimumUserHashSize {
 		return &invalidParamsError{fmt.Sprintf("Invalid user_hash_list parameter  %v", len(p.UserHashs))}
-	} else {
-		for _, hash := range p.UserHashs {
-			if len(hash) != hashSize {
-				return &invalidParamsError{fmt.Sprintf("Invalid user_hash_list parameter element  %v", len(p.MetaID))}
-			}
+	}
+	for _, hash := range p.UserHashs {
+		if len(hash) != hashSize {
+			return &invalidParamsError{fmt.Sprintf("Invalid user_hash_list parameter element  %v", len(p.MetaID))}
 		}
 	}
+
 	return nil
 }
 
@@ -109,13 +110,13 @@ func (p *metaIDUpdateParams) validate() Error {
 	}
 	if len(p.UserHashs) < minimumUserHashSize {
 		return &invalidParamsError{"Invalid user_hash_list parameter."}
-	} else {
-		for _, hash := range p.UserHashs {
-			if len(hash) != hashSize {
-				return &invalidParamsError{"Invalid user_hash_list parameter element."}
-			}
+	}
+	for _, hash := range p.UserHashs {
+		if len(hash) != hashSize {
+			return &invalidParamsError{"Invalid user_hash_list parameter element."}
 		}
 	}
+
 	return nil
 }
 
@@ -169,13 +170,13 @@ func (p *metaIDRestoreParams) validate() Error {
 
 	if len(p.UserHashs) < minimumUserHashSize {
 		return &invalidParamsError{"Invalid user_hash_list parameter."}
-	} else {
-		for _, hash := range p.UserHashs {
-			if len(hash) != hashSize {
-				return &invalidParamsError{"Invalid user_hash_list parameter element."}
-			}
+	}
+	for _, hash := range p.UserHashs {
+		if len(hash) != hashSize {
+			return &invalidParamsError{"Invalid user_hash_list parameter element."}
 		}
 	}
+
 	return nil
 }
 
@@ -342,10 +343,11 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 		err = fmt.Errorf(errObj.Error())
 		return
 	}
+	checkAddress := common.HexToAddress(signedAddress)
+	fmt.Println("Address :", checkAddress)
 
-	fmt.Println("Address :", signedAddress)
-
-	if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	if checkAddress.String() != reqParam.Address.String() {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -400,14 +402,22 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 		}
 		err = fmt.Errorf(errObj.Error())
 		return
-	} else {
-		fmt.Printf("MetaID valid : %v \n", reqParam.MetaID)
 	}
+
+	fmt.Printf("MetaID valid : %v \n", reqParam.MetaID)
 
 	//4. Reqest Get UserAddress for Meta ID
 	//  if GetAddress == nil  then Pass  else Error
 	address := &common.Address{}
-	address, err = identitymanager.GetOwnerAddress(reqParam.MetaID)
+	address, err = identitymanager.CallOwnerOf(reqParam.MetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+	}
 	if address != nil {
 
 		errObj := &alreadyExistsError{"Cannot register Meta ID"}
@@ -420,8 +430,20 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	}
 
 	//5. Send Transaction for Calling SC Function [createNewMetaID]
-
+	//identitymanager.CallCreateMetaID()
 	//  return txid
+
+	trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+	}
+
+	resp.Result = trx.Hash().String()
 	return
 }
 
@@ -503,13 +525,42 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 		}
 		err = fmt.Errorf(errObj.Error())
 		return
-	} else {
-		fmt.Printf("MetaID valid : %v \n", reqParam.NewMetaID)
 	}
+
+	fmt.Printf("MetaID valid : %v \n", reqParam.NewMetaID)
+
 	//4. Reqest Get UserAddress for New Meta ID
 	//  if GetAddress ==  reqParam.Address   then pass
 	//  else Error
+	findAddress := &common.Address{}
+	findAddress, err = identitymanager.CallOwnerOf(reqParam.OldMetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
 
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+	}
+	if findAddress == nil {
+
+		errObj := &notExistsError{"Cannot Update Meta ID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		err = fmt.Errorf(errObj.Error())
+		return
+	}
+	if !bytes.Equal(findAddress.Bytes(), reqParam.Address.Bytes()) {
+		errObj := &invalidAddressError{"Cannot find valid user Address"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		err = fmt.Errorf(errObj.Error())
+		return
+	}
 	//5. Send Transaction for Calling SC Function[ updateMetaID ]
 	//  return txid
 	return
@@ -676,15 +727,17 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-// Content For metaID
+// HashContent Content For metaID
 type HashContent struct {
 	h hexutil.Bytes
 }
 
+// CalculateHash function to calculate hash
 func (t HashContent) CalculateHash() []byte {
 	return t.h
 }
 
+// Equals function to compare other Content
 func (t HashContent) Equals(other merkletree.Content) bool {
 	return t.h.String() == other.(HashContent).h.String()
 }
