@@ -1,23 +1,34 @@
 package main
 
 import (
+	"flag"
+	"os"
 	"testing"
 
+	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
 
 	"github.com/aws/aws-lambda-go/events"
 )
 
-func TestHandler(t *testing.T) {
-	req := json.RpcRequest{
+func TestMain(t *testing.T) {
+	os.Setenv(crypto.Passphrase, "")
+	os.Setenv(crypto.Path, "crypto/test/testkey")
+	os.Setenv(IsAwsLambda, "")
+	flag.Parse()
+	main()
+}
+
+func TestLambdaHandler(t *testing.T) {
+	req := json.RPCRequest{
 		Jsonrpc: "2.0",
 		Method:  "eth_getBalance",
-		Id:      1,
+		ID:      1,
 	}
 	req.Params = append(req.Params, "0xeeaf5f87cb85433a0db0fc31863b21d1c8279f7d")
 	req.Params = append(req.Params, "latest")
 	req.Params = append(req.Params, "ether")
-	resp, err := Handler(nil, events.APIGatewayProxyRequest{
+	resp, err := lambdaHandler(nil, events.APIGatewayProxyRequest{
 		Body: req.String(),
 	})
 	if resp.Body == "" || err != nil {

@@ -2,16 +2,17 @@ package crypto
 
 import (
 	"math/big"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 // GetDummy returns dummy Crypto instance for test
 func GetDummy() *Crypto {
+	privKey, _ := crypto.HexToECDSA("25c317c8d0a63c122073ae52984e8477e7fbc322c93a9457c5579ee6e5a813b3")
 	instance := &Crypto{
-		secretKey: "dummysecret",
-		nonce:     "dummynonce",
-		privKey:   "289c2857d4598e37fb9647507e47a309d6133539bf21a8b9cb6df88fd5232032",
-		ChainID:   big.NewInt(127),
+		privKey: privKey,
+		ChainID: big.NewInt(127),
+		Address: "0xed56062123b0301a9a642f85f2711581bec8d79d",
 	}
-	instance.Sign("0xabcdef")
 	return instance
 }
