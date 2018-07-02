@@ -7,9 +7,9 @@ import (
 	"sync"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
+	"bitbucket.org/coinplugin/proxy/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var nsAddress = common.HexToAddress("0xe06dbbcb9af642017012d5021d586536673b955f")
@@ -43,21 +43,10 @@ func getSession() (*NameserviceSession, error) {
 	return session, nil
 }
 
-func getMetaClient() (*ethclient.Client, error) {
-	client, err := ethclient.Dial("http://13.125.247.228:8545")
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
-// var nsService *Nameservice
 func getNSService() (*Nameservice, error) {
+	_rpc := rpc.GetInstance()
+	client := _rpc.GetEthClient()
 
-	client, err := getMetaClient()
-	if err != nil {
-		return nil, err
-	}
 	instance, err := NewNameservice(nsAddress, client)
 	if err != nil {
 		return nil, err

@@ -8,12 +8,12 @@ import (
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/predefined/sc/nameservice"
+	"bitbucket.org/coinplugin/proxy/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	//	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 var once sync.Once
@@ -45,24 +45,11 @@ func getSession() (*IdentitymanagerSession, error) {
 	return session, nil
 }
 
-func getMetaClient() (*ethclient.Client, error) {
-	//	if metaClient == nil {
-	client, err := ethclient.Dial("http://13.125.247.228:8545")
-	if err != nil {
-		return nil, err
-	}
-	//		metaClient = client
-	//	}
-	return client, nil
-}
-
 // var nsService *Nameservice
 func getIMService() (*Identitymanager, error) {
-	// if nsService == nil {
-	client, err := getMetaClient()
-	if err != nil {
-		return nil, err
-	}
+
+	_rpc := rpc.GetInstance()
+	client := _rpc.GetEthClient()
 
 	imAddress, err := nameservice.GetIMContractAddress()
 	instance, err := NewIdentitymanager(*imAddress, client)
