@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-var nsAddress = common.HexToAddress("0xe06dbbcb9af642017012d5021d586536673b955f")
+var nsAddress = common.HexToAddress("0xb2cdd687dc0805f003a7020765886db5136b0db7")
 
 var once sync.Once
 var session *NameserviceSession

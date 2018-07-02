@@ -10,9 +10,9 @@ import (
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/predefined/merkletree"
 	"bitbucket.org/coinplugin/proxy/predefined/sc/identitymanager"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 const (
@@ -433,16 +433,37 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	//identitymanager.CallCreateMetaID()
 	//  return txid
 
-	trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
-	if err != nil {
-		errObj := &internalError{err.Error()}
+	// trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
+	// if err != nil {
+	// 	errObj := &internalError{err.Error()}
+
+	// 	resp.Error = &json.RPCError{
+	// 		Code:    errObj.ErrorCode(),
+	// 		Message: errObj.Error(),
+	// 	}
+	// }
+
+	// resp.Result = trx.Hash().String()
+	var trx *types.Transaction
+	tx := func(nonce uint64) error {
+		var err error
+		trx, err = identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address, nonce)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
+
+	if !res {
+		errObj := &internalError{"call function Error - CreateMetaID"}
 
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
 	}
-
 	resp.Result = trx.Hash().String()
 	return
 }

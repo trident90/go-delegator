@@ -17,46 +17,70 @@ import (
 )
 
 var once sync.Once
-var session *IdentitymanagerSession
 
-func getSession() (*IdentitymanagerSession, error) {
+// var session *IdentitymanagerSession
+var instance *Identitymanager
+
+// func getSession() (*IdentitymanagerSession, error) {
+// 	once.Do(func() {
+// 		service, err := getIMService()
+// 		//auth := bind.NewKeyedTransactor(getPrivateKey())
+// 		auth := crypto.GetTransactionOpts()
+// 		auth.Value = big.NewInt(0)
+// 		auth.GasLimit = uint64(300000)
+// 		if err != nil {
+// 			log.Fatal(err)
+// 			return
+// 		}
+// 		session = &IdentitymanagerSession{
+// 			Contract: service,
+// 			CallOpts: bind.CallOpts{
+// 				Pending: true,
+// 			},
+// 			TransactOpts: *auth,
+// 		}
+// 	})
+// 	if session == nil {
+// 		err := fmt.Errorf("Cannot make session for IdentityManager")
+// 		return nil, err
+// 	}
+// 	return session, nil
+// }
+// func getIMService() (*Identitymanager, error) {
+
+// 	_rpc := rpc.GetInstance()
+// 	client := _rpc.GetEthClient()
+
+// 	imAddress, err := nameservice.GetIMContractAddress()
+// 	service, err := NewIdentitymanager(*imAddress, client)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return service, nil
+
+// }
+
+func getService() (*Identitymanager, error) {
 	once.Do(func() {
-		service, err := getIMService()
-		//auth := bind.NewKeyedTransactor(getPrivateKey())
-		auth := crypto.GetTransactionOpts()
-		auth.Value = big.NewInt(0)
-		auth.GasLimit = uint64(300000)
+		_rpc := rpc.GetInstance()
+		client := _rpc.GetEthClient()
+		//var err error
+		imAddress, err := nameservice.GetIMContractAddress()
 		if err != nil {
 			log.Fatal(err)
 			return
 		}
-		session = &IdentitymanagerSession{
-			Contract: service,
-			CallOpts: bind.CallOpts{
-				Pending: true,
-			},
-			TransactOpts: *auth,
+		instance, err = NewIdentitymanager(*imAddress, client)
+		if err != nil {
+			log.Fatal(err)
+			return
 		}
 	})
-	if session == nil {
-		err := fmt.Errorf("Cannot make session for IdentityManager")
+
+	if instance == nil {
+		err := fmt.Errorf("Cannot make service for IdentityManager")
 		return nil, err
 	}
-	return session, nil
-}
-
-// var nsService *Nameservice
-func getIMService() (*Identitymanager, error) {
-
-	_rpc := rpc.GetInstance()
-	client := _rpc.GetEthClient()
-
-	imAddress, err := nameservice.GetIMContractAddress()
-	instance, err := NewIdentitymanager(*imAddress, client)
-	if err != nil {
-		return nil, err
-	}
-	//	} else {
 	return instance, nil
 	//	}
 
@@ -65,7 +89,7 @@ func getIMService() (*Identitymanager, error) {
 //CallOwnerOf ownerOf function call
 func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 
-	service, err := getIMService()
+	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)
@@ -87,7 +111,7 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 }
 
 //CallCreateMetaID createMetaID function call
-func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address, nonce uint64) (*types.Transaction, error) {
 	var metaPack metaPackage
 	metaPack = &metaPackageV1{
 		Version:           1,
@@ -95,15 +119,19 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 	}
 	pack := metaPack.Serialize()
 	fmt.Printf("Pack : %x", pack)
-	session, err := getSession()
+	service, err := getService()
+	//session, err := getSession()
 
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
+	auth := crypto.GetTransactionOpts()
+	auth.Nonce = big.NewInt(int64(nonce))
+
 	var id [32]byte
 	copy(id[:], metaID)
-	result, err := session.CreateMetaID(id, sig, pack)
+	result, err := service.CreateMetaID(auth, id, sig, pack)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -112,7 +140,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 }
 
 //CallUpdateMetaID  updateMetaID function call of IentityManager Smart Contract
-func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address, nonce uint64) (*types.Transaction, error) {
 
 	var metaPack metaPackage
 	metaPack = &metaPackageV1{
@@ -121,16 +149,18 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 	}
 	pack := metaPack.Serialize()
 	fmt.Printf("Pack : %x", pack)
-	session, err := getSession()
+	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
+	auth := crypto.GetTransactionOpts()
+	auth.Nonce = big.NewInt(int64(nonce))
 	var oldID, newID [32]byte
 	copy(oldID[:], oldMetaID)
 	copy(newID[:], newMetaID)
-	result, err := session.UpdateMetaID(oldID, newID, sig, pack)
+	result, err := service.UpdateMetaID(auth, oldID, newID, sig, pack)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -140,7 +170,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 
 // CallDeleteMetaID is delete MetaID
 // TODO: timestamp 파라메터 추가 필요 (Smart contract 수정/반영후, 조치 예정 )
-func CallDeleteMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address, nonce uint64) (*types.Transaction, error) {
 
 	var metaPack metaPackage
 	metaPack = &metaPackageV1{
@@ -149,16 +179,19 @@ func CallDeleteMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 	}
 	pack := metaPack.Serialize()
 	fmt.Printf("Pack : %x", pack)
-	session, err := getSession()
+	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
+	auth := crypto.GetTransactionOpts()
+	auth.Nonce = big.NewInt(int64(nonce))
+
 	var id [32]byte
 	copy(id[:], metaID)
 
-	result, err := session.DeleteMetaID(id, sig, pack)
+	result, err := service.DeleteMetaID(auth, id, timestamp, sig)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -189,7 +222,7 @@ func (t *metaPackageV1) Serialize() []byte {
 //CallEcverify Ecverify function call
 func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) (bool, error) {
 
-	service, err := getIMService()
+	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)
