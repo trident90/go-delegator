@@ -41,9 +41,12 @@ const (
 	threshold = 10
 	// RPC retry count
 	retryCnt = 3
+	// HTTP timeout
+	httpTimeout = 5
 )
 
 var (
+	zero = big.NewInt(0)
 	// For singleton
 	instance *RPC
 	once     sync.Once
@@ -53,7 +56,6 @@ var (
 	httpFailCnt = make(map[string]int)
 	// NetType => available length of IP list
 	availLen = make(map[string]int)
-	zero     = big.NewInt(0)
 	// NetType is either mainnet or testnet
 	NetType = Testnet
 )
@@ -79,8 +81,8 @@ func GetInstance() *RPC {
 	return instance
 }
 
-func (r *RPC) getURL() (url string) {
-	switch r.NetType {
+func randomURL(netType string) (url string) {
+	switch netType {
 	case Mainnet:
 		url = MainnetUrls[rand.Intn(availLen[Mainnet])]
 		break
@@ -91,17 +93,13 @@ func (r *RPC) getURL() (url string) {
 	return
 }
 
+func (r *RPC) getURL() string {
+	return randomURL(r.NetType)
+}
+
 // GetEthClient returns ether client among urls included in target net
 func (r *RPC) GetEthClient() *ethclient.Client {
-	var url string
-	switch r.NetType {
-	case Mainnet:
-		url = MainnetUrls[rand.Intn(availLen[Mainnet])]
-		break
-	case Testnet:
-		url = TestnetUrls[rand.Intn(availLen[Testnet])]
-		break
-	}
+	url := randomURL(r.NetType)
 	if ethClients[url] == nil {
 		ethClients[url], _ = ethclient.Dial(url)
 	}
@@ -151,14 +149,14 @@ func (r *RPC) refreshURLList(url string) {
 
 // InitClient initializes HTTP client to reduce handshaking overhead
 func (r *RPC) InitClient() {
-	var netTransport = &http.Transport{
+	netTransport := &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
+			Timeout: time.Second * httpTimeout,
 		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
+		TLSHandshakeTimeout: time.Second * httpTimeout,
 	}
 	r.client = &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * httpTimeout,
 		Transport: netTransport,
 	}
 }
