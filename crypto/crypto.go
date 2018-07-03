@@ -18,7 +18,6 @@ import (
 
 	"bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/db"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ethcommon "github.com/ethereum/go-ethereum/common"
@@ -353,11 +352,4 @@ func DecryptAes(text, keyStr string, nonce []byte) string {
 		panic(err.Error())
 	}
 	return string(plaintext[:])
-}
-
-// GetTransactionOpts   return TransactOpts for creating contract session
-func GetTransactionOpts() *bind.TransactOpts {
-	ins := GetInstance()
-	auth := bind.NewKeyedTransactor(ins.privKey)
-	return auth
 }
