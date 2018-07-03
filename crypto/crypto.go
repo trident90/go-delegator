@@ -39,9 +39,11 @@ type Crypto struct {
 
 // For singleton
 var (
-	instance *Crypto
-	once     sync.Once
-	mutex    = &sync.Mutex{}
+	instance       *Crypto
+	once           sync.Once
+	mutex          = &sync.Mutex{}
+	PathChan       = make(chan string)
+	PassphraseChan = make(chan string)
 )
 
 // For DB columns
@@ -60,23 +62,24 @@ const (
 	Passphrase = "KEY_PASSPHRASE"
 	// Path means a location of keyjson in file system
 	Path = "KEY_PATH"
+	// IsAwsLambda decides if served as AWS lambda or not
+	IsAwsLambda = "AWS_LAMBDA"
 )
 
 // GetInstance returns pointer of Crypto instance
 // Because DB operations are needed for Crypto initiation,
 // Crypto is designed as singleton to reduce the number of DB operation units used
 func GetInstance() *Crypto {
-	if os.Getenv(Path) == "" && os.Getenv(Passphrase) == "" {
-		return instance
-	}
-
 	once.Do(func() {
+		path := <-PathChan
+		passphrase := <-PassphraseChan
+
 		var privkey *ecdsa.PrivateKey
 		var addr string
-		if os.Getenv(Path) == "" {
-			privkey, addr = getPrivateKeyFromDB(os.Getenv(Passphrase))
+		if os.Getenv(IsAwsLambda) != "" {
+			privkey, addr = getPrivateKeyFromDB(passphrase)
 		} else {
-			privkey, addr = getPrivateKeyFromFile(os.Getenv(Path), os.Getenv(Passphrase))
+			privkey, addr = getPrivateKeyFromFile(path, passphrase)
 		}
 		//fmt.Printf("privkey %s, addr: %s\n", hex.EncodeToString(crypto.FromECDSA(privkey)), addr)
 		fmt.Println("Crypto address is set to ", addr)
@@ -99,11 +102,10 @@ func getPrivateKeyFromDB(passphrase string) (privkey *ecdsa.PrivateKey, addr str
 
 	bNonce, _ := hex.DecodeString(dbNonce)
 	keyjson := DecryptAes(dbKeyJSON, dbSecretKey, bNonce)
-	key, err := keystore.DecryptKey([]byte(keyjson), passphrase)
-	if err != nil {
-		return
+	if key, err := keystore.DecryptKey([]byte(keyjson), passphrase); err == nil {
+		return key.PrivateKey, key.Address.String()
 	}
-	return key.PrivateKey, key.Address.String()
+	return
 }
 
 // getPrivateKeyFromFile returns private key and address from file
@@ -112,27 +114,24 @@ func getPrivateKeyFromFile(filepath, passphrase string) (privkey *ecdsa.PrivateK
 	if err != nil {
 		return
 	}
-	key, err := keystore.DecryptKey(keyjson, passphrase)
-	if err != nil {
-		return
+	if key, err := keystore.DecryptKey(keyjson, passphrase); err == nil {
+		return key.PrivateKey, key.Address.String()
 	}
-	return key.PrivateKey, key.Address.String()
+	return
 }
 
 // InitChainID initalizes chain ID
 func (c *Crypto) InitChainID(chainID *big.Int) {
-	if c.chainID != nil {
-		return
+	if c.chainID == nil {
+		c.chainID = chainID
 	}
-	c.chainID = chainID
 }
 
 // InitNonce initailizes TX nonce one time
 func (c *Crypto) InitNonce(nonce uint64) {
-	if c.txnonce > 0 {
-		return
+	if c.txnonce == 0 {
+		c.txnonce = nonce
 	}
-	c.txnonce = nonce
 }
 
 // GetAddress returns an address of Crypto manager
