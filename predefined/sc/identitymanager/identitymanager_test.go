@@ -46,15 +46,15 @@ func TestGetOwnerAddress2(t *testing.T) {
 	fmt.Printf("Onwer Address: %x \n", result)
 }
 */
+func TestCallDefault(t *testing.T) {
+	defaultSetting()
+}
 func TestGetOwnerAddress(t *testing.T) {
 	var address *common.Address
 	var err error
 	defaultSetting()
-	// os.Setenv(crypto.Passphrase, "testtesttest")
-	// os.Setenv(crypto.Path, "/Users/ywshin/keyStore/UTC--2018-06-19T03-29-35.987669228Z--084f8293f1b047d3a217025b24cd7b5ace8fc657")
 
 	// metaID := hexutil.MustDecode("0x1b442640e0333cb03054940e3cda07da982d2b57af68c3df8d0557b47a77d0bc")		//084f8293f1b047d3a217025b24cd7b5ace8fc657
-
 	metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972") //961c20596e7ec441723fbb168461f4b51371d8aa
 	address, err = CallOwnerOf(metaID)
 	if err != nil {
@@ -86,15 +86,30 @@ func TestCallCreateMetaID(t *testing.T) {
 
 	address := common.HexToAddress("0x961c20596e7ec441723fbb168461f4b51371d8aa")
 	metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972")
-	//sig := hexutil.MustDecode("0x542e3d9af6758e80e4f2500395898a9cd9f5e3bd91b3053ad60d4cb0147b608c7de2ff608ae7528bc59cc6a7ba006020678d2ee5b5f88a97204734953cd2cccb1b")
-	sig := hexutil.MustDecode("0x94b7ca242f431df15ba6c1019f3e4e52b8e1c177615b254140456d7814d202751224329073bf22bd4779d98dbaa02c65c9e1ac867932f2828197e012cffd45ef1c")
+	sig := hexutil.MustDecode("0x542e3d9af6758e80e4f2500395898a9cd9f5e3bd91b3053ad60d4cb0147b608c7de2ff608ae7528bc59cc6a7ba006020678d2ee5b5f88a97204734953cd2cccb1b")
+	//sig := hexutil.MustDecode("0x94b7ca242f431df15ba6c1019f3e4e52b8e1c177615b254140456d7814d202751224329073bf22bd4779d98dbaa02c65c9e1ac867932f2828197e012cffd45ef1c")
 	//txId := hexutil.MustDecode("0xaea34e618fe1defc7472d0b2a0cdffe3407d5cadee59f1d050d523e20d71ca49")
 	//fmt.Printf("txId : %v", txId)
+
 	trx, err := CallCreateMetaID(metaID, sig, address)
 	if err != nil {
 		t.Error("Error CallCreateMetaID", err)
 	}
 
+	fmt.Printf("trxid : %v", trx.Hash().String())
+}
+
+func TestCallDeleteMetaID(t *testing.T) {
+	defaultSetting()
+	metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972")
+	timestamp := hexutil.Bytes("20180703142012")
+	sig := hexutil.MustDecode("0x3f593b366bf85cc98c877cc0c7e406017ced62b2913494457597bf78a65e8fd26023727bd2e9f7ac5dadf394744476a69fd43f5cbcc30c5b5987d6404ba4a4321b")
+	trx, err := CallDeleteMetaID(metaID, timestamp, sig)
+	if err != nil {
+		t.Error("Error CallCreateMetaID", err)
+	}
+	//metaID|timestamp
+	//0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e9723230313830373033313432303132
 	fmt.Printf("trxid : %v", trx.Hash().String())
 }
 
@@ -136,7 +151,7 @@ func TestEcverify(t *testing.T) {
 	// }
 	// fmt.Println(res)
 
-	service, err := getIMService()
+	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)

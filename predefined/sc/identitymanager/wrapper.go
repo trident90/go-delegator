@@ -111,7 +111,10 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 }
 
 //CallCreateMetaID createMetaID function call
-func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address, nonce uint64) (*types.Transaction, error) {
+func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address) (*types.Transaction, error) {
+	var trx *types.Transaction
+	var err error
+
 	var metaPack metaPackage
 	metaPack = &metaPackageV1{
 		Version:           1,
@@ -126,17 +129,40 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 		log.Fatal(err)
 		return nil, err
 	}
-	auth := crypto.GetTransactionOpts()
-	auth.Nonce = big.NewInt(int64(nonce))
 
-	var id [32]byte
-	copy(id[:], metaID)
-	result, err := service.CreateMetaID(auth, id, sig, pack)
-	if err != nil {
-		log.Fatal(err)
+	tx := func(nonce uint64) error {
+		_rpc := rpc.GetInstance()
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
+		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+
+		var id [32]byte
+		copy(id[:], metaID)
+
+		trx, err = service.CreateMetaID(auth, id, sig, pack)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
+
+	if !res {
+		if err == nil {
+			err = fmt.Errorf("call function Error - CreateMetaID")
+		}
 		return nil, err
 	}
-	return result, nil
+
+	// var id [32]byte
+	// copy(id[:], metaID)
+	// result, err := service.CreateMetaID(auth, id, sig, pack)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return nil, err
+	// }
+	return trx, nil
 }
 
 //CallUpdateMetaID  updateMetaID function call of IentityManager Smart Contract
@@ -169,34 +195,63 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 }
 
 // CallDeleteMetaID is delete MetaID
-// TODO: timestamp 파라메터 추가 필요 (Smart contract 수정/반영후, 조치 예정 )
-func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil.Bytes, userAddress common.Address, nonce uint64) (*types.Transaction, error) {
+func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil.Bytes) (*types.Transaction, error) {
 
-	var metaPack metaPackage
-	metaPack = &metaPackageV1{
-		Version:           1,
-		UserSenderAddress: userAddress,
-	}
-	pack := metaPack.Serialize()
-	fmt.Printf("Pack : %x", pack)
 	service, err := getService()
 
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
-	auth := crypto.GetTransactionOpts()
-	auth.Nonce = big.NewInt(int64(nonce))
+	/*
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
 
-	var id [32]byte
-	copy(id[:], metaID)
+		var id [32]byte
+		copy(id[:], metaID)
 
-	result, err := service.DeleteMetaID(auth, id, timestamp, sig)
-	if err != nil {
-		log.Fatal(err)
+		result, err := service.DeleteMetaID(auth, id, timestamp, sig)
+		if err != nil {
+			log.Fatal(err)
+			return nil, err
+		}
+		return result, nil
+	*/
+	var trx *types.Transaction
+
+	tx := func(nonce uint64) error {
+		_rpc := rpc.GetInstance()
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
+		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		var id [32]byte
+		copy(id[:], metaID)
+
+		trx, err = service.DeleteMetaID(auth, id, timestamp, sig)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
+
+	if !res {
+		if err == nil {
+			err = fmt.Errorf("call function Error -DeleteMetaID")
+		}
 		return nil, err
 	}
-	return result, nil
+
+	// var id [32]byte
+	// copy(id[:], metaID)
+	// result, err := service.CreateMetaID(auth, id, sig, pack)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return nil, err
+	// }
+	return trx, nil
+
 }
 
 type metaPackage interface {

@@ -12,7 +12,6 @@ import (
 	"bitbucket.org/coinplugin/proxy/predefined/sc/identitymanager"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
 )
 
 const (
@@ -433,37 +432,41 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	//identitymanager.CallCreateMetaID()
 	//  return txid
 
-	// trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
-	// if err != nil {
-	// 	errObj := &internalError{err.Error()}
-
-	// 	resp.Error = &json.RPCError{
-	// 		Code:    errObj.ErrorCode(),
-	// 		Message: errObj.Error(),
-	// 	}
-	// }
-
-	// resp.Result = trx.Hash().String()
-	var trx *types.Transaction
-	tx := func(nonce uint64) error {
-		var err error
-		trx, err = identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address, nonce)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-	c := crypto.GetInstance()
-	res := c.ApplyNonce(tx)
-
-	if !res {
-		errObj := &internalError{"call function Error - CreateMetaID"}
+	trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
+	if err != nil {
+		errObj := &internalError{err.Error()}
 
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
 	}
+
+	// resp.Result = trx.Hash().String()
+
+	/*
+		var trx *types.Transaction
+		tx := func(nonce uint64) error {
+			var err error
+			trx, err = identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address, nonce)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		c := crypto.GetInstance()
+		res := c.ApplyNonce(tx)
+
+		if !res {
+			errObj := &internalError{"call function Error - CreateMetaID"}
+
+			resp.Error = &json.RPCError{
+				Code:    errObj.ErrorCode(),
+				Message: errObj.Error(),
+			}
+		}
+	*/
+
 	resp.Result = trx.Hash().String()
 	return
 }
@@ -737,13 +740,75 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 		err = fmt.Errorf(errObj.Error())
 		return
 	}
-	reqParam := tmpParams.(metaIDRestoreParams)
-	fmt.Println("parameter[NewAddress] : ", reqParam.NewAddress)
-	fmt.Println("parameter[OldAddress] : ", reqParam.OldAddress)
-	fmt.Println("parameter[NewMetaID] : ", reqParam.NewMetaID)
-	fmt.Println("parameter[OldMetaID] : ", reqParam.OldMetaID)
-	fmt.Println("parameter[userHash] : ", reqParam.UserHashs)
-	fmt.Println("parameter[Sig] : ", reqParam.Signature)
+	reqParam := tmpParams.(metaIDRevokeParams)
+	fmt.Println("parameter[MetaID] : ", reqParam.MetaID)
+	fmt.Println("parameter[Timestamp] : ", reqParam.Timestamp)
+	fmt.Println("parameter[Signature] : ", reqParam.Signature)
+
+	//	2. Get Address from  Signature
+	//  signdata = metaID|timestamp
+	mSize := len(reqParam.MetaID)
+	tSize := len(reqParam.MetaID) + len(reqParam.Timestamp)
+	var signData hexutil.Bytes
+	signData = make(hexutil.Bytes, tSize, tSize)
+	copy(signData, reqParam.MetaID)
+	copy(signData[mSize:tSize], reqParam.Timestamp)
+
+	signedAddress, err := crypto.EcRecover(signData.String(), reqParam.Signature.String())
+	if err != nil {
+		fmt.Println("Error :", err)
+		errObj := &invalidSignatureError{"Failed to verify signature"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		err = fmt.Errorf(errObj.Error())
+		return
+	}
+
+	// 3. Get Address from Ownerof function(Smart Contract)
+	findAddress := &common.Address{}
+	findAddress, err = identitymanager.CallOwnerOf(reqParam.MetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+
+	}
+	if findAddress == nil {
+
+		errObj := &notExistsError{"Cannot revoke Meta ID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		err = fmt.Errorf(errObj.Error())
+		return
+	}
+	checkAddress := common.HexToAddress(signedAddress)
+	if !bytes.Equal(findAddress.Bytes(), checkAddress.Bytes()) {
+		errObj := &invalidAddressError{"Cannot find valid user Address"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		err = fmt.Errorf(errObj.Error())
+		return
+	}
+	// 4. Call deleteMetaID function
+	trx, err := identitymanager.CallDeleteMetaID(reqParam.MetaID, reqParam.Timestamp, reqParam.Signature)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+	}
+	resp.Result = trx.Hash().String()
 
 	return
 }
