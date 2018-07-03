@@ -117,8 +117,10 @@ func main() {
 		help()
 		return
 	}
-	go func() { crypto.PathChan <- path }()
-	go func() { crypto.PassphraseChan <- passphrase }()
+	go func() {
+		crypto.PathChan <- path
+		crypto.PassphraseChan <- passphrase
+	}()
 	crypto.GetInstance()
 
 	// Run
