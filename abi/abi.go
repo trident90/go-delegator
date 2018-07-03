@@ -3,10 +3,9 @@ package abi
 
 import (
 	"encoding/hex"
+	"fmt"
 	"math/big"
 	"strings"
-	"sync"
-	"sync/atomic"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
@@ -20,8 +19,7 @@ import (
 )
 
 var (
-	zero  = big.NewInt(0)
-	mutex = &sync.Mutex{}
+	zero = big.NewInt(0)
 )
 
 // Pack makes packed data with inputs on ABI
@@ -50,13 +48,13 @@ func Unpack(abi abi.ABI, v interface{}, name string, output string) error {
 }
 
 // Call gets contract value with contract address and name
-func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}) (resp json.RPCResponse, err error) {
+func Call(abi abi.ABI, to, name string, inputs []interface{}) (resp json.RPCResponse, err error) {
 	data, err := Pack(abi, name, inputs...)
 	if err != nil {
 		return
 	}
 
-	r := rpc.GetInstance(targetNet)
+	r := rpc.GetInstance()
 	respStr, err := r.Call(to, data)
 	if err != nil {
 		return
@@ -67,15 +65,15 @@ func Call(abi abi.ABI, targetNet, to, name string, inputs []interface{}) (resp j
 }
 
 // SendTransaction calls smart contract with ABI using eth_sendTransaction
-func SendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gas int) (resp json.RPCResponse, err error) {
-	data, err := Pack(abi, name, inputs...)
-	if err != nil {
+func SendTransaction(abi abi.ABI, to, name string, inputs []interface{}, gas int) (resp json.RPCResponse, err error) {
+	var data string
+	if data, err = Pack(abi, name, inputs...); err != nil {
 		return
 	}
 
 	c := crypto.GetInstance()
-	r := rpc.GetInstance(targetNet)
-	respStr, err := r.SendTransaction(c.Address, to, data, gas)
+	r := rpc.GetInstance()
+	respStr, err := r.SendTransaction(c.GetAddress(), to, data, gas)
 	if err != nil {
 		return
 	}
@@ -85,41 +83,39 @@ func SendTransaction(abi abi.ABI, targetNet, to, name string, inputs []interface
 }
 
 // SendTransactionWithSign calls smart contract with ABI using eth_sendRawTransaction
-func SendTransactionWithSign(abi abi.ABI, targetNet, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RPCResponse, err error) {
-	data, err := abi.Pack(name, inputs...)
-	if err != nil {
+func SendTransactionWithSign(abi abi.ABI, to, name string, inputs []interface{}, gasLimit, gasPrice uint64) (resp json.RPCResponse, err error) {
+	var data []byte
+	if data, err = abi.Pack(name, inputs...); err != nil {
 		return
 	}
 
-	// Get TX nonce
 	c := crypto.GetInstance()
-	r := rpc.GetInstance(targetNet)
-	mutex.Lock()
-	defer mutex.Unlock()
-	if c.Txnonce == 0 {
-		c.Txnonce = r.GetTransactionCount(c.Address)
-	}
-	nonce := atomic.LoadUint64(&c.Txnonce)
-	tx := types.NewTransaction(nonce, common.HexToAddress(to), zero, uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
-	tx, err = c.SignTx(tx)
-	if err != nil {
+	r := rpc.GetInstance()
+
+	// Make TX function to get nonce
+	tx := func(nonce uint64) (err error) {
+		tx := types.NewTransaction(nonce, common.HexToAddress(to), zero, uint64(gasLimit), big.NewInt(int64(gasPrice)), data)
+		if tx, err = c.SignTx(tx); err != nil {
+			return
+		}
+
+		var rlpTx []byte
+		if rlpTx, err = rlp.EncodeToBytes(tx); err != nil {
+			return
+		}
+
+		var respStr string
+		if respStr, err = r.SendRawTransaction(rlpTx); err != nil {
+			return
+		}
+
+		if resp = json.GetRPCResponseFromJSON(respStr); resp.Error == nil {
+			return fmt.Errorf("%s", resp.Error.Message)
+		}
 		return
 	}
 
-	rlpTx, err := rlp.EncodeToBytes(tx)
-	if err != nil {
-		return
-	}
-
-	respStr, err := r.SendRawTransaction(rlpTx)
-	if err != nil {
-		return
-	}
-
-	resp = json.GetRPCResponseFromJSON(respStr)
-	if resp.Error == nil {
-		atomic.AddUint64(&c.Txnonce, 1)
-	}
+	c.ApplyNonce(tx)
 	return
 }
 
@@ -130,8 +126,8 @@ func GetAbiFromJSON(raw string) (abi.ABI, error) {
 
 // getAbiFromAddress is NOT YET SUPPORTED
 // TODO: use eth.compile.solidity?
-func getAbiFromAddress(targetNet, addr string) (abi abi.ABI) {
-	r := rpc.GetInstance(targetNet)
+func getAbiFromAddress(addr string) (abi abi.ABI) {
+	r := rpc.GetInstance()
 	respStr, err := r.GetCode(addr)
 	if err != nil {
 		return

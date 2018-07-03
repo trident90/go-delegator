@@ -18,6 +18,7 @@ import (
 	ethjson "bitbucket.org/coinplugin/proxy/json"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 // RPC is a JSON-RPC manager through HTTP
@@ -40,39 +41,48 @@ const (
 	threshold = 10
 	// RPC retry count
 	retryCnt = 3
+	// HTTP timeout
+	httpTimeout = 5
 )
 
 var (
+	zero = big.NewInt(0)
 	// For singleton
 	instance *RPC
 	once     sync.Once
+	// IP => ethclient
+	ethClients = make(map[string]*ethclient.Client)
 	// IP => http fail count
 	httpFailCnt = make(map[string]int)
 	// NetType => available length of IP list
 	availLen = make(map[string]int)
-	zero     = big.NewInt(0)
+	// NetType is either mainnet or testnet
+	NetType = Testnet
 )
 
-// GetInstance returns the instance of Rpc
-// _netType should be Mainnet or Testnet
-func GetInstance(_netType string) *RPC {
+// GetInstance returns the instance of RPC
+func GetInstance() *RPC {
 	once.Do(func() {
 		instance = &RPC{}
 		instance.InitClient()
 		availLen[Mainnet] = len(MainnetUrls)
 		availLen[Testnet] = len(TestnetUrls)
 
-		instance.NetType = _netType
+		instance.NetType = NetType
 		instance.NetVersion = instance.GetChainID()
-		crypto.GetInstance().ChainID = instance.NetVersion
-
 		instance.GasPrice = instance.GetGasPrice()
+
+		c := crypto.GetInstance()
+		if c != nil {
+			c.InitChainID(instance.NetVersion)
+			c.InitNonce(instance.GetTransactionCount(c.GetAddress()))
+		}
 	})
 	return instance
 }
 
-func (r *RPC) getURL() (url string) {
-	switch r.NetType {
+func randomURL(netType string) (url string) {
+	switch netType {
 	case Mainnet:
 		url = MainnetUrls[rand.Intn(availLen[Mainnet])]
 		break
@@ -81,6 +91,19 @@ func (r *RPC) getURL() (url string) {
 		break
 	}
 	return
+}
+
+func (r *RPC) getURL() string {
+	return randomURL(r.NetType)
+}
+
+// GetEthClient returns ether client among urls included in target net
+func (r *RPC) GetEthClient() *ethclient.Client {
+	url := randomURL(r.NetType)
+	if ethClients[url] == nil {
+		ethClients[url], _ = ethclient.Dial(url)
+	}
+	return ethClients[url]
 }
 
 // refreshURLList sorts url list to avoid bad nodes
@@ -126,14 +149,14 @@ func (r *RPC) refreshURLList(url string) {
 
 // InitClient initializes HTTP client to reduce handshaking overhead
 func (r *RPC) InitClient() {
-	var netTransport = &http.Transport{
+	netTransport := &http.Transport{
 		Dial: (&net.Dialer{
-			Timeout: 5 * time.Second,
+			Timeout: time.Second * httpTimeout,
 		}).Dial,
-		TLSHandshakeTimeout: 5 * time.Second,
+		TLSHandshakeTimeout: time.Second * httpTimeout,
 	}
 	r.client = &http.Client{
-		Timeout:   time.Second * 10,
+		Timeout:   time.Second * httpTimeout,
 		Transport: netTransport,
 	}
 }

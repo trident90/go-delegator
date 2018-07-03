@@ -13,6 +13,8 @@ import (
 	"math/big"
 	"os"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	"bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/db"
@@ -25,18 +27,24 @@ import (
 )
 
 // Crypto manager
+// It should be initialized first at main
 type Crypto struct {
 	privKey *ecdsa.PrivateKey
-	Address string
-	ChainID *big.Int
-	Txnonce uint64
+	address string
+
 	signer  types.Signer
+	chainID *big.Int
+
+	txnonce uint64
 }
 
 // For singleton
 var (
-	instance *Crypto
-	once     sync.Once
+	instance       *Crypto
+	once           sync.Once
+	mutex          = &sync.Mutex{}
+	PathChan       = make(chan string)
+	PassphraseChan = make(chan string)
 )
 
 // For DB columns
@@ -55,29 +63,52 @@ const (
 	Passphrase = "KEY_PASSPHRASE"
 	// Path means a location of keyjson in file system
 	Path = "KEY_PATH"
+	// IsAwsLambda decides if served as AWS lambda or not
+	IsAwsLambda = "AWS_LAMBDA"
 )
 
 // GetInstance returns pointer of Crypto instance
 // Because DB operations are needed for Crypto initiation,
 // Crypto is designed as singleton to reduce the number of DB operation units used
 func GetInstance() *Crypto {
-	if os.Getenv(Path) == "" && os.Getenv(Passphrase) == "" {
+	// Check if already assigned
+	if instance != nil {
 		return instance
 	}
 
+	// Check channel within the timeout
+	var path string
+	select {
+	case path = <-PathChan:
+		break
+	case <-time.After(1 * time.Second):
+		break
+	}
+	if path == "" {
+		return instance
+	}
+
+	// Initalize
 	once.Do(func() {
+		passphrase := <-PassphraseChan
+
 		var privkey *ecdsa.PrivateKey
 		var addr string
-		if os.Getenv(Path) == "" {
-			privkey, addr = getPrivateKeyFromDB(os.Getenv(Passphrase))
+		if os.Getenv(IsAwsLambda) != "" {
+			privkey, addr = getPrivateKeyFromDB(passphrase)
 		} else {
-			privkey, addr = getPrivateKeyFromFile(os.Getenv(Path), os.Getenv(Passphrase))
+			privkey, addr = getPrivateKeyFromFile(path, passphrase)
 		}
+
+		if addr == "" {
+			panic("Failed to parse key json for Crypto")
+		}
+
 		//fmt.Printf("privkey %s, addr: %s\n", hex.EncodeToString(crypto.FromECDSA(privkey)), addr)
 		fmt.Println("Crypto address is set to ", addr)
 		instance = &Crypto{
 			privKey: privkey,
-			Address: addr,
+			address: addr,
 		}
 	})
 	return instance
@@ -94,11 +125,10 @@ func getPrivateKeyFromDB(passphrase string) (privkey *ecdsa.PrivateKey, addr str
 
 	bNonce, _ := hex.DecodeString(dbNonce)
 	keyjson := DecryptAes(dbKeyJSON, dbSecretKey, bNonce)
-	key, err := keystore.DecryptKey([]byte(keyjson), passphrase)
-	if err != nil {
-		return
+	if key, err := keystore.DecryptKey([]byte(keyjson), passphrase); err == nil {
+		return key.PrivateKey, key.Address.String()
 	}
-	return key.PrivateKey, key.Address.String()
+	return
 }
 
 // getPrivateKeyFromFile returns private key and address from file
@@ -107,11 +137,29 @@ func getPrivateKeyFromFile(filepath, passphrase string) (privkey *ecdsa.PrivateK
 	if err != nil {
 		return
 	}
-	key, err := keystore.DecryptKey(keyjson, passphrase)
-	if err != nil {
-		return
+	if key, err := keystore.DecryptKey(keyjson, passphrase); err == nil {
+		return key.PrivateKey, key.Address.String()
 	}
-	return key.PrivateKey, key.Address.String()
+	return
+}
+
+// InitChainID initalizes chain ID
+func (c *Crypto) InitChainID(chainID *big.Int) {
+	if c.chainID == nil {
+		c.chainID = chainID
+	}
+}
+
+// InitNonce initailizes TX nonce one time
+func (c *Crypto) InitNonce(nonce uint64) {
+	if c.txnonce == 0 {
+		c.txnonce = nonce
+	}
+}
+
+// GetAddress returns an address of Crypto manager
+func (c *Crypto) GetAddress() string {
+	return c.address
 }
 
 // Sign returns signed message using own private key
@@ -123,9 +171,9 @@ func (c *Crypto) Sign(msg string) string {
 	sig[64] += 27
 
 	ret := hexutil.Encode(sig)
-	if c.Address == "" {
-		c.Address, _ = EcRecover(hexutil.Encode(crypto.Keccak256([]byte(msg))), ret)
-		fmt.Printf("Crypto address is set to %s\n", c.Address)
+	if c.address == "" {
+		c.address, _ = EcRecover(hexutil.Encode(crypto.Keccak256([]byte(msg))), ret)
+		fmt.Printf("Crypto address is set to %s\n", c.address)
 	}
 	return ret
 }
@@ -134,8 +182,8 @@ func (c *Crypto) Sign(msg string) string {
 func (c *Crypto) SignTx(tx *types.Transaction) (*types.Transaction, error) {
 	if c.signer != nil {
 		// Nothing to do
-	} else if c.ChainID != nil {
-		c.signer = types.NewEIP155Signer(c.ChainID)
+	} else if c.chainID != nil {
+		c.signer = types.NewEIP155Signer(c.chainID)
 	} else {
 		c.signer = types.HomesteadSigner{}
 	}
@@ -144,6 +192,22 @@ func (c *Crypto) SignTx(tx *types.Transaction) (*types.Transaction, error) {
 		return nil, fmt.Errorf("tx or private key is not appropriate")
 	}
 	return signedTx, nil
+}
+
+// ApplyNonce applies nonce to a given function "f"
+// Function description should be func(uint64) (error)
+// If given function returns nil error, increase nonce
+// Meaning of this function's return is either nonce was increased or not
+func (c *Crypto) ApplyNonce(f interface{}) bool {
+	mutex.Lock()
+	defer mutex.Unlock()
+	nonce := atomic.LoadUint64(&c.txnonce)
+	err := f.(func(uint64) error)(nonce)
+	if err != nil {
+		return false
+	}
+	atomic.AddUint64(&c.txnonce, 1)
+	return true
 }
 
 // Sign returns signed message using given private key
