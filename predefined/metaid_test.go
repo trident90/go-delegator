@@ -11,7 +11,7 @@ import (
 	"bitbucket.org/coinplugin/proxy/json"
 )
 
-func DefaultSetting() {
+func defaultSetting() {
 
 	path := "/tmp/testKey"
 
@@ -30,7 +30,7 @@ func DefaultSetting() {
 
 }
 func TestMetaIdRegister(t *testing.T) {
-	DefaultSetting()
+	defaultSetting()
 	req := json.RPCRequest{
 		Jsonrpc: "2.0",
 		Method:  "register_meta_id",
@@ -93,7 +93,7 @@ func TestMetaIdUpdate(t *testing.T) {
 	// resp, err := main.Handler(nil, events.APIGatewayProxyRequest{
 	// 	Body: req.String(),
 	// })
-	resp, err := registerMetaID(req)
+	resp, err := updateMetaID(req)
 	if resp.String() == "" || err != nil {
 		fmt.Println("Error : ", err)
 		t.Errorf("Failed to start main")
@@ -110,9 +110,14 @@ func TestMetaIdRevoke(t *testing.T) {
 	}
 
 	param := map[string]interface{}{
-		"meta_id":   "0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972",
+
+		// 	"meta_id":   "0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972",
+		// 	"timestamp": "0x3230313830373033313432303132",
+		//	"signature": "0x3f593b366bf85cc98c877cc0c7e406017ced62b2913494457597bf78a65e8fd26023727bd2e9f7ac5dadf394744476a69fd43f5cbcc30c5b5987d6404ba4a4321b",
+
+		"meta_id":   "0xc30255d8455a90fbb0ce11405b501624be9287370a41779312944c8739a9f79d",
 		"timestamp": "0x3230313830373033313432303132",
-		"signature": "0x3f593b366bf85cc98c877cc0c7e406017ced62b2913494457597bf78a65e8fd26023727bd2e9f7ac5dadf394744476a69fd43f5cbcc30c5b5987d6404ba4a4321b",
+		"signature": "0x2e0828fc90ec82ac850555dfda43fa900c55c76026fe0f769e055c17d11d324e5c473cb640e6e900a4f91451af83442dabde021fc7e46acf3b4944deaff577731c",
 	}
 	req.Params = append(req.Params, param)
 	fmt.Println("reqest : ", req.String())

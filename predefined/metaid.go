@@ -587,6 +587,16 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	}
 	//5. Send Transaction for Calling SC Function[ updateMetaID ]
 	//  return txid
+	trx, err := identitymanager.CallUpdateMetaID(reqParam.OldMetaID, reqParam.NewMetaID, reqParam.Signature, reqParam.Address)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+	}
+	resp.Result = trx.Hash().String()
 	return
 }
 
