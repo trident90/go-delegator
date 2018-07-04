@@ -308,7 +308,7 @@ func getParameter(method string, obj interface{}) (interface{}, Error) {
 
 }
 
-func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -320,7 +320,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDRegisterParams)
@@ -339,7 +338,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	checkAddress := common.HexToAddress(signedAddress)
@@ -353,7 +351,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -399,7 +396,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -416,6 +412,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
+		return
 	}
 	if address != nil {
 
@@ -424,7 +421,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -440,6 +436,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
+		return
 	}
 
 	// resp.Result = trx.Hash().String()
@@ -471,7 +468,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -483,7 +480,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDUpdateParams)
@@ -503,7 +499,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -516,7 +511,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -547,7 +541,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -565,6 +558,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
+		return
 	}
 	if findAddress == nil {
 
@@ -573,7 +567,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	if !bytes.Equal(findAddress.Bytes(), reqParam.Address.Bytes()) {
@@ -582,7 +575,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	//5. Send Transaction for Calling SC Function[ updateMetaID ]
@@ -595,12 +587,13 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
+		return
 	}
 	resp.Result = trx.Hash().String()
 	return
 }
 
-func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -612,7 +605,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDBackupParams)
@@ -631,7 +623,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -644,7 +635,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -657,7 +647,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -669,7 +659,6 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDGetUserDataParams)
@@ -687,7 +676,6 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -700,7 +688,6 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	//3. GET User Data from IPFS
@@ -709,7 +696,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -721,7 +708,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDRestoreParams)
@@ -735,7 +721,7 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	return
 }
 
-func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
+func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
@@ -747,7 +733,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	reqParam := tmpParams.(metaIDRevokeParams)
@@ -772,7 +757,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 
@@ -786,7 +770,7 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-
+		return
 	}
 	if findAddress == nil {
 
@@ -795,7 +779,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	checkAddress := common.HexToAddress(signedAddress)
@@ -805,7 +788,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
-		err = fmt.Errorf(errObj.Error())
 		return
 	}
 	// 4. Call deleteMetaID function
@@ -817,9 +799,9 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
 		}
+		return
 	}
 	resp.Result = trx.Hash().String()
-
 	return
 }
 
