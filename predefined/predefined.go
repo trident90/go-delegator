@@ -65,4 +65,5 @@ var predefinedPaths = map[string]interface{}{
 	"eth_getBalance":   getBalance,
 	"register_meta_id": registerMetaID,
 	"revoke_meta_id":   revokeMetaID,
+	"update_meta_id":   updateMetaID,
 }

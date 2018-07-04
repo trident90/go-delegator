@@ -1,6 +1,7 @@
 package identitymanager
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -13,8 +14,22 @@ import (
 )
 
 func defaultSetting() {
-	os.Setenv(crypto.Passphrase, "testtesttest")
-	os.Setenv(crypto.Path, "/Users/ywshin/keyStore/UTC--2018-06-19T03-29-35.987669228Z--084f8293f1b047d3a217025b24cd7b5ace8fc657")
+
+	path := "/Users/ywshin/keyStore/UTC--2018-06-19T03-29-35.987669228Z--084f8293f1b047d3a217025b24cd7b5ace8fc657"
+
+	file, err := os.Open("/tmp/testKeyPass")
+	if err != nil {
+		log.Panicf("fail reading file : %s", err)
+	}
+	defer file.Close()
+	r := bufio.NewReader(file)
+	data, _, err := r.ReadLine()
+	passphrase := string(data)
+
+	go func() { crypto.PathChan <- path }()
+	go func() { crypto.PassphraseChan <- passphrase }()
+	crypto.GetInstance()
+
 }
 
 /*
@@ -46,16 +61,15 @@ func TestGetOwnerAddress2(t *testing.T) {
 	fmt.Printf("Onwer Address: %x \n", result)
 }
 */
-func TestCallDefault(t *testing.T) {
-	defaultSetting()
-}
+
 func TestGetOwnerAddress(t *testing.T) {
 	var address *common.Address
 	var err error
 	defaultSetting()
 
 	// metaID := hexutil.MustDecode("0x1b442640e0333cb03054940e3cda07da982d2b57af68c3df8d0557b47a77d0bc")		//084f8293f1b047d3a217025b24cd7b5ace8fc657
-	metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972") //961c20596e7ec441723fbb168461f4b51371d8aa
+	//metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972") //created 961c20596e7ec441723fbb168461f4b51371d8aa
+	metaID := hexutil.MustDecode("0xc30255d8455a90fbb0ce11405b501624be9287370a41779312944c8739a9f79d") //Updated 961c20596e7ec441723fbb168461f4b51371d8aa
 	address, err = CallOwnerOf(metaID)
 	if err != nil {
 		log.Fatal(err)
@@ -92,6 +106,22 @@ func TestCallCreateMetaID(t *testing.T) {
 	//fmt.Printf("txId : %v", txId)
 
 	trx, err := CallCreateMetaID(metaID, sig, address)
+	if err != nil {
+		t.Error("Error CallCreateMetaID", err)
+	}
+
+	fmt.Printf("trxid : %v", trx.Hash().String())
+}
+
+func TestCallUpdateMetaID(t *testing.T) {
+	defaultSetting()
+
+	address := common.HexToAddress("0x961c20596e7ec441723fbb168461f4b51371d8aa")
+	oldMetaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972")
+	newMetaID := hexutil.MustDecode("0xc30255d8455a90fbb0ce11405b501624be9287370a41779312944c8739a9f79d")
+	sig := hexutil.MustDecode("0x0f86138d24ecd75efd982e8c68555c97c70d5abfa67ab99edeca462b9b546d706888437eecc91f1ea5a0e815606188b6e91353bd867c9ad08cf2f62781aefe391c")
+
+	trx, err := CallUpdateMetaID(oldMetaID, newMetaID, sig, address)
 	if err != nil {
 		t.Error("Error CallCreateMetaID", err)
 	}
