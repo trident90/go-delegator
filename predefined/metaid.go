@@ -19,7 +19,7 @@ const (
 	hashSize            = 32
 	signatureSize       = 65
 	fileHashSize        = 46
-	timestampSize       = 52
+	timestampSize       = 14
 	minimumUserHashSize = 3
 )
 
