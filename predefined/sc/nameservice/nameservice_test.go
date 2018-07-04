@@ -1,6 +1,7 @@
 package nameservice
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,24 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+func defaultSetting() {
+
+	path := "/tmp/testKey"
+
+	file, err := os.Open("/tmp/testKeyPass")
+	if err != nil {
+		log.Panicf("fail reading file : %s", err)
+	}
+	defer file.Close()
+	r := bufio.NewReader(file)
+	data, _, err := r.ReadLine()
+	passphrase := string(data)
+
+	go func() { crypto.PathChan <- path }()
+	go func() { crypto.PassphraseChan <- passphrase }()
+	crypto.GetInstance()
+
+}
 func TestGetMetaIDContractAddress(t *testing.T) {
 	client, err := ethclient.Dial("http://13.125.247.228:8545")
 	if err != nil {
@@ -60,6 +79,7 @@ func TestGetMetadiumIdentityManagerContractAddress(t *testing.T) {
 }
 
 func TestGetIDContractAddress(t *testing.T) {
+
 	defaultSetting()
 	address, err := GetIDContractAddress()
 	if err != nil {
@@ -77,9 +97,4 @@ func TestGetIMContractAddress(t *testing.T) {
 		t.Error("error ", err)
 	}
 	fmt.Printf("IM Address: %x", *address)
-}
-
-func defaultSetting() {
-	os.Setenv(crypto.Passphrase, "testtesttest")
-	os.Setenv(crypto.Path, "/Users/ywshin/keyStore/UTC--2018-06-19T03-29-35.987669228Z--084f8293f1b047d3a217025b24cd7b5ace8fc657")
 }

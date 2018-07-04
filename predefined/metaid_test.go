@@ -11,9 +11,9 @@ import (
 	"bitbucket.org/coinplugin/proxy/json"
 )
 
-func defaultSetting() {
+func DefaultSetting() {
 
-	path := "/Users/ywshin/keyStore/UTC--2018-06-19T03-29-35.987669228Z--084f8293f1b047d3a217025b24cd7b5ace8fc657"
+	path := "/tmp/testKey"
 
 	file, err := os.Open("/tmp/testKeyPass")
 	if err != nil {
@@ -30,7 +30,7 @@ func defaultSetting() {
 
 }
 func TestMetaIdRegister(t *testing.T) {
-	defaultSetting()
+	DefaultSetting()
 	req := json.RPCRequest{
 		Jsonrpc: "2.0",
 		Method:  "register_meta_id",
