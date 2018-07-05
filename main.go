@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
+	_ "bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/predefined"
 	"bitbucket.org/coinplugin/proxy/rpc"
