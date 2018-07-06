@@ -4,6 +4,7 @@ import (
 	"bytes"
 	encodingJson "encoding/json"
 	"fmt"
+	"log"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/ipfs"
@@ -338,7 +339,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//  if  address == ecrecover()  then Pass else Error
 	signedAddress, err := crypto.EcRecover(reqParam.MetaID.String(), reqParam.Signature.String())
 	if err != nil {
-		fmt.Println("Error :", err)
+		log.Println("Error :", err)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -346,12 +347,8 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		}
 		return
 	}
-	checkAddress := common.HexToAddress(signedAddress)
-	fmt.Println("Address :", checkAddress)
 
-	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
-	//if checkAddress.String() != reqParam.Address.String() {
-	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
+	if !bytes.Equal(signedAddress.Bytes(), reqParam.Address.Bytes()) {
 
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
@@ -510,10 +507,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		return
 	}
 
-	fmt.Println("Address :", signedAddress)
-	checkAddress := common.HexToAddress(signedAddress)
-	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
-	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
+	if !bytes.Equal(signedAddress.Bytes(), reqParam.Address.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -635,10 +629,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		return
 	}
 
-	fmt.Println("Address :", signedAddress)
-	checkAddress := common.HexToAddress(signedAddress)
-	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
-	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
+	if !bytes.Equal(signedAddress.Bytes(), reqParam.Address.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -649,7 +640,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 
 	//4. Save file to IPFS
-	ins := ipfs.GetInstance("localhost:5001")
+	ins := ipfs.GetInstance()
 	fileHash, err := ins.Add(reqParam.EncData.String())
 	if err != nil {
 		fmt.Println("Error :", err)
@@ -698,10 +689,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		return
 	}
 
-	fmt.Println("Address :", signedAddress)
-	checkAddress := common.HexToAddress(signedAddress)
-	//if signedAddress != strings.ToLower(reqParam.NewAddress.Hex()) {
-	if !bytes.Equal(checkAddress.Bytes(), reqParam.NewAddress.Bytes()) {
+	if !bytes.Equal(signedAddress.Bytes(), reqParam.NewAddress.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.NewAddress.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -712,7 +700,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 	//3. GET User Data from IPFS
 	//return data
-	ins := ipfs.GetInstance("localhost:5001")
+	ins := ipfs.GetInstance()
 	ret := ins.Cat(reqParam.FileID)
 	if ret == "" {
 		fmt.Println("Error : Cannot find file ")
@@ -764,9 +752,8 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		}
 		return
 	}
-	fmt.Println("Address :", signedAddress)
-	checkAddress := common.HexToAddress(signedAddress)
-	if !bytes.Equal(checkAddress.Bytes(), reqParam.NewAddress.Bytes()) {
+
+	if !bytes.Equal(signedAddress.Bytes(), reqParam.NewAddress.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.NewAddress.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -960,8 +947,8 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		}
 		return
 	}
-	checkAddress := common.HexToAddress(signedAddress)
-	if !bytes.Equal(findAddress.Bytes(), checkAddress.Bytes()) {
+
+	if !bytes.Equal(findAddress.Bytes(), signedAddress.Bytes()) {
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
