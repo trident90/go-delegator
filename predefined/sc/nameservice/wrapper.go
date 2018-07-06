@@ -72,7 +72,7 @@ func GetIDContractAddress() (*common.Address, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	fmt.Printf("Meta ID Address: %x \n", result)
+	log.Printf("Meta ID Address: %x \n", result)
 	return &result, nil
 }
 
