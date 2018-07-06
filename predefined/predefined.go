@@ -61,9 +61,12 @@ func Contains(path string) bool {
 }
 
 var predefinedPaths = map[string]interface{}{
-	"foo":              foo,
-	"eth_getBalance":   getBalance,
-	"register_meta_id": registerMetaID,
-	"revoke_meta_id":   revokeMetaID,
-	"update_meta_id":   updateMetaID,
+	"foo":               foo,
+	"eth_getBalance":    getBalance,
+	"register_meta_id":  registerMetaID,
+	"revoke_meta_id":    revokeMetaID,
+	"update_meta_id":    updateMetaID,
+	"backup_user_data":  backupUserData,
+	"get_user_data":     getUserData,
+	"restore_user_data": restoreUserData,
 }

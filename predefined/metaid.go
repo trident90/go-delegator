@@ -4,14 +4,15 @@ import (
 	"bytes"
 	encodingJson "encoding/json"
 	"fmt"
-	"strings"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
+	"bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/predefined/merkletree"
 	"bitbucket.org/coinplugin/proxy/predefined/sc/identitymanager"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 const (
@@ -21,6 +22,8 @@ const (
 	fileHashSize        = 46
 	timestampSize       = 14
 	minimumUserHashSize = 3
+	minimumUserDataSize = 10
+	addressHashIdx      = 0
 )
 
 type metaIDRegisterParams struct {
@@ -127,7 +130,7 @@ func (p *metaIDBackupParams) validate() Error {
 	if len(p.MetaID) != hashSize {
 		return &invalidParamsError{"Invalid meta_id parameter."}
 	}
-	if len(p.EncData) > minimumUserHashSize {
+	if len(p.EncData) < minimumUserHashSize {
 		return &invalidParamsError{"Invalid enc_data parameter."}
 	}
 	if len(p.Signature) != signatureSize {
@@ -249,8 +252,11 @@ func fillParam(p metaParam, obj interface{}) Error {
 
 // }
 
-func getParameter(method string, obj interface{}) (interface{}, Error) {
-
+func getParameter(method string, params []interface{}) (interface{}, Error) {
+	if len(params) != 1 {
+		return nil, &invalidParamsError{"Invalid params."}
+	}
+	obj := params[0]
 	switch method {
 	case "register_meta_id":
 		var reqParam metaIDRegisterParams
@@ -314,7 +320,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -344,7 +350,9 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	fmt.Println("Address :", checkAddress)
 
 	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
-	if checkAddress.String() != reqParam.Address.String() {
+	//if checkAddress.String() != reqParam.Address.String() {
+	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
+
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -474,7 +482,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -503,8 +511,9 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 
 	fmt.Println("Address :", signedAddress)
-
-	if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	checkAddress := common.HexToAddress(signedAddress)
+	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -599,7 +608,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -627,8 +636,9 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 
 	fmt.Println("Address :", signedAddress)
-
-	if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	checkAddress := common.HexToAddress(signedAddress)
+	//if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	if !bytes.Equal(checkAddress.Bytes(), reqParam.Address.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -638,12 +648,20 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		return
 	}
 
-	//3. Reqest Get UserAddress for New Meta ID
-	//  if GetAddress ==  reqParam.Address   then pass
-	//  else Error
-
 	//4. Save file to IPFS
-	//  return fileID
+	ins := ipfs.GetInstance("localhost:5001")
+	fileHash, err := ins.Add(reqParam.EncData.String())
+	if err != nil {
+		fmt.Println("Error :", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	// //  return fileID
+	resp.Result = fileHash
 	return
 }
 
@@ -653,7 +671,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -668,7 +686,8 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
 	//2. check Signature
 	//  if  newAddress == ecrecover()  then Pass else Error
-	signedAddress, err := crypto.EcRecover(reqParam.FileID, reqParam.Signature.String())
+	fHex := hexutil.Bytes(reqParam.FileID)
+	signedAddress, err := crypto.EcRecover(fHex.String(), reqParam.Signature.String())
 	if err != nil {
 		fmt.Println("Error :", err)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
@@ -680,8 +699,9 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 
 	fmt.Println("Address :", signedAddress)
-
-	if signedAddress != strings.ToLower(reqParam.NewAddress.Hex()) {
+	checkAddress := common.HexToAddress(signedAddress)
+	//if signedAddress != strings.ToLower(reqParam.NewAddress.Hex()) {
+	if !bytes.Equal(checkAddress.Bytes(), reqParam.NewAddress.Bytes()) {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.NewAddress.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
@@ -692,7 +712,19 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 	//3. GET User Data from IPFS
 	//return data
-
+	ins := ipfs.GetInstance("localhost:5001")
+	ret := ins.Cat(reqParam.FileID)
+	if ret == "" {
+		fmt.Println("Error : Cannot find file ")
+		errObj := &internalError{"Cannot find file"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	// //  return fileID
+	resp.Result = ret
 	return
 }
 
@@ -702,7 +734,7 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -717,7 +749,154 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	fmt.Println("parameter[OldMetaID] : ", reqParam.OldMetaID)
 	fmt.Println("parameter[userHash] : ", reqParam.UserHashs)
 	fmt.Println("parameter[Sig] : ", reqParam.Signature)
+	//	2. Get Address from  Signature
+	// 	   signdata = newMetaID
 
+	//2. check Signature
+	//  if  address == ecrecover()  then Pass else Error
+	signedAddress, err := crypto.EcRecover(reqParam.NewMetaID.String(), reqParam.Signature.String())
+	if err != nil {
+		fmt.Println("Error :", err)
+		errObj := &invalidSignatureError{"Failed to verify signature"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	fmt.Println("Address :", signedAddress)
+	checkAddress := common.HexToAddress(signedAddress)
+	if !bytes.Equal(checkAddress.Bytes(), reqParam.NewAddress.Bytes()) {
+		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.NewAddress.Hex(), signedAddress)
+		errObj := &invalidSignatureError{"Failed to verify signature"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+
+	// 3. Verification new MetaID  by make merkle tree root.
+	//   if newMetaID == root  then Pass  else  Error
+
+	var usrHashs []merkletree.Content
+
+	for _, userHash := range reqParam.UserHashs {
+
+		usrHashs = append(usrHashs, HashContent{h: userHash})
+
+	}
+
+	nTree, _ := merkletree.NewTree(usrHashs)
+
+	//Get the Merkle Root of the tree
+	nMr := nTree.MerkleRoot()
+
+	nRoot := hexutil.Bytes(nMr)
+
+	fmt.Printf("root hash: %v \n", nRoot)
+
+	if nRoot.String() != reqParam.NewMetaID.String() {
+		fmt.Printf("new MetaID invalid : %v, %x \n", reqParam.NewMetaID, nRoot)
+		errObj := &invalidSignatureError{"Failed to verify New MetaID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+
+	fmt.Printf("MetaID valid : %v \n", reqParam.NewMetaID)
+	// 4. Verification oldMetaID (merkleTree) by making merkle tree root with oldAddress
+
+	oldHash := ethCrypto.Keccak256(reqParam.OldAddress.Bytes())
+	//change newAddress to oldAddress
+	usrHashs[addressHashIdx] = HashContent{h: oldHash}
+
+	oTree, _ := merkletree.NewTree(usrHashs)
+
+	//Get the Merkle Root of the tree
+	oMr := oTree.MerkleRoot()
+
+	oRoot := hexutil.Bytes(oMr)
+
+	fmt.Printf("root hash: %v \n", oRoot)
+
+	if oRoot.String() != reqParam.OldMetaID.String() {
+		fmt.Printf("old MetaID invalid : %v, %x \n", reqParam.OldMetaID, oRoot)
+		errObj := &invalidSignatureError{"Failed to verify OldMetaID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+
+	// 5. Get user Address for Old Meta ID
+	//    getAddres == nil   then Error
+	//    getAddress == oldAddress  then pass
+	findOldAddress := &common.Address{}
+	findOldAddress, err = identitymanager.CallOwnerOf(reqParam.OldMetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	if findOldAddress == nil {
+
+		errObj := &notExistsError{"Canot get address for old Meta ID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	if !bytes.Equal(findOldAddress.Bytes(), reqParam.OldAddress.Bytes()) {
+		errObj := &invalidAddressError{"Cannot find valid user Address"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	// 6. Get user Address for New Meta ID
+	//    getAddres == nil   then Pass else error
+	findNewAddress := &common.Address{}
+	findNewAddress, err = identitymanager.CallOwnerOf(reqParam.NewMetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	if findNewAddress != nil {
+
+		errObj := &alreadyExistsError{"Cannot restore Meta ID"}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	// 7. Call restoreMetaID  function
+	trx, err := identitymanager.CallRestoreMetaID(reqParam.OldMetaID, reqParam.NewMetaID, reqParam.OldAddress, reqParam.NewAddress, reqParam.Signature)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	resp.Result = trx.Hash().String()
 	return
 }
 
@@ -727,7 +906,7 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
-	tmpParams, errObj := getParameter(req.Method, req.Params[0])
+	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),

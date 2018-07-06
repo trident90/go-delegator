@@ -222,6 +222,56 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 	return trx, nil
 }
 
+//CallRestoreMetaID   change new meta id,address  from old meta id, address
+//TODO: Contract 구현이 안되어 있음.
+func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddress common.Address, newAddress common.Address, sig hexutil.Bytes) (*types.Transaction, error) {
+	// var trx *types.Transaction
+	var err error
+
+	// var metaPack metaPackage
+	// metaPack = &metaPackageV1{
+	// 	Version:           1,
+	// 	UserSenderAddress: Address,
+	// }
+	// pack := metaPack.Serialize()
+	// fmt.Printf("Pack : %x", pack)
+	// service, err := getService()
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// 	return nil, err
+	// }
+
+	// tx := func(nonce uint64) error {
+	// 	_rpc := rpc.GetInstance()
+	// 	auth := crypto.GetTransactionOpts()
+	// 	auth.Nonce = big.NewInt(int64(nonce))
+	// 	auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+
+	// 	var oldID, newID [32]byte
+	// 	copy(oldID[:], oldMetaID)
+	// 	copy(newID[:], newMetaID)
+
+	// 	trx, err = service.UpdateMetaID(auth, oldID, newID, sig, pack)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return nil
+	// }
+	// c := crypto.GetInstance()
+	// res := c.ApplyNonce(tx)
+
+	// if !res {
+	// 	if err == nil {
+	// 		err = fmt.Errorf("call function Error - CreateMetaID")
+	// 	}
+	// 	return nil, err
+	// }
+	// return trx, nil
+	err = fmt.Errorf("Not implemented function.")
+	return nil, err
+}
+
 // CallDeleteMetaID is delete MetaID
 func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil.Bytes) (*types.Transaction, error) {
 
