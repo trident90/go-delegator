@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 
@@ -47,9 +49,6 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 			Code:    -1,
 			Message: err.Error(),
 		}
-		statusCode = 400
-	} else if resp.Error != nil && resp.Error.Code != 0 {
-		// In case of ether-node-side RPC fail
 		statusCode = 400
 	}
 	body = resp.String()
@@ -96,9 +95,25 @@ func help() {
 	fmt.Println("========== $> export KEY_PASSPHRASE=[passphrase]")
 	fmt.Println("========== $> proxy")
 }
+func init() {
 
+	log.SetPrefix("LOG: ")
+	log.SetFlags(log.Ldate | log.Lmicroseconds | log.Llongfile)
+	log.Println("init started")
+
+}
 func main() {
 	rpc.NetType = Targetnet
+
+	fpLog, err := os.OpenFile("/tmp/proxy.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer fpLog.Close()
+
+	// 파일과 화면에 같이 출력하기 위해 MultiWriter 생성
+	multiWriter := io.MultiWriter(fpLog, os.Stdout)
+	log.SetOutput(multiWriter)
 
 	// Initalize Crypto with arguments
 	var path, passphrase string
