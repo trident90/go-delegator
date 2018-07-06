@@ -96,8 +96,9 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 		return nil, err
 	}
 
-	tmpBigInt := hexutil.MustDecodeBig(metaID.String())
-
+	//tmpBigInt := hexutil.MustDecodeBig(metaID.String())
+	tmpBigInt := new(big.Int)
+	tmpBigInt.SetBytes(metaID)
 	result, err := service.OwnerOf(&bind.CallOpts{}, tmpBigInt)
 	if err != nil {
 		if err.Error() == "abi: unmarshalling empty output" {
@@ -106,7 +107,7 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 		log.Fatal(err)
 		return nil, err
 	}
-	fmt.Printf("Onwer Address: %x \n", result)
+	log.Printf("Onwer Address: %x \n", result)
 	return &result, nil
 }
 
@@ -121,7 +122,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 		UserSenderAddress: userAddress,
 	}
 	pack := metaPack.Serialize()
-	fmt.Printf("Pack : %x", pack)
+	log.Printf("Pack : %x", pack)
 	service, err := getService()
 	//session, err := getSession()
 
@@ -176,7 +177,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 		UserSenderAddress: userAddress,
 	}
 	pack := metaPack.Serialize()
-	fmt.Printf("Pack : %x", pack)
+	log.Printf("Pack : %x", pack)
 	service, err := getService()
 
 	if err != nil {
@@ -234,7 +235,7 @@ func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddr
 	// 	UserSenderAddress: Address,
 	// }
 	// pack := metaPack.Serialize()
-	// fmt.Printf("Pack : %x", pack)
+	// log.Printf("Pack : %x", pack)
 	// service, err := getService()
 
 	// if err != nil {
@@ -370,6 +371,6 @@ func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) 
 		log.Fatal(err1)
 		return false, err1
 	}
-	fmt.Printf("Ecverfiy: %v \n", result)
+	log.Printf("Ecverfiy: %v \n", result)
 	return result, nil
 }
