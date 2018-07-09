@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/coinplugin/proxy/crypto"
 	_ "bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
+	_ "bitbucket.org/coinplugin/proxy/log"
 	"bitbucket.org/coinplugin/proxy/predefined"
 	"bitbucket.org/coinplugin/proxy/rpc"
 
