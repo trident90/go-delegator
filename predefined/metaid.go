@@ -3,7 +3,6 @@ package predefined
 import (
 	encodingJson "encoding/json"
 	"fmt"
-	"strings"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/json"
@@ -343,7 +342,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, err error) {
 
 	fmt.Println("Address :", signedAddress)
 
-	if signedAddress != strings.ToLower(reqParam.Address.Hex()) {
+	if signedAddress != reqParam.Address {
 		fmt.Printf("Error  :Sign Error %v / %v \n", reqParam.Address.Hex(), signedAddress)
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = &json.RPCError{
