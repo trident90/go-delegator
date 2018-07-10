@@ -24,7 +24,7 @@ const (
 	timestampSize       = 14
 	minimumUserHashSize = 3
 	minimumUserDataSize = 10
-	addressHashIdx      = 0
+	addressHashIdx      = 2
 )
 
 type metaIDRegisterParams struct {
@@ -258,6 +258,7 @@ func getParameter(method string, params []interface{}) (interface{}, Error) {
 		return nil, &invalidParamsError{"Invalid params."}
 	}
 	obj := params[0]
+	log.Println("Req Param:", obj)
 	switch method {
 	case "register_meta_id":
 		var reqParam metaIDRegisterParams
@@ -380,7 +381,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
 	if root.String() != reqParam.MetaID.String() {
 		log.Printf("MetaID invalid : %v, %x \n", reqParam.MetaID, root)
-		errObj := &invalidMetaIDError{"Failed to verify signature"}
+		errObj := &invalidMetaIDError{"Failed to verify metaID"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
@@ -769,7 +770,7 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 
 	if nRoot.String() != reqParam.NewMetaID.String() {
 		log.Printf("new MetaID invalid : %v, %x \n", reqParam.NewMetaID, nRoot)
-		errObj := &invalidSignatureError{"Failed to verify New MetaID"}
+		errObj := &invalidMetaIDError{"Failed to verify New MetaID"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
@@ -795,7 +796,7 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 
 	if oRoot.String() != reqParam.OldMetaID.String() {
 		log.Printf("old MetaID invalid : %v, %x \n", reqParam.OldMetaID, oRoot)
-		errObj := &invalidSignatureError{"Failed to verify OldMetaID"}
+		errObj := &invalidMetaIDError{"Failed to verify Old MetaID"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
 			Message: errObj.Error(),
