@@ -14,7 +14,6 @@ import (
 )
 
 func defaultSetting() {
-
 	path := "/tmp/testKey"
 
 	file, err := os.Open("/tmp/testKeyPass")
@@ -36,14 +35,14 @@ func defaultSetting() {
 func TestGetOwnerAddress2(t *testing.T) {
 	client, err := ethclient.Dial("http://13.125.247.228:8545")
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	address := common.HexToAddress("0xc0b39803ae89ffa15b06a9b2784a1504b48eeb30")
 	//address := common.HexToAddress("0x71f446d16475d80322e880121dc7996512172031")
 	instance, err := NewIdentitymanager(address, client)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	var contractName [32]byte
@@ -55,7 +54,7 @@ func TestGetOwnerAddress2(t *testing.T) {
 		if err.Error() == "abi: unmarshalling empty output" {
 			fmt.Println("not registered ID")
 		} else {
-			log.Fatal(err)
+			log.Print(err)
 		}
 	}
 	fmt.Printf("Onwer Address: %x \n", result)
@@ -69,10 +68,12 @@ func TestGetOwnerAddress(t *testing.T) {
 
 	// metaID := hexutil.MustDecode("0x1b442640e0333cb03054940e3cda07da982d2b57af68c3df8d0557b47a77d0bc")		//084f8293f1b047d3a217025b24cd7b5ace8fc657
 	//metaID := hexutil.MustDecode("0xdb6dd8f5917a3c2f84a280f365ac137549e62d647b6cfba05a0f2c5e8e60e972") //created 961c20596e7ec441723fbb168461f4b51371d8aa
-	metaID := hexutil.MustDecode("0xc30255d8455a90fbb0ce11405b501624be9287370a41779312944c8739a9f79d") //Updated 961c20596e7ec441723fbb168461f4b51371d8aa
+	//metaID := hexutil.MustDecode("0xc30255d8455a90fbb0ce11405b501624be9287370a41779312944c8739a9f79d") //Updated 961c20596e7ec441723fbb168461f4b51371d8aa
+	//metaID := hexutil.MustDecode("0x628defba1494674ff937a7b88c453e25ae00b89dc925819007fa6f13a505a74c")
+	metaID := hexutil.MustDecode("0x400c2c9ae5f66133fb6a48d476756b9048a345a0666676e416cdaddf93ae09c5")
 	address, err = CallOwnerOf(metaID)
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 
 	if address != nil {
@@ -177,14 +178,14 @@ func TestEcverify(t *testing.T) {
 	sig := hexutil.MustDecode("0x94b7ca242f431df15ba6c1019f3e4e52b8e1c177615b254140456d7814d202751224329073bf22bd4779d98dbaa02c65c9e1ac867932f2828197e012cffd45ef1c")
 	// res, err := CallEcverify(metaID, sig, address)
 	// if err != nil {
-	// 	log.Fatal(err)
+	// 	log.Print(err)
 	// }
 	// fmt.Println(res)
 
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 	}
 	var msgBytes [32]byte
 	copy(msgBytes[:], metaID)
@@ -192,7 +193,7 @@ func TestEcverify(t *testing.T) {
 	result, err1 := service.Ecverify(&bind.CallOpts{}, msgBytes, sig, address)
 
 	if err1 != nil {
-		log.Fatal(err1)
+		log.Print(err1)
 
 	}
 	fmt.Printf("Ecverfiy: %v \n", result)
