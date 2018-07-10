@@ -46,3 +46,33 @@ type invalidSignatureError struct{ message string }
 func (e *invalidSignatureError) ErrorCode() int32 { return -32010 }
 
 func (e *invalidSignatureError) Error() string { return e.message }
+
+type invalidMetaIDError struct{ message string }
+
+func (e *invalidMetaIDError) ErrorCode() int32 { return -32012 }
+
+func (e *invalidMetaIDError) Error() string { return e.message }
+
+type alreadyExistsError struct{ message string }
+
+func (e *alreadyExistsError) ErrorCode() int32 { return -32013 }
+
+func (e *alreadyExistsError) Error() string { return e.message }
+
+type internalError struct{ message string }
+
+func (e *internalError) ErrorCode() int32 { return -32603 }
+
+func (e *internalError) Error() string { return e.message }
+
+type notExistsError struct{ message string }
+
+func (e *notExistsError) ErrorCode() int32 { return -32614 }
+
+func (e *notExistsError) Error() string { return e.message }
+
+type invalidAddressError struct{ message string }
+
+func (e *invalidAddressError) ErrorCode() int32 { return -32611 }
+
+func (e *invalidAddressError) Error() string { return e.message }
