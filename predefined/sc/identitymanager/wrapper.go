@@ -29,7 +29,7 @@ var instance *Identitymanager
 // 		auth.Value = big.NewInt(0)
 // 		auth.GasLimit = uint64(300000)
 // 		if err != nil {
-// 			log.Fatal(err)
+// 			log.Print(err)
 // 			return
 // 		}
 // 		session = &IdentitymanagerSession{
@@ -67,12 +67,12 @@ func getService() (*Identitymanager, error) {
 		//var err error
 		imAddress, err := nameservice.GetIMContractAddress()
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 			return
 		}
 		instance, err = NewIdentitymanager(*imAddress, client)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 			return
 		}
 	})
@@ -92,7 +92,7 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 
@@ -107,7 +107,7 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 		if err.Error() == "abi: unmarshalling empty output" {
 			return nil, nil
 		}
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 	log.Printf("Onwer Address: %x \n", result)
@@ -130,7 +130,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 	//session, err := getSession()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 
@@ -163,7 +163,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 	// copy(id[:], metaID)
 	// result, err := service.CreateMetaID(auth, id, sig, pack)
 	// if err != nil {
-	// 	log.Fatal(err)
+	// 	log.Print(err)
 	// 	return nil, err
 	// }
 	return trx, nil
@@ -184,7 +184,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 	// auth := crypto.GetTransactionOpts()
@@ -194,7 +194,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 	// copy(newID[:], newMetaID)
 	// result, err := service.UpdateMetaID(auth, oldID, newID, sig, pack)
 	// if err != nil {
-	// 	log.Fatal(err)
+	// 	log.Print(err)
 	// 	return nil, err
 	// }
 
@@ -241,7 +241,7 @@ func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddr
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 
@@ -281,7 +281,7 @@ func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return nil, err
 	}
 	/*
@@ -293,7 +293,7 @@ func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil
 
 		result, err := service.DeleteMetaID(auth, id, timestamp, sig)
 		if err != nil {
-			log.Fatal(err)
+			log.Print(err)
 			return nil, err
 		}
 		return result, nil
@@ -328,7 +328,7 @@ func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil
 	// copy(id[:], metaID)
 	// result, err := service.CreateMetaID(auth, id, sig, pack)
 	// if err != nil {
-	// 	log.Fatal(err)
+	// 	log.Print(err)
 	// 	return nil, err
 	// }
 	return trx, nil
@@ -361,7 +361,7 @@ func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) 
 	service, err := getService()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return false, err
 	}
 	var msgBytes [32]byte
@@ -370,7 +370,7 @@ func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) 
 	result, err1 := service.Ecverify(&bind.CallOpts{}, msgBytes, sig, address)
 
 	if err1 != nil {
-		log.Fatal(err1)
+		log.Print(err1)
 		return false, err1
 	}
 	log.Printf("Ecverfiy: %v \n", result)
