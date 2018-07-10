@@ -4,7 +4,8 @@ import (
 	"bytes"
 	encodingJson "encoding/json"
 	"fmt"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/ipfs"

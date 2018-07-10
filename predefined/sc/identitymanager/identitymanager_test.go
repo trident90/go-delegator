@@ -3,7 +3,7 @@ package identitymanager
 import (
 	"bufio"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"testing"
 

@@ -2,7 +2,7 @@ package nameservice
 
 import (
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math/big"
 	"sync"
 

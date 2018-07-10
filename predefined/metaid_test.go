@@ -3,7 +3,7 @@ package predefined
 import (
 	"bufio"
 	"fmt"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"math/big"
 	"os"
 	"testing"

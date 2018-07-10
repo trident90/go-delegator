@@ -2,9 +2,10 @@ package identitymanager
 
 import (
 	"fmt"
-	"log"
 	"math/big"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/predefined/sc/nameservice"

@@ -3,15 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	_ "bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
+	_ "bitbucket.org/coinplugin/proxy/log"
 	"bitbucket.org/coinplugin/proxy/predefined"
 	"bitbucket.org/coinplugin/proxy/rpc"
 
@@ -50,6 +50,9 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 			Message: err.Error(),
 		}
 		statusCode = 400
+	} else if resp.Error != nil && resp.Error.Code != 0 {
+		// In case of ether-node-side RPC fail
+		statusCode = 400
 	}
 	body = resp.String()
 	return
@@ -85,35 +88,19 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func help() {
-	fmt.Println("====== Need arguments")
-	fmt.Println("======== Option 1. key path only as argument")
-	fmt.Println("========== $> proxy [path]")
-	fmt.Println("======== Option 2. key path and passphrase as argument")
-	fmt.Println("========== $> proxy [path] [passphrase]")
-	fmt.Println("======== Option 3. key path and passphrase as environment variable")
-	fmt.Println("========== $> export KEY_PATH=[path]")
-	fmt.Println("========== $> export KEY_PASSPHRASE=[passphrase]")
-	fmt.Println("========== $> proxy")
+	fmt.Println("USAGE")
+	fmt.Println("  Option 1. key path only as argument")
+	fmt.Println("    $> proxy [path]")
+	fmt.Println("  Option 2. key path and passphrase as argument")
+	fmt.Println("    $> .proxy [path] [passphrase]")
+	fmt.Println("  Option 3. key path and passphrase as environment variable")
+	fmt.Println("    $> export KEY_PATH=[path]")
+	fmt.Println("    $> export KEY_PASSPHRASE=[passphrase]")
+	fmt.Println("    $> proxy")
 }
+
 func init() {
-
-	log.SetPrefix("LOG: ")
-	log.SetFlags(log.Ldate | log.Lmicroseconds | log.Llongfile)
-	log.Println("init started")
-
-}
-func main() {
 	rpc.NetType = Targetnet
-
-	fpLog, err := os.OpenFile("/tmp/proxy.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
-	}
-	defer fpLog.Close()
-
-	// 파일과 화면에 같이 출력하기 위해 MultiWriter 생성
-	multiWriter := io.MultiWriter(fpLog, os.Stdout)
-	log.SetOutput(multiWriter)
 
 	// Initalize Crypto with arguments
 	var path, passphrase string
@@ -121,9 +108,9 @@ func main() {
 		passphrase = os.Getenv(crypto.Passphrase)
 		os.Setenv(crypto.Path, "")
 		os.Setenv(crypto.Passphrase, "")
-	} else if len(os.Args) > 1 {
+	} else if len(os.Args) > 1 && os.Args[1] != "help" {
 		path = os.Args[1]
-		if len(os.Args) > 2 {
+		if len(os.Args) > 2 && !strings.HasPrefix(os.Args[2], "-") {
 			passphrase = os.Args[2]
 		} else {
 			fmt.Printf("Passphrase: ")
@@ -131,15 +118,16 @@ func main() {
 		}
 	} else {
 		help()
-		return
+		panic("Please refer above help")
 	}
 	go func() {
 		crypto.PathChan <- path
 		crypto.PassphraseChan <- passphrase
 	}()
 	crypto.GetInstance()
+}
 
-	// Run
+func main() {
 	if os.Getenv(crypto.IsAwsLambda) != "" {
 		fmt.Println("Ready to start Lambda")
 		lambda.Start(lambdaHandler)
