@@ -637,6 +637,26 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		}
 		return
 	}
+	err = ins.Pin(fileHash)
+	if err != nil {
+		log.Println("Error :", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
+	err = ins.PinByCluster(fileHash)
+	if err != nil {
+		log.Println("Error :", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = &json.RPCError{
+			Code:    errObj.ErrorCode(),
+			Message: errObj.Error(),
+		}
+		return
+	}
 	// //  return fileID
 	resp.Result = fileHash
 	return
