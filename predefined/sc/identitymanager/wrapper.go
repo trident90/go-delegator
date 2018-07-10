@@ -97,9 +97,12 @@ func CallOwnerOf(metaID hexutil.Bytes) (*common.Address, error) {
 	}
 
 	//tmpBigInt := hexutil.MustDecodeBig(metaID.String())
-	tmpBigInt := new(big.Int)
-	tmpBigInt.SetBytes(metaID)
-	result, err := service.OwnerOf(&bind.CallOpts{}, tmpBigInt)
+	// tmpBigInt := new(big.Int)
+	// tmpBigInt.SetBytes(metaID)
+	var id [32]byte
+	copy(id[:], metaID)
+
+	result, err := service.OwnerOf(&bind.CallOpts{}, id)
 	if err != nil {
 		if err.Error() == "abi: unmarshalling empty output" {
 			return nil, nil
@@ -224,53 +227,52 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 }
 
 //CallRestoreMetaID   change new meta id,address  from old meta id, address
-//TODO: Contract 구현이 안되어 있음.
 func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddress common.Address, newAddress common.Address, sig hexutil.Bytes) (*types.Transaction, error) {
-	// var trx *types.Transaction
+	var trx *types.Transaction
 	var err error
 
-	// var metaPack metaPackage
-	// metaPack = &metaPackageV1{
-	// 	Version:           1,
-	// 	UserSenderAddress: Address,
-	// }
-	// pack := metaPack.Serialize()
-	// log.Printf("Pack : %x", pack)
-	// service, err := getService()
+	var metaPack metaPackage
+	metaPack = &metaPackageV1{
+		Version:           1,
+		UserSenderAddress: newAddress,
+	}
+	pack := metaPack.Serialize()
+	log.Printf("Pack : %x", pack)
+	service, err := getService()
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	return nil, err
-	// }
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
 
-	// tx := func(nonce uint64) error {
-	// 	_rpc := rpc.GetInstance()
-	// 	auth := crypto.GetTransactionOpts()
-	// 	auth.Nonce = big.NewInt(int64(nonce))
-	// 	auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+	tx := func(nonce uint64) error {
+		_rpc := rpc.GetInstance()
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
+		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
 
-	// 	var oldID, newID [32]byte
-	// 	copy(oldID[:], oldMetaID)
-	// 	copy(newID[:], newMetaID)
+		var oldID, newID [32]byte
+		copy(oldID[:], oldMetaID)
+		copy(newID[:], newMetaID)
 
-	// 	trx, err = service.UpdateMetaID(auth, oldID, newID, sig, pack)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return nil
-	// }
-	// c := crypto.GetInstance()
-	// res := c.ApplyNonce(tx)
+		trx, err = service.RestoreMetaID(auth, oldID, newID, oldAddress, sig, pack)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
 
-	// if !res {
-	// 	if err == nil {
-	// 		err = fmt.Errorf("call function Error - CreateMetaID")
-	// 	}
-	// 	return nil, err
-	// }
-	// return trx, nil
-	err = fmt.Errorf("Not implemented function.")
-	return nil, err
+	if !res {
+		if err == nil {
+			err = fmt.Errorf("call function Error - Restore MetaID")
+		}
+		return nil, err
+	}
+	return trx, nil
+	// err = fmt.Errorf("Not implemented function.")
+	// return nil, err
 }
 
 // CallDeleteMetaID is delete MetaID
