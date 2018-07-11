@@ -11,7 +11,7 @@ import (
 	"bitbucket.org/coinplugin/proxy/crypto"
 	_ "bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
-	_ "bitbucket.org/coinplugin/proxy/log"
+	"bitbucket.org/coinplugin/proxy/log"
 	"bitbucket.org/coinplugin/proxy/predefined"
 	"bitbucket.org/coinplugin/proxy/rpc"
 
@@ -49,9 +49,6 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 			Code:    -1,
 			Message: err.Error(),
 		}
-		statusCode = 400
-	} else if resp.Error != nil && resp.Error.Code != 0 {
-		// In case of ether-node-side RPC fail
 		statusCode = 400
 	}
 	body = resp.String()
@@ -128,11 +125,12 @@ func init() {
 }
 
 func main() {
+	log.Info("Server starting...")
 	if os.Getenv(crypto.IsAwsLambda) != "" {
-		fmt.Println("Ready to start Lambda")
+		log.Info("Ready to start Lambda")
 		lambda.Start(lambdaHandler)
 	} else {
-		fmt.Println("Ready to start HTTP/HTTPS")
+		log.Info("Ready to start HTTP/HTTPS")
 		http.HandleFunc("/", httpHandler)
 		http.ListenAndServe(":8545", nil)
 		// http.ListenAndServeTLS()
