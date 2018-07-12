@@ -2,9 +2,10 @@ package nameservice
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"math/big"
 	"sync"
+
+	"bitbucket.org/coinplugin/proxy/log"
 
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/rpc"
@@ -25,7 +26,7 @@ func getSession() (*NameserviceSession, error) {
 		auth.Value = big.NewInt(0)
 		auth.GasLimit = uint64(300000)
 		if err != nil {
-			log.Print(err)
+			log.Error(err)
 			return
 		}
 		session = &NameserviceSession{
@@ -59,7 +60,7 @@ func GetIDContractAddress() (*common.Address, error) {
 
 	session, err := getSession()
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 		return nil, err
 	}
 
@@ -69,10 +70,10 @@ func GetIDContractAddress() (*common.Address, error) {
 	// result, err := instance.GetContractAddress(&bind.CallOpts{}, contractName)
 	result, err := session.GetContractAddress(contractName)
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 		return nil, err
 	}
-	log.Printf("Meta ID Address: %x \n", result)
+	log.Infof("Meta ID Address: %x ", result)
 	return &result, nil
 }
 
@@ -80,16 +81,16 @@ func GetIDContractAddress() (*common.Address, error) {
 func GetIMContractAddress() (*common.Address, error) {
 	session, err := getSession()
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 	}
 	var contractName [32]byte
 	copy(contractName[:], "MetadiumIdentityManager")
 
 	result, err := session.GetContractAddress(contractName)
 	if err != nil {
-		log.Print(err)
+		log.Error(err)
 	}
 
-	fmt.Printf("MetadiumIdentity Address: %x \n", result)
+	log.Infof("Metadium Identity Manager Address: %x ", result)
 	return &result, nil
 }
