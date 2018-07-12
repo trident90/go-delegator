@@ -15,8 +15,9 @@ func init() {
 	logger = log.New()
 
 	// Default configuration
+	timestampFormat := "02-01-2006 15:04:05"
 	logger.Formatter = &log.TextFormatter{
-		TimestampFormat: "02-01-2006 15:04:05",
+		TimestampFormat: timestampFormat,
 		FullTimestamp:   true,
 	}
 	logger.Out = os.Stdout
@@ -37,7 +38,7 @@ func init() {
 			switch strings.ToLower(arg[1]) {
 			case "json":
 				logger.Formatter = &log.JSONFormatter{
-					TimestampFormat: "02-01-2006 15:04:05",
+					TimestampFormat: timestampFormat,
 				}
 				break
 			}
@@ -49,7 +50,7 @@ func init() {
 	}
 	if stdoutLogger != nil {
 		stdoutLogger.Formatter = &log.TextFormatter{
-			TimestampFormat: "02-01-2006 15:04:05",
+			TimestampFormat: timestampFormat,
 			FullTimestamp:   true,
 		}
 		stdoutLogger.SetLevel(logger.Level)
