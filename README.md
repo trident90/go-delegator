@@ -2,7 +2,7 @@
 Main functions are MetaID CRUD and relaying JSON-RPC result with metadium node. In addition, this project try porting web3 to Golang. Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 
 ## Contents
-- [Features](#features)
+- [Features](README.md#features)
 - [Prerequisite](#prerequisite)
 - [Build](#build)
 - [Test](#test)
