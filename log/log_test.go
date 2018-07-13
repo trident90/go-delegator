@@ -2,10 +2,38 @@
 package log
 
 import (
+	"os"
 	"testing"
+	"time"
 
 	"bitbucket.org/coinplugin/proxy/common"
+	"bitbucket.org/coinplugin/proxy/json"
 )
+
+func TestStderr(t *testing.T) {
+	if f, err := os.OpenFile("./test.stderr", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
+		redirectStderr(f)
+	}
+	panic("TestStderr")
+}
+
+func TestSeq(t *testing.T) {
+	f := func(s string) {
+		for i := 0; i < 10; i++ {
+			Info(s)
+		}
+	}
+	go f("1")
+	go f("2")
+	go f("3")
+	time.Sleep(2 * time.Second)
+}
+
+func TestFormatd(t *testing.T) {
+	var a uint64
+	a = 55555555555555
+	Warnf("%d", a)
+}
 
 func TestId(t *testing.T) {
 	id := common.RandomUint64()
@@ -14,6 +42,11 @@ func TestId(t *testing.T) {
 	Infod(id, "info", "2")
 	Warnd(id, "warn", "3")
 	Errord(id, "error", "4")
+}
+
+func TestJson(t *testing.T) {
+	resp := &json.RPCResponse{}
+	Error(resp.String())
 }
 
 func TestGeneral(t *testing.T) {

@@ -1,18 +1,25 @@
 # Metadium Proxy
-Main functions are MetaID registration/update/recover and relaying JSON-RPC result with metadium node.
+Main functions are MetaID CRUD and relaying JSON-RPC result with metadium node. In addition, this project try porting web3 to Golang. Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 
-In addition, this project try porting web3 to Golang.
+## Contents
+* [Features](#markdown-header-features)
+* [Prerequisite](#markdown-header-prerequisite)
+* [Build](#markdown-header-build)
+* [Test](#markdown-header-test)
+* [Usage](#markdown-header-usage)
+* [Deploy (for AWS Lambda)](#markdown-header-deploy-for-aws-lambda)
+* [Documentation](#markdown-header-documentation)
+* [Reference](#markdown-header-reference)
+* [License](#markdown-header-license)
 
-Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
-
-# Features
+## Features
 1. JSON-RPC relay with metadium node
 2. Proofs for sign and merkle tree such as Ecrecover, DeriveSha, VerifyProof and so on
 3. Sign, SignTx with encrypted private key on DynamoDB
 4. IPFS
 5. fromWei, toWei written in Golang
 
-# Prerequisite
+## Prerequisite
 0. Go
     - Install at https://golang.org/doc/install
 1. Dep
@@ -30,7 +37,7 @@ docker pull karalabe/xgo-latest
 go get github.com/karalabe/xgo
 ```
 
-# Build
+## Build
 1. Move to root directory of this repo
 2. Build on your preference
 
@@ -43,24 +50,24 @@ go get github.com/karalabe/xgo
   - In case of compile for local machine,
 `make local`
 
-# Test
+## Test
 1. Move each module directory such as json, rpc and so on
 2. Run testunit
     ```
     go test -v
     ```
     
-# Usage
-1. $> proxy [KEY_JSON_PATH] -log_lev=debug -log_dir=/log/proxy.log -log_fmt=json
-2. $> proxy [KEY_JSON_PATH] [KEY_JSON_PASSPHRASE] -log_lev=debug -log_dir=/log/proxy.log -log_fmt=json
-    - ```log_lev```, ```log_dir``` and ```log_fmt``` are optional
+## Usage
+1. $> proxy [KEY_JSON_PATH] -log_lev=debug -log_out=/log/proxy.log -log_fmt=json
+2. $> proxy [KEY_JSON_PATH] [KEY_JSON_PASSPHRASE] -log_lev=debug -log_out=/log/proxy.log -log_fmt=json
+    - ```log_lev```, ```log_out``` and ```log_fmt``` are optional
     - default:
-        * log_lev: warn
-        * log_dir: stdout
+        * log_lev: info
+        * log_out: stdout
         * log_fmt: text
 
 
-# Deploy (for AWS Lambda)
+## Deploy (for AWS Lambda)
 1. Set Lambda on AWS
     - Function package: compressed binary file in $GOPATH/src/{repo}/bin
     - Handler: proxy (binary file name, it is optional)
@@ -70,7 +77,7 @@ go get github.com/karalabe/xgo
 3. Add API Gateway as Lambda trigger
 4. Add CloudWatch Logs
 
-# Documentation
+## Documentation
 1. Execute godoc -http like below
     ```
     godoc -http=:6060
@@ -79,7 +86,7 @@ go get github.com/karalabe/xgo
     - http://localhost:6060/pkg/bitbucket.org/coinplugin/proxy/
     - If you change port at 1., it should be applied to url
 
-# Reference
+## Reference
 [1] AWS Lambda Go, https://github.com/aws/aws-lambda-go
 
 [2] Go ethereum, https://github.com/ethereum/go-ethereum
@@ -94,5 +101,5 @@ go get github.com/karalabe/xgo
 
 [7] Dep, https://github.com/golang/dep
 
-# License
+## License
 MIT

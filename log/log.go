@@ -2,8 +2,10 @@
 package log
 
 import (
+	"io"
 	"os"
 	"strings"
+	"syscall"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -15,55 +17,52 @@ func init() {
 	logger = log.New()
 
 	// Default configuration
-	logger.Formatter = &log.TextFormatter{}
+	timestampFormat := "02-01-2006 15:04:05"
+	logger.Formatter = &log.TextFormatter{
+		TimestampFormat: timestampFormat,
+		FullTimestamp:   true,
+	}
 	logger.Out = os.Stdout
-	logger.SetLevel(log.WarnLevel)
+	logger.SetLevel(log.InfoLevel)
 
 	// Advanced configuration
-	var err error
 	var logPath string
 	for _, val := range os.Args {
 		arg := strings.Split(val, "=")
 		if len(arg) < 2 {
 			continue
-		} else if arg[0] == "-log_fmt" {
-			switch strings.ToLower(arg[1]) {
-			case "text":
-				logger.Formatter = &log.TextFormatter{}
-				break
-			case "json":
-				logger.Formatter = &log.JSONFormatter{}
-				break
-			}
 		} else if arg[0] == "-log_out" {
 			logPath = arg[1]
-		} else if arg[0] == "-log_lev" {
+		} else if arg[0] == "-log_fmt" {
 			switch strings.ToLower(arg[1]) {
-			case "debug":
-				logger.SetLevel(log.DebugLevel)
+			case "json":
+				logger.Formatter = &log.JSONFormatter{
+					TimestampFormat: timestampFormat,
+				}
 				break
-			case "info":
-				logger.SetLevel(log.InfoLevel)
-				break
-			case "warn":
-				logger.SetLevel(log.WarnLevel)
-				break
-			case "error":
-				logger.SetLevel(log.ErrorLevel)
-				break
-			case "fatal":
-				logger.SetLevel(log.FatalLevel)
-				break
-			case "panic":
-				logger.SetLevel(log.PanicLevel)
-				break
+			}
+		} else if arg[0] == "-log_lev" {
+			if lev, err := log.ParseLevel(strings.ToLower(arg[1])); err != nil {
+				logger.SetLevel(lev)
 			}
 		}
 	}
 	if logPath != "" {
-		if logger.Out, err = os.Create(logPath); err != nil {
-			panic("Failed to create log file")
+		if f, err := os.OpenFile(logPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
+			logger.Out = io.MultiWriter(f, os.Stdout)
+		} else {
+			Panic("Failed to create log file")
 		}
+		// Stderr
+		if f, err := os.OpenFile(logPath+".stderr", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
+			redirectStderr(f)
+		}
+	}
+}
+
+func redirectStderr(f *os.File) {
+	if err := syscall.Dup2(int(f.Fd()), int(os.Stderr.Fd())); err != nil {
+		Fatalf("Failed to redirect stderr to file: %v", err)
 	}
 }
 
