@@ -428,7 +428,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		}
 		return
 	}
-	log.Debugfd(requestTmpID, "PASS 04-2. Get Address OwnerOf MetaID : %v", address.String())
+	log.Debugd(requestTmpID, "PASS 04-2. Get Address OwnerOf MetaID : nil")
 	//5. Send Transaction for Calling SC Function [createNewMetaID]
 	//identitymanager.CallCreateMetaID()
 	//  return txid
