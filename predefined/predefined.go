@@ -3,6 +3,7 @@ package predefined
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/log"
@@ -45,7 +46,7 @@ func getBalance(req json.RPCRequest) (json.RPCResponse, error) {
 func Forward(req json.RPCRequest) (resp json.RPCResponse, err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			log.Errorf("Internal Error(Panic) : %s", r)
+			log.Errorf("Internal Error(Panic) : %s", debug.Stack())
 			resp.Error = &json.RPCError{
 				Code:    -32603,
 				Message: "Internal Error",
