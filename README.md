@@ -3,14 +3,14 @@ Main functions are MetaID CRUD and relaying JSON-RPC result with metadium node. 
 
 ## Contents
 * [Features](#markdown-header-features)
-* [Prerequisite](#markdown-heading-prerequisite)
-* [Build](#build)
-* [Test](#test)
-* [Usage](#usage)
-* [Deploy (for AWS Lambda)](#deploy-for-aws-lambda)
-* [Documentation](#documentation)
-* [Reference](#reference)
-* [License](#license)
+* [Prerequisite](#markdown-header-prerequisite)
+* [Build](#markdown-header-build)
+* [Test](#markdown-header-test)
+* [Usage](#markdown-header-usage)
+* [Deploy (for AWS Lambda)](#markdown-header-deploy-for-aws-lambda)
+* [Documentation](#markdown-header-documentation)
+* [Reference](#markdown-header-reference)
+* [License](#markdown-header-license)
 
 ## Features
 1. JSON-RPC relay with metadium node
