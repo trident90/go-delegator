@@ -546,7 +546,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	log.Debugd(requestTmpID, "PASS - 04-1. Get Address OwnerOf Old MetaID")
 
 	if findAddress == nil {
-		log.Errorf("not found address for old MetaID")
+		log.Error("not found address for old MetaID")
 		errObj := &notExistsError{"Cannot Update Meta ID"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -557,7 +557,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	log.Debugfd(requestTmpID, "PASS - 04-2. Get Address OwnerOf Old MetaID : %v", findAddress.String())
 
 	if !bytes.Equal(findAddress.Bytes(), reqParam.Address.Bytes()) {
-		log.Errorf("Address is not valid")
+		log.Error("Address is not valid")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -719,7 +719,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	ins := ipfs.GetInstance()
 	ret := ins.Cat(reqParam.FileID)
 	if ret == "" {
-		log.Errorf("Error : Cannot find file ")
+		log.Error("Error : Cannot find file ")
 		errObj := &internalError{"Cannot find file"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),
@@ -867,7 +867,7 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	log.Debugfd(requestTmpID, "PASS - 05-2. Get Address OwnerOf Old MetaID : %v", findOldAddress.String())
 
 	if !bytes.Equal(findOldAddress.Bytes(), reqParam.OldAddress.Bytes()) {
-		log.Errorf("Old Address is not valid")
+		log.Error("Old Address is not valid")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = &json.RPCError{
 			Code:    errObj.ErrorCode(),

@@ -181,7 +181,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 		UserSenderAddress: userAddress,
 	}
 	pack := metaPack.Serialize()
-	log.Errorf("Pack : %x", pack)
+	log.Debugf("Pack : %x", pack)
 	service, err := getService()
 
 	if err != nil {
