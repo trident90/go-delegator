@@ -3,8 +3,10 @@ package predefined
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"bitbucket.org/coinplugin/proxy/json"
+	"bitbucket.org/coinplugin/proxy/log"
 	"bitbucket.org/coinplugin/proxy/rpc"
 	"bitbucket.org/coinplugin/proxy/web3"
 )
@@ -41,13 +43,24 @@ func getBalance(req json.RPCRequest) (json.RPCResponse, error) {
 }
 
 // Forward delivers RPCRequest to predefined function and returns that
-func Forward(req json.RPCRequest) (json.RPCResponse, error) {
+func Forward(req json.RPCRequest) (resp json.RPCResponse, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Errorf("Internal Error(Panic) : %s", debug.Stack())
+			resp.Error = &json.RPCError{
+				Code:    -32603,
+				Message: "Internal Error",
+			}
+		}
+	}()
 	for k, v := range predefinedPaths {
 		if k == req.Method {
 			return v.(func(json.RPCRequest) (json.RPCResponse, error))(req)
 		}
 	}
-	return json.RPCResponse{}, fmt.Errorf("predefined NOT FOUND")
+	err = fmt.Errorf("predefined NOT FOUND")
+
+	return resp, err
 }
 
 // Contains check if given path is in predefined or not
