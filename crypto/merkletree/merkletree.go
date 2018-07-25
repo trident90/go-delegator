@@ -1,12 +1,12 @@
 package merkletree
 
+//TODO: crypto package로 이동
 import (
 	"bytes"
 
 	"errors"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -226,14 +226,14 @@ func (m *MerkleTree) String() string {
 }
 
 // Content For metaID
-type HashContent struct {
-	h hexutil.Bytes
-}
+// type HashContent struct {
+// 	h hexutil.Bytes
+// }
 
-func (t HashContent) CalculateHash() []byte {
-	return t.h
-}
+// func (t HashContent) CalculateHash() []byte {
+// 	return t.h
+// }
 
-func (t HashContent) Equals(other Content) bool {
-	return t.h.String() == other.(HashContent).h.String()
-}
+// func (t HashContent) Equals(other Content) bool {
+// 	return t.h.String() == other.(HashContent).h.String()
+// }
