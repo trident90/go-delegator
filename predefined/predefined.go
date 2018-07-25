@@ -82,4 +82,5 @@ var predefinedPaths = map[string]interface{}{
 	"backup_user_data":  backupUserData,
 	"get_user_data":     getUserData,
 	"restore_user_data": restoreUserData,
+	"get_address":       getAddress,
 }
