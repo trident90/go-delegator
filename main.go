@@ -17,6 +17,8 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/fvbock/endless"
 )
 
 const (
@@ -27,6 +29,7 @@ const (
 )
 
 func handler(req json.RPCRequest) (body string, statusCode int) {
+	log.Info("request:", req.String())
 	var resp json.RPCResponse
 	var err error
 	if predefined.Contains(req.Method) {
@@ -44,7 +47,7 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 	statusCode = 200
 	if err != nil {
 		// In case of server-side RPC fail
-		fmt.Println(err.Error())
+		log.Error(err.Error())
 		resp.Error = &json.RPCError{
 			Code:    -1,
 			Message: err.Error(),
@@ -131,8 +134,8 @@ func main() {
 		lambda.Start(lambdaHandler)
 	} else {
 		log.Info("Ready to start HTTP/HTTPS")
-		http.HandleFunc("/", httpHandler)
-		http.ListenAndServe(":8545", nil)
-		// http.ListenAndServeTLS()
+		h := http.NewServeMux()
+		h.HandleFunc("/", httpHandler)
+		endless.ListenAndServe(":8545", h)
 	}
 }
