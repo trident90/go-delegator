@@ -2,6 +2,7 @@ package predefined
 
 import "fmt"
 
+// Error is general error interface in Proxy
 type Error interface {
 	Error() string    // returns the message
 	ErrorCode() int32 // returns the code
@@ -94,3 +95,9 @@ type notFoundFileError struct{ message string }
 func (e *notFoundFileError) ErrorCode() int32 { return -32616 }
 
 func (e *notFoundFileError) Error() string { return e.message }
+
+type alreadyUsedAddressError struct{ message string }
+
+func (e *alreadyUsedAddressError) ErrorCode() int32 { return -32018 }
+
+func (e *alreadyUsedAddressError) Error() string { return e.message }
