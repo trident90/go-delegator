@@ -377,3 +377,49 @@ func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) 
 	log.Debugf("Ecverfiy: %v", result)
 	return result, nil
 }
+func CallBalanceOf(address common.Address) (*big.Int, error) {
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return new(big.Int), err
+	}
+	result, err1 := service.BalanceOf(&bind.CallOpts{}, address)
+
+	if err1 != nil {
+		log.Error(err1)
+		return new(big.Int), err1
+	}
+	return result, nil
+}
+
+func CallTokenOfOwnerByIndex(address common.Address, idx *big.Int) (hexutil.Bytes, error) {
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	count, err := service.BalanceOf(&bind.CallOpts{}, address)
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if count.Cmp(idx) < 1 {
+		return nil, fmt.Errorf("index is out of range")
+	}
+
+	metaIDBytes, err := service.TokenOfOwnerByIndex(&bind.CallOpts{}, address, idx)
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	// var metaID hexutil.Bytes
+	// metaID = metaIDBytes[:]
+
+	//metaID := hexutil.Encode(metaIDBytes)
+	return metaIDBytes[:], nil
+}
