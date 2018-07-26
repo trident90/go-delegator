@@ -2,6 +2,7 @@ package predefined
 
 import (
 	"bytes"
+	"math/big"
 
 	proxyCommon "bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/crypto"
@@ -13,6 +14,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+)
+
+var (
+	zero = big.NewInt(0)
 )
 
 func makeErrorResponse(err Error) *json.RPCError {
@@ -53,27 +58,18 @@ func getAddress(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	return
 }
 
-//func getLogger(id uint64, method string)
 func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
-	// methodName := "registerMetaID"
+
 	requestTmpID := proxyCommon.RandomUint64()
-	// logger := log.GetLogger(requestTmpID, methodName)
 	log.Debugd(requestTmpID, " Call registerMetalID Function")
-	// log.Debugfd(requestTmpID, "%p %s - Call registerMetalID Function", &req, "registerMetaID")
-	//log.Debugfd(requestTmpID, "%v - Call registerMetalID Function", "registerMetaID")
-	//var reqParam interface{}
+
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
 	//1. Check paramter format
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
-		//TODO: 공통 func 으로
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDRegisterParams)
@@ -87,15 +83,9 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	//  if  address == ecrecover()  then Pass else Error
 	signedAddress, err := crypto.EcRecover(reqParam.MetaID.String(), reqParam.Signature.String())
 	if err != nil {
-		//TODO: 인지된 에러는 debug로... 인지되지 않은 internalError는 Error로 로깅
 		log.Errorfd(requestTmpID, "EcRecover Error: %v", err)
-		//TODO:  ecRecover 에러와 address다른 부분 에러 분리
 		errObj := &internalError{"Failed to EcRecover"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 02-1. Check Signature signAddress : %v", signedAddress.String())
@@ -105,10 +95,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		//TODO:  ecRecover 에러와 address다른 부분 에러 분리
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 02-2. signedAddress is valid")
@@ -118,9 +104,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
 	var usrHashs []merkletree.Content
 
-	//raws := []string{"abc", "123"}
 	for _, userHash := range reqParam.UserHashs {
-
 		usrHashs = append(usrHashs, merkletree.HashContent{H: userHash})
 	}
 
@@ -133,15 +117,10 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
 	log.Debugfd(requestTmpID, "PASS 03-1. Make Merkle Root: %v ", root)
 
-	//if root.String() != reqParam.MetaID.String() {
 	if !bytes.Equal(root, reqParam.MetaID) {
 		log.Debugfd(requestTmpID, "Error - Invalid MetaID (MetaID,ROOT): %v,%v", reqParam.MetaID, root)
 		errObj := &invalidMetaIDError{"Failed to verify metaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
@@ -155,10 +134,6 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS 04-1. Get Address OwnerOf MetaID")
@@ -168,29 +143,39 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugf("Error-Already registered MetaID: %v", address.String())
 		errObj := &alreadyExistsAddressError{"already exists address for metaID"} //"Cannot register Meta ID"
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS 04-2. Get Address OwnerOf MetaID : nil")
-	//5. Send Transaction for Calling SC Function [createNewMetaID]
+
+	//5.get MetaID Count for Address
+	count, err := identitymanager.CallBalanceOf(reqParam.Address)
+	if err != nil {
+		log.Errorfd(requestTmpID, "CallBalanceOf Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	if zero.Cmp(count) != 0 {
+		log.Errord(requestTmpID, "already used address for registering metaID")
+		errObj := &alreadyUsedAddressError{"already used address"}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	//6. Send Transaction for Calling SC Function [createNewMetaID]
 	//identitymanager.CallCreateMetaID()
-	//  return txid
 
 	trx, err := identitymanager.CallCreateMetaID(reqParam.MetaID, reqParam.Signature, reqParam.Address)
 	if err != nil {
 		log.Errorfd(requestTmpID, "CallCreateMetaID Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS 05. Call CreateMetaID : %v", trx.Hash().String())
+
+	//  return txid
 	resp.Result = trx.Hash().String()
 	return
 }
@@ -198,7 +183,7 @@ func registerMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	requestTmpID := proxyCommon.RandomUint64()
 	log.Debugd(requestTmpID, "Call updateMetaID Function")
-	//var reqParam interface{}
+
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
@@ -206,10 +191,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDUpdateParams)
@@ -226,10 +207,6 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "EcRecover Error : %v", err)
 		errObj := &internalError{"Failed to EcRecover"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 02-1.EcRecover(Signd Address): %v", signedAddress.String())
@@ -239,13 +216,10 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 02-2. signd Address is valid")
+
 	//3. Check New Meta ID  by make merkle tree root.
 	//   if newMetaID == root  then Pass  else  Error
 
@@ -265,23 +239,18 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	root := hexutil.Bytes(mr)
 
 	log.Debugfd(requestTmpID, "PASS - 03-1. Make Merkle Root: %v", root)
-	//TODO: String 비교 -> byte 비교
-	//if root.String() != reqParam.NewMetaID.String() {
+
 	if !bytes.Equal(root, reqParam.NewMetaID) {
 
 		log.Debugfd(requestTmpID, "Error - Invalid MetaID (MetaID, ROOT) : %v, %x ", reqParam.NewMetaID, root)
 		errObj := &invalidMetaIDError{"Failed to verify metaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
 	log.Debugfd(requestTmpID, "PASS - 03-2. MetaID valid : %v", reqParam.NewMetaID)
 
-	//4. Reqest Get UserAddress for New Meta ID
+	//4. Reqest Get UserAddress for old Meta ID
 	//  if GetAddress ==  reqParam.Address   then pass
 	//  else Error
 	findAddress := &common.Address{}
@@ -290,22 +259,14 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 04-1. Get Address OwnerOf Old MetaID")
 
 	if findAddress == nil {
 		log.Debugd(requestTmpID, "not found address for old MetaID")
-		errObj := &notExistsAddressError{"not found Address for metaID"} //"Cannot Update Meta ID"
+		errObj := &notExistsAddressError{"not found Address for old metaID"} //"Cannot Update Meta ID"
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 04-2. Get Address OwnerOf Old MetaID : %v", findAddress.String())
@@ -314,13 +275,31 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugd(requestTmpID, "Error - Address is not valid")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 04-3. Address Valid ")
+
+	//5. Reqest Get UserAddress for New Meta ID
+	//  if GetAddress ==  nil   then pass
+	//  else Error
+	findNewAddress := &common.Address{}
+	findNewAddress, err = identitymanager.CallOwnerOf(reqParam.NewMetaID)
+	if err != nil {
+		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugd(requestTmpID, "PASS - 05-1. Get Address OwnerOf New MetaID")
+
+	if findNewAddress != nil {
+		log.Debugfd(requestTmpID, "already exists address for new MetaID(id/addr): %v, %v", reqParam.NewMetaID.String(), findNewAddress.String())
+		errObj := &alreadyExistsAddressError{"already exists address for new MetaID"} //"Cannot Update Meta ID"
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugfd(requestTmpID, "PASS - 05-2. Get Address OwnerOf Old MetaID : %v", findAddress.String())
+
 	//5. Send Transaction for Calling SC Function[ updateMetaID ]
 	//  return txid
 	trx, err := identitymanager.CallUpdateMetaID(reqParam.OldMetaID, reqParam.NewMetaID, reqParam.Signature, reqParam.Address)
@@ -334,7 +313,7 @@ func updateMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		// }
 		return
 	}
-	log.Debugfd(requestTmpID, "PASS - 05. Call SC UpdateMetaID : %v", trx.Hash().String())
+	log.Debugfd(requestTmpID, "PASS - 06. Call SC UpdateMetaID : %v", trx.Hash().String())
 	resp.Result = trx.Hash().String()
 
 	return
@@ -351,10 +330,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDBackupParams)
@@ -371,10 +346,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "EcRecover Error : %v", err)
 		errObj := &internalError{"Failed to EcRecover"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
@@ -382,10 +353,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugfd(requestTmpID, "Error  :Sign Error %v / %v ", reqParam.Address.String(), signedAddress.String())
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 02. Check Signature")
@@ -396,10 +363,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 03-1. Get Address OwnerOf MetaID")
@@ -408,10 +371,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugd(requestTmpID, "not found address for MetaID")
 		errObj := &notExistsAddressError{"not found address for metaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 03-2. Get Address OwnerOfMetaID : %v", findAddress.String())
@@ -420,10 +379,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugd(requestTmpID, "Error - Address is not valid")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 03-3. Address Valid ")
@@ -435,10 +390,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "ipfs.Add Error : %v", err)
 		errObj := &saveBackupFileError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 04-1. ipfs add ")
@@ -447,10 +398,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "ipfs.Pin Error : %v", err)
 		errObj := &saveBackupFileError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 04-2. ipfs Pin ")
@@ -475,7 +422,6 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	requestTmpID := proxyCommon.RandomUint64()
 	log.Debugd(requestTmpID, "Call getUserData Function")
-	//var reqParam interface{}
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
@@ -483,10 +429,6 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDGetUserDataParams)
@@ -530,10 +472,6 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugd(requestTmpID, "Error : Cannot find file ")
 		errObj := &notFoundFileError{"not found backup file"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 03. ipfs.Cat")
@@ -553,10 +491,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDRestoreParams)
@@ -568,20 +502,14 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	log.Debugfd(requestTmpID, "parameter[Sig] : %v", reqParam.Signature)
 	log.Debugd(requestTmpID, "PASS - 01. Check Parameter")
 
-	//	2. Get Address from  Signature
-	// 	   signdata = newMetaID
-
 	//2. check Signature
+	// 	   signdata = newMetaID
 	//  if  address == ecrecover()  then Pass else Error
 	signedAddress, err := crypto.EcRecover(reqParam.NewMetaID.String(), reqParam.Signature.String())
 	if err != nil {
 		log.Errorfd(requestTmpID, "EcRecover Error : %v", err)
 		errObj := &internalError{"Failed to EcRecover"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 02-1. Check Signature signedAddress : %v ", signedAddress.String())
@@ -590,10 +518,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Debugfd(requestTmpID, "Error  :Sign Error %v / %v ", reqParam.NewAddress.String(), signedAddress.String())
 		errObj := &invalidSignatureError{"Failed to verify signature"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 02-2. signed Address Valid")
@@ -616,15 +540,10 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	nRoot := hexutil.Bytes(nMr)
 	log.Debugfd(requestTmpID, "PASS - 03-1. Make Merkle Root For new MetaID: %v", nRoot)
 
-	//if nRoot.String() != reqParam.NewMetaID.String() {
 	if !bytes.Equal(nRoot, reqParam.NewMetaID) {
 		log.Debugfd(requestTmpID, "new MetaID invalid : %v, %x ", reqParam.NewMetaID, nRoot)
 		errObj := &invalidMetaIDError{"Failed to verify New MetaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
@@ -643,15 +562,11 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 	oRoot := hexutil.Bytes(oMr)
 
 	log.Debugfd(requestTmpID, "PASS - 04-1. Make Merkle Root For old MetaID: %v", oRoot)
-	//if oRoot.String() != reqParam.OldMetaID.String() {
+
 	if !bytes.Equal(oRoot, reqParam.OldMetaID) {
 		log.Debugfd(requestTmpID, "Error - old MetaID invalid : %v, %x ", reqParam.OldMetaID, oRoot)
 		errObj := &invalidOldMetaIDError{"Failed to verify Old MetaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 04-2. Old MetaID valid : %v ", reqParam.OldMetaID)
@@ -664,10 +579,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 05-1. Get Address OwnerOf Old MetaID")
@@ -675,10 +586,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Debugfd(requestTmpID, "Not Found Address for Old MetaID : %v", reqParam.OldMetaID)
 		errObj := &notExistsAddressError{"not found address for old metaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 05-2. Get Address OwnerOf Old MetaID : %v", findOldAddress.String())
@@ -687,10 +594,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Debugd(requestTmpID, "Old Address is not valid")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 05-3. Old Address is valid")
@@ -702,10 +605,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
@@ -714,10 +613,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Debugfd(requestTmpID, "address for new MetaID is already Existed : %v", findNewAddress.String())
 		errObj := &alreadyExistsAddressError{"already exists address for new metaID"} //Cannot restore Meta ID
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 06-2. Not Found Address for New MetaID")
@@ -727,10 +622,6 @@ func restoreUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) 
 		log.Errorfd(requestTmpID, "CallRestoreMetaID Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 07. Call SC restoreMetaID : %v", trx.Hash().String())
@@ -749,10 +640,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	reqParam := tmpParams.(metaIDRevokeParams)
@@ -775,10 +662,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "EcRecover Error : %v", err)
 		errObj := &internalError{"Failed to EcRecover"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 02. Check Signature signedAddress : %v ", signedAddress.String())
@@ -789,10 +672,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "CallOwnerOf Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 
@@ -802,10 +681,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugfd(requestTmpID, "Error - not found Address for MetaID (%v) ", reqParam.MetaID)
 		errObj := &notExistsAddressError{"not found Address for metaID"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 03-2. Get Address OwnerOf MetaID : %v", findAddress.String())
@@ -814,10 +689,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Debugfd(requestTmpID, "signed Address Not Valid ")
 		errObj := &invalidAddressError{"Cannot find valid user Address"}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugd(requestTmpID, "PASS - 03-3. signed Address Valid")
@@ -828,10 +699,6 @@ func revokeMetaID(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		log.Errorfd(requestTmpID, "CallDeleteMetaID Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		// resp.Error = &json.RPCError{
-		// 	Code:    errObj.ErrorCode(),
-		// 	Message: errObj.Error(),
-		// }
 		return
 	}
 	log.Debugfd(requestTmpID, "PASS - 04. Call SC DeleteMetaID : %v", trx.Hash().String())
