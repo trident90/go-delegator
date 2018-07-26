@@ -3,10 +3,11 @@ package predefined
 import (
 	"bufio"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"math/big"
 	"os"
 	"testing"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
@@ -256,8 +257,8 @@ func TestGetUserDataError(t *testing.T) {
 }
 func TestConvert(t *testing.T) {
 
-	metaId := "0x059e1e9bee92b3d2c425434ac3e7f076c10049b79bbfdf98fb0c5408217531f2"
-	bytes := hexutil.MustDecode(metaId)
+	metaID := "0x059e1e9bee92b3d2c425434ac3e7f076c10049b79bbfdf98fb0c5408217531f2"
+	bytes := hexutil.MustDecode(metaID)
 	//tmpBigInt := hexutil.MustDecodeBig(metaId)
 	n := new(big.Int)
 	n.SetBytes(bytes)

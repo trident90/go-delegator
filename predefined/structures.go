@@ -120,7 +120,6 @@ func getParameter(method string, params []interface{}) (interface{}, Error) {
 		return nil, &invalidParamsError{"Invalid params."}
 	}
 	obj := params[0]
-	log.Debugf("Req Param: %v", obj)
 	switch method {
 	case "register_meta_id":
 		var reqParam metaIDRegisterParams
