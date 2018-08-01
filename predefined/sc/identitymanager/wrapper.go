@@ -17,7 +17,11 @@ import (
 	//	"github.com/ethereum/go-ethereum/crypto"
 )
 
-var once sync.Once
+var (
+	once   sync.Once
+	zero   = big.NewInt(0)
+	glimit = uint64(0)
+)
 
 // var session *IdentitymanagerSession
 var instance *Identitymanager
@@ -140,7 +144,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
-
+		auth.GasLimit = glimit
 		var id [32]byte
 		copy(id[:], metaID)
 
@@ -204,6 +208,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
 
 		var oldID, newID [32]byte
 		copy(oldID[:], oldMetaID)
@@ -251,6 +256,7 @@ func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddr
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
 
 		var oldID, newID [32]byte
 		copy(oldID[:], oldMetaID)
@@ -306,6 +312,8 @@ func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
+
 		var id [32]byte
 		copy(id[:], metaID)
 
@@ -384,12 +392,20 @@ func CallBalanceOf(address common.Address) (*big.Int, error) {
 		log.Error(err)
 		return new(big.Int), err
 	}
-	result, err1 := service.BalanceOf(&bind.CallOpts{}, address)
+	result, err := service.BalanceOf(&bind.CallOpts{}, address)
 
-	if err1 != nil {
-		log.Error(err1)
-		return new(big.Int), err1
+	if err != nil {
+		if err.Error() == "abi: unmarshalling empty output" {
+			return zero, nil
+		}
+		log.Error(err)
+		return nil, err
 	}
+
+	// if err1 != nil {
+	// 	log.Error(err1)
+	// 	return new(big.Int), err1
+	// }
 	return result, nil
 }
 
