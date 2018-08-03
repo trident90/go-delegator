@@ -20,7 +20,7 @@ import (
 var (
 	once   sync.Once
 	zero   = big.NewInt(0)
-	glimit = uint64(0)
+	glimit = uint64(4000000)
 )
 
 // var session *IdentitymanagerSession
