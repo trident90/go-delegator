@@ -427,7 +427,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(requestTmpID, "PASS - 04-1. ipfs add ")
+	log.Debugd(requestTmpID, "PASS - 04-1. ipfs add ", fileHash)
 	err = ins.Pin(fileHash)
 	if err != nil {
 		log.Errorfd(requestTmpID, "ipfs.Pin Error : %v", err)
@@ -435,7 +435,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(requestTmpID, "PASS - 04-2. ipfs Pin ")
+	log.Debugd(requestTmpID, "PASS - 04-2. ipfs Pin ", fileHash)
 	err = ins.PinByCluster(fileHash)
 	//TODO: 당분간 Cluster 에러 PASS
 	// if err != nil {
@@ -448,7 +448,7 @@ func backupUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	// 	// }
 	// 	return
 	// }
-	log.Debugd(requestTmpID, "PASS - 04-3. ipfs PinByCluster ")
+	log.Debugd(requestTmpID, "PASS - 04-3. ipfs PinByCluster ", fileHash)
 	//  return fileID
 	resp.Result = fileHash
 	return
