@@ -93,7 +93,7 @@ func TestGetIMContractAddress(t *testing.T) {
 	defaultSetting()
 	address, err := GetIMContractAddress()
 	if err != nil {
-		fmt.Printfln(err)
+		fmt.Println(err)
 		t.Error("error ", err)
 	}
 	fmt.Printf("IM Address: %x", *address)

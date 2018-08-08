@@ -17,7 +17,11 @@ import (
 	//	"github.com/ethereum/go-ethereum/crypto"
 )
 
-var once sync.Once
+var (
+	once   sync.Once
+	zero   = big.NewInt(0)
+	glimit = uint64(4000000)
+)
 
 // var session *IdentitymanagerSession
 var instance *Identitymanager
@@ -140,7 +144,7 @@ func CallCreateMetaID(metaID hexutil.Bytes, sig hexutil.Bytes, userAddress commo
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
-
+		auth.GasLimit = glimit
 		var id [32]byte
 		copy(id[:], metaID)
 
@@ -181,7 +185,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 		UserSenderAddress: userAddress,
 	}
 	pack := metaPack.Serialize()
-	log.Errorf("Pack : %x", pack)
+	log.Debugf("Pack : %x", pack)
 	service, err := getService()
 
 	if err != nil {
@@ -204,6 +208,7 @@ func CallUpdateMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, sig hexu
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
 
 		var oldID, newID [32]byte
 		copy(oldID[:], oldMetaID)
@@ -251,6 +256,7 @@ func CallRestoreMetaID(oldMetaID hexutil.Bytes, newMetaID hexutil.Bytes, oldAddr
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
 
 		var oldID, newID [32]byte
 		copy(oldID[:], oldMetaID)
@@ -306,6 +312,8 @@ func CallDeleteMetaID(metaID hexutil.Bytes, timestamp hexutil.Bytes, sig hexutil
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
+
 		var id [32]byte
 		copy(id[:], metaID)
 
@@ -376,4 +384,58 @@ func CallEcverify(msg hexutil.Bytes, sig hexutil.Bytes, address common.Address) 
 	}
 	log.Debugf("Ecverfiy: %v", result)
 	return result, nil
+}
+func CallBalanceOf(address common.Address) (*big.Int, error) {
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return new(big.Int), err
+	}
+	result, err := service.BalanceOf(&bind.CallOpts{}, address)
+
+	if err != nil {
+		if err.Error() == "abi: unmarshalling empty output" {
+			return zero, nil
+		}
+		log.Error(err)
+		return nil, err
+	}
+
+	// if err1 != nil {
+	// 	log.Error(err1)
+	// 	return new(big.Int), err1
+	// }
+	return result, nil
+}
+
+func CallTokenOfOwnerByIndex(address common.Address, idx *big.Int) (hexutil.Bytes, error) {
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	count, err := service.BalanceOf(&bind.CallOpts{}, address)
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	if count.Cmp(idx) < 1 {
+		return nil, fmt.Errorf("index is out of range")
+	}
+
+	metaIDBytes, err := service.TokenOfOwnerByIndex(&bind.CallOpts{}, address, idx)
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+	// var metaID hexutil.Bytes
+	// metaID = metaIDBytes[:]
+
+	//metaID := hexutil.Encode(metaIDBytes)
+	return metaIDBytes[:], nil
 }

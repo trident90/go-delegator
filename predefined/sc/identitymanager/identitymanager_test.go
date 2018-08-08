@@ -3,6 +3,7 @@ package identitymanager
 import (
 	"bufio"
 	"fmt"
+	"math/big"
 	"os"
 	"testing"
 
@@ -205,3 +206,27 @@ func TestEcverify(t *testing.T) {
 // 	ct := crypto.GetInstance()
 // 	fmt.Println(ct.Address)
 // }
+func TestBalanceOf(t *testing.T) {
+	defaultSetting()
+
+	address := common.HexToAddress("0x961c20596e7ec441723fbb168461f4b51371d8aa")
+
+	result, err := CallBalanceOf(address)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("BalnaceOf(%v): %v \n", address.String(), result)
+
+}
+func TestGetMetaIDByAddr(t *testing.T) {
+	defaultSetting()
+
+	address := common.HexToAddress("0x961c20596e7ec441723fbb168461f4b51371d8aa")
+
+	result, err := CallTokenOfOwnerByIndex(address, big.NewInt(2))
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("MetaIDOf(%v): %v \n", address.String(), result)
+
+}
