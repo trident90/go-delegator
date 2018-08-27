@@ -95,6 +95,16 @@ func TestCall(t *testing.T) {
 	}
 }
 
+func TestGasPrice(t *testing.T) {
+	NetType = Testnet
+	r := GetInstance()
+	if ret := r.GetGasPrice(); ret == 0 {
+		t.Errorf("Failed to get gas price")
+	} else {
+		t.Logf("%d", ret)
+	}
+}
+
 func TestRpc(t *testing.T) {
 	testMsg := "{\"jsonrpc\":\"2.0\",\"method\":\"web3_clientVersion\",\"params\":[\"a\",1],\"id\":100}"
 
