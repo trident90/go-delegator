@@ -12,7 +12,7 @@ import (
 	_ "bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
 	"bitbucket.org/coinplugin/proxy/log"
-	"bitbucket.org/coinplugin/proxy/predefined"
+	"bitbucket.org/coinplugin/proxy/metaservice"
 	"bitbucket.org/coinplugin/proxy/rpc"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -32,9 +32,9 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 	log.Info("request:", req.String())
 	var resp json.RPCResponse
 	var err error
-	if predefined.Contains(req.Method) {
-		// Forward RPC request to predefined function
-		resp, err = predefined.Forward(req)
+	if metaservice.Contains(req.Method) {
+		// Forward RPC request to metaservice function (v2)
+		resp, err = metaservice.Forward(req)
 	} else {
 		// Forward RPC request to Ether node
 		var respBody string
