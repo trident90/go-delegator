@@ -237,23 +237,12 @@ func TestAddActionKey(t *testing.T) {
 		t.Fatalf("Failed to get key %s", err)
 	}
 
-	// bytes, _ := executeArgs.Pack(
-	// 	toAddr,
-	// 	common.Big0,
-	// 	data,
-	// 	nonce,
-	// )
-
 	//Make executeSig
 	var executeSigData hexutil.Bytes
 	valueBytes := intToByte32(common.Big0)
 	nonceBytes := intToByte32(nonce)
-	executeSigData = concateBytes(toAddr.Bytes(), valueBytes[:], data, nonceBytes[:])
-	// fmt.Printf("executeArgs : %x \n", bytes)
-
-	// bMsg := ethCrypto.Keccak256(bytes)
-
-	// fmt.Printf("signMsg : %x \n", bMsg)
+	executeSigData = concatBytes(toAddr.Bytes(), valueBytes[:], data, nonceBytes[:])
+	fmt.Printf("executeSigData : %v \n", executeSigData)
 	var sig hexutil.Bytes
 	sig, err = signBytes(executeSigData, signPrivkey)
 	if err != nil {
@@ -318,7 +307,7 @@ func TestAddSelfClaim(t *testing.T) {
 
 	//_topicBytes, err := claimSignArgs.Pack(_topic)
 	_topicBytes := intToByte32(_topic)
-	_signData = concateBytes(_signData, _topicBytes[:], _data)
+	_signData = concatBytes(_signData, _topicBytes[:], _data)
 	fmt.Println("_signData : ", _signData.String())
 
 	//2-2 sign  data
@@ -343,7 +332,7 @@ func TestAddSelfClaim(t *testing.T) {
 	var executeSigData hexutil.Bytes
 	valueBytes := intToByte32(common.Big0)
 	nonceBytes := intToByte32(nonce)
-	executeSigData = concateBytes(toAddr.Bytes(), valueBytes[:], executeData, nonceBytes[:])
+	executeSigData = concatBytes(toAddr.Bytes(), valueBytes[:], executeData, nonceBytes[:])
 
 	fmt.Printf("executeSigData :  %v \n", executeSigData)
 	var executeSig hexutil.Bytes
@@ -377,4 +366,8 @@ func TestAddSelfClaim(t *testing.T) {
 func signBytes(bmsg []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
 	bMsg := ethCrypto.Keccak256(bmsg)
 	return ethCrypto.Sign(signHash(bMsg), privKey)
+}
+func signHash(data []byte) []byte {
+	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	return ethCrypto.Keccak256([]byte(msg))
 }

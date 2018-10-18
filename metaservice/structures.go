@@ -27,7 +27,7 @@ const (
 type metaIDCreateParams struct {
 	Address   common.Address `json:"address" validate:"len=20"`
 	Signature hexutil.Bytes  `json:"signature" validate:"len=65"` // Sign(Address)
-	recaptcha string         `json:"recaptcha"`
+	Recaptcha string         `json:"recaptcha"`
 }
 
 type metaIDExecuteParams struct {

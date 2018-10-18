@@ -3,7 +3,6 @@ package metaservice
 import (
 	"bytes"
 	"fmt"
-	"math/big"
 
 	proxyCommon "bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/crypto"
@@ -12,27 +11,10 @@ import (
 	"bitbucket.org/coinplugin/proxy/log"
 	"bitbucket.org/coinplugin/proxy/metaservice/sc/identity"
 	"bitbucket.org/coinplugin/proxy/metaservice/sc/identitymanager"
-	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
-
-var (
-	uint256Type, _ = abi.NewType("uint256")
-	//bytes32Type, _ := abi.NewType("bytes32")
-	addressType, _ = abi.NewType("address")
-	bytesType, _   = abi.NewType("bytes")
-
-	//_to, _value, _data, _nonce
-	executeArgs = abi.Arguments{
-		//		{Type: addressType},
-		{Type: uint256Type},
-		{Type: bytesType},
-		{Type: uint256Type},
-	}
-)
-
 
 func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
@@ -48,7 +30,13 @@ func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, err
 	}
 	reqParam := tmpParams.(metaIDCreateParams)
 	// 1. check recaptcha
-	recaptcha := reqParam.recaptcha
+	recaptcha := reqParam.Recaptcha
+
+	err := checkRecaptcha(reqParam.Recaptcha)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+	}
 	log.Debugd(reqID, recaptcha)
 
 	// 2. Verify signature
@@ -116,7 +104,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 	var executeSigData hexutil.Bytes
 	valueBytes := intToByte32(reqParam.Value)
 	nonceBytes := intToByte32(reqParam.Nonce)
-	executeSigData = concateBytes(reqParam.To.Bytes(), valueBytes[:], reqParam.Data, nonceBytes[:])
+	executeSigData = concatBytes(reqParam.To.Bytes(), valueBytes[:], reqParam.Data, nonceBytes[:])
 
 	fmt.Println("executeSigData : ", executeSigData.String())
 
@@ -151,7 +139,6 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 	resp.Result = trx.Hash().String()
 	return
 }
-
 
 func backupUserData(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 
@@ -301,22 +288,4 @@ func verifySignature(reqID uint64, msg string, sig string, address *common.Addre
 	}
 
 	return &signedAddress, nil
-}
-
-func signHash(data []byte) []byte {
-	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
-	return ethCrypto.Keccak256([]byte(msg))
-}
-func intToByte32(_val *big.Int) [32]byte {
-	result := [32]byte{}
-	_bytes := _val.Bytes()
-	copy(result[32-len(_bytes):], _bytes)
-	return result
-}
-func concateBytes(args ...[]byte) []byte {
-	var ret []byte
-	for _, a := range args {
-		ret = append(ret, a...)
-	}
-	return ret
 }
