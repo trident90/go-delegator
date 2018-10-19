@@ -30,14 +30,12 @@ func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, err
 	}
 	reqParam := tmpParams.(metaIDCreateParams)
 	// 1. check recaptcha
-	recaptcha := reqParam.Recaptcha
-
 	err := checkRecaptcha(reqParam.Recaptcha)
 	if err != nil {
-		errObj := &internalError{err.Error()}
+		errObj := &verifyRecaptchaError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 	}
-	log.Debugd(reqID, recaptcha)
+	log.Debugd(reqID, "Verified reCaptcha")
 
 	// 2. Verify signature
 	_, errObj = verifySignature(reqID, reqParam.Address.String(), reqParam.Signature.String(), &reqParam.Address)
@@ -54,7 +52,7 @@ func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, err
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugfd(reqID, "PASS 05. Call CreateMetaID : %v", trx.Hash().String())
+	log.Debugfd(reqID, "PASS - Call CreateMetaID : %v", trx.Hash().String())
 
 	//  return txid
 	resp.Result = trx.Hash().String()
@@ -96,7 +94,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 02. Get Identity")
+	log.Debugd(reqID, "PASS - 01. Get Identity")
 
 	//2. validate signature
 	//   - get sign address
@@ -108,22 +106,26 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 
 	fmt.Println("executeSigData : ", executeSigData.String())
 
-	signAddr, err := verifySignature(reqID, hexutil.Encode(ethCrypto.Keccak256(executeSigData)), reqParam.Signature.String(), &reqParam.From)
-	if err != nil {
-		errObj := &internalError{err.Error()}
+	signAddr, errObj := verifySignature(reqID, hexutil.Encode(ethCrypto.Keccak256(executeSigData)), reqParam.Signature.String(), &reqParam.From)
+	// if err != nil {
+	// 	errObj := &internalError{err.Error()}
+	// 	resp.Error = makeErrorResponse(errObj)
+	// 	return
+	// }
+	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 03. Verify Sign : ", signAddr.String())
+	log.Debugd(reqID, "PASS - 02. Verify Sign : ", signAddr.String())
 
 	//3. Check permission
 	err = identity.CheckDelegateExecutePermission(instance, reqParam.From, reqParam.To, reqParam.Data)
 	if err != nil {
-		errObj := &internalError{err.Error()}
+		errObj := &invalidPermissionError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 04. Check Permission ")
+	log.Debugd(reqID, "PASS - 03. Check Permission ")
 
 	// 4. CallDelegatedExecute
 	trx, err := identity.CallDelegatedExecute(instance, reqParam.From, reqParam.To, reqParam.Value, reqParam.Data, reqParam.Nonce, reqParam.Signature)
@@ -133,7 +135,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugfd(reqID, "PASS 05. Call DelegatedExecute : %v", trx.Hash().String())
+	log.Debugfd(reqID, "PASS 04. Call DelegatedExecute : %v", trx.Hash().String())
 
 	//  return txid
 	resp.Result = trx.Hash().String()
@@ -261,7 +263,7 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(requestTmpID, "PASS - 03. ipfs.Cat")
+	log.Debugd(requestTmpID, "PASS - 02. ipfs.Cat")
 	// //  return fileID
 	resp.Result = ret
 

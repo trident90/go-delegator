@@ -101,3 +101,15 @@ type alreadyUsedAddressError struct{ message string }
 func (e *alreadyUsedAddressError) ErrorCode() int32 { return -32018 }
 
 func (e *alreadyUsedAddressError) Error() string { return e.message }
+
+type verifyRecaptchaError struct{ message string }
+
+func (e *verifyRecaptchaError) ErrorCode() int32 { return -32017 }
+
+func (e *verifyRecaptchaError) Error() string { return e.message }
+
+type invalidPermissionError struct{ message string }
+
+func (e *invalidPermissionError) ErrorCode() int32 { return -32019 }
+
+func (e *invalidPermissionError) Error() string { return e.message }
