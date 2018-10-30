@@ -30,13 +30,14 @@ func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, err
 	}
 	reqParam := tmpParams.(metaIDCreateParams)
 	// 1. check recaptcha
-	err := checkRecaptcha(reqParam.Recaptcha)
-	if err != nil {
-		errObj := &verifyRecaptchaError{err.Error()}
-		resp.Error = makeErrorResponse(errObj)
-	}
-	log.Debugd(reqID, "Verified reCaptcha")
-
+	//TODO: domain Setting 관련 현재 skip
+	// err := checkRecaptcha(reqParam.Recaptcha)
+	// if err != nil {
+	// 	errObj := &verifyRecaptchaError{err.Error()}
+	// 	resp.Error = makeErrorResponse(errObj)
+	// }
+	// log.Debugd(reqID, "Verified reCaptcha")
+	log.Debugd(reqID, "SKIP reCaptcha")
 	// 2. Verify signature
 	_, errObj = verifySignature(reqID, reqParam.Address.String(), reqParam.Signature.String(), &reqParam.Address)
 	if errObj != nil {

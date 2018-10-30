@@ -15,10 +15,10 @@ import (
 )
 
 // RegistryABI is the input ABI used to generate the binding from.
-const RegistryABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"permissions\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"contracts\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"},{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setContractDomain\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"getContractAddress\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"},{\"name\":\"_status\",\"type\":\"bool\"}],\"name\":\"setPermission\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"}],\"name\":\"getPermission\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const RegistryABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"permissions\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"contracts\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"setter\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"name\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"SetContractDomain\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_contract\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"granted\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"status\",\"type\":\"bool\"}],\"name\":\"SetPermission\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"},{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setContractDomain\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"getContractAddress\",\"outputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"},{\"name\":\"_status\",\"type\":\"bool\"}],\"name\":\"setPermission\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"}],\"name\":\"getPermission\",\"outputs\":[{\"name\":\"found\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // RegistryBin is the compiled bytecode used for deploying new contracts.
-const RegistryBin = `608060405260008054600160a060020a03191633179055610400806100256000396000f30060806040526004361061008d5763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166304af66ad81146100925780630d2020dd146100b85780633ec50c6c146100ec578063599e4c701461012457806360d6c7cf1461014d5780638da5cb5b14610171578063ec56a37314610186578063f2fde38b1461019e575b600080fd5b34801561009e57600080fd5b506100b6600435600160a060020a03602435166101bf565b005b3480156100c457600080fd5b506100d0600435610226565b60408051600160a060020a039092168252519081900360200190f35b3480156100f857600080fd5b50610110600435600160a060020a0360243516610265565b604080519115158252519081900360200190f35b34801561013057600080fd5b50610110600435600160a060020a03602435166044351515610285565b34801561015957600080fd5b50610110600435600160a060020a03602435166102eb565b34801561017d57600080fd5b506100d0610316565b34801561019257600080fd5b506100d0600435610325565b3480156101aa57600080fd5b506100b6600160a060020a0360043516610340565b600054600160a060020a031633146101d657600080fd5b600160a060020a03811615156101eb57600080fd5b600091825260016020526040909120805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03909216919091179055565b600081815260016020526040812054600160a060020a0316151561024957600080fd5b50600090815260016020526040902054600160a060020a031690565b600260209081526000928352604080842090915290825290205460ff1681565b60008054600160a060020a0316331461029d57600080fd5b600160a060020a03831615156102b257600080fd5b506000928352600260209081526040808520600160a060020a039490941685529290529120805460ff1916911515919091179055600190565b6000918252600260209081526040808420600160a060020a0393909316845291905290205460ff1690565b600054600160a060020a031681565b600160205260009081526040902054600160a060020a031681565b600054600160a060020a0316331461035757600080fd5b600160a060020a038116151561036c57600080fd5b60008054604051600160a060020a03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a36000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03929092169190911790555600a165627a7a72305820688f1eac814009caa61dff0315c493c92fd0431e793611dee26ac3b4dc2af6280029`
+const RegistryBin = `608060405260008054600160a060020a03191633179055610474806100256000396000f30060806040526004361061008d5763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166304af66ad81146100925780630d2020dd146100ca5780633ec50c6c146100fe578063599e4c701461012257806360d6c7cf1461014b5780638da5cb5b1461016f578063ec56a37314610184578063f2fde38b1461019c575b600080fd5b34801561009e57600080fd5b506100b6600435600160a060020a03602435166101bf565b604080519115158252519081900360200190f35b3480156100d657600080fd5b506100e2600435610264565b60408051600160a060020a039092168252519081900360200190f35b34801561010a57600080fd5b506100b6600435600160a060020a03602435166102a3565b34801561012e57600080fd5b506100b6600435600160a060020a036024351660443515156102c3565b34801561015757600080fd5b506100b6600435600160a060020a036024351661035f565b34801561017b57600080fd5b506100e261038a565b34801561019057600080fd5b506100e2600435610399565b3480156101a857600080fd5b506101bd600160a060020a03600435166103b4565b005b60008054600160a060020a031633146101d757600080fd5b600160a060020a03821615156101ec57600080fd5b600083815260016020908152604091829020805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03861690811790915582513381529251909286927f37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db92918290030190a350600192915050565b600081815260016020526040812054600160a060020a0316151561028757600080fd5b50600090815260016020526040902054600160a060020a031690565b600260209081526000928352604080842090915290825290205460ff1681565b60008054600160a060020a031633146102db57600080fd5b600160a060020a03831615156102f057600080fd5b6000848152600260209081526040808320600160a060020a03871680855290835292819020805460ff19168615159081179091558151908152905187927fe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818928290030190a35060019392505050565b6000918252600260209081526040808420600160a060020a0393909316845291905290205460ff1690565b600054600160a060020a031681565b600160205260009081526040902054600160a060020a031681565b600054600160a060020a031633146103cb57600080fd5b600160a060020a03811615156103e057600080fd5b60008054604051600160a060020a03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a36000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03929092169190911790555600a165627a7a72305820993964f91bddfba7f681cfe5975d4c4a552143e02f190beab92f81f883e965780029`
 
 // DeployRegistry deploys a new Ethereum contract, binding an instance of Registry to it.
 func DeployRegistry(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Registry, error) {
@@ -203,7 +203,7 @@ func (_Registry *RegistryCallerSession) Contracts(arg0 [32]byte) (common.Address
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(address)
+// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
 func (_Registry *RegistryCaller) GetContractAddress(opts *bind.CallOpts, _name [32]byte) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -215,21 +215,21 @@ func (_Registry *RegistryCaller) GetContractAddress(opts *bind.CallOpts, _name [
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(address)
+// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
 func (_Registry *RegistrySession) GetContractAddress(_name [32]byte) (common.Address, error) {
 	return _Registry.Contract.GetContractAddress(&_Registry.CallOpts, _name)
 }
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(address)
+// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
 func (_Registry *RegistryCallerSession) GetContractAddress(_name [32]byte) (common.Address, error) {
 	return _Registry.Contract.GetContractAddress(&_Registry.CallOpts, _name)
 }
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(bool)
+// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
 func (_Registry *RegistryCaller) GetPermission(opts *bind.CallOpts, _contract [32]byte, _granted common.Address) (bool, error) {
 	var (
 		ret0 = new(bool)
@@ -241,14 +241,14 @@ func (_Registry *RegistryCaller) GetPermission(opts *bind.CallOpts, _contract [3
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(bool)
+// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
 func (_Registry *RegistrySession) GetPermission(_contract [32]byte, _granted common.Address) (bool, error) {
 	return _Registry.Contract.GetPermission(&_Registry.CallOpts, _contract, _granted)
 }
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(bool)
+// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
 func (_Registry *RegistryCallerSession) GetPermission(_contract [32]byte, _granted common.Address) (bool, error) {
 	return _Registry.Contract.GetPermission(&_Registry.CallOpts, _contract, _granted)
 }
@@ -307,42 +307,42 @@ func (_Registry *RegistryCallerSession) Permissions(arg0 [32]byte, arg1 common.A
 
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns()
+// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
 func (_Registry *RegistryTransactor) SetContractDomain(opts *bind.TransactOpts, _name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.contract.Transact(opts, "setContractDomain", _name, _addr)
 }
 
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns()
+// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
 func (_Registry *RegistrySession) SetContractDomain(_name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.SetContractDomain(&_Registry.TransactOpts, _name, _addr)
 }
 
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns()
+// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
 func (_Registry *RegistryTransactorSession) SetContractDomain(_name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.SetContractDomain(&_Registry.TransactOpts, _name, _addr)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(bool)
+// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
 func (_Registry *RegistryTransactor) SetPermission(opts *bind.TransactOpts, _contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.contract.Transact(opts, "setPermission", _contract, _granted, _status)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(bool)
+// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
 func (_Registry *RegistrySession) SetPermission(_contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.Contract.SetPermission(&_Registry.TransactOpts, _contract, _granted, _status)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(bool)
+// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
 func (_Registry *RegistryTransactorSession) SetPermission(_contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.Contract.SetPermission(&_Registry.TransactOpts, _contract, _granted, _status)
 }
@@ -489,6 +489,290 @@ func (_Registry *RegistryFilterer) WatchOwnershipTransferred(opts *bind.WatchOpt
 				// New log arrived, parse the event and forward to the user
 				event := new(RegistryOwnershipTransferred)
 				if err := _Registry.contract.UnpackLog(event, "OwnershipTransferred", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// RegistrySetContractDomainIterator is returned from FilterSetContractDomain and is used to iterate over the raw logs and unpacked data for SetContractDomain events raised by the Registry contract.
+type RegistrySetContractDomainIterator struct {
+	Event *RegistrySetContractDomain // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RegistrySetContractDomainIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RegistrySetContractDomain)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RegistrySetContractDomain)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RegistrySetContractDomainIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RegistrySetContractDomainIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RegistrySetContractDomain represents a SetContractDomain event raised by the Registry contract.
+type RegistrySetContractDomain struct {
+	Setter common.Address
+	Name   [32]byte
+	Addr   common.Address
+	Raw    types.Log // Blockchain specific contextual infos
+}
+
+// FilterSetContractDomain is a free log retrieval operation binding the contract event 0x37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db.
+//
+// Solidity: e SetContractDomain(setter address, name indexed bytes32, addr indexed address)
+func (_Registry *RegistryFilterer) FilterSetContractDomain(opts *bind.FilterOpts, name [][32]byte, addr []common.Address) (*RegistrySetContractDomainIterator, error) {
+
+	var nameRule []interface{}
+	for _, nameItem := range name {
+		nameRule = append(nameRule, nameItem)
+	}
+	var addrRule []interface{}
+	for _, addrItem := range addr {
+		addrRule = append(addrRule, addrItem)
+	}
+
+	logs, sub, err := _Registry.contract.FilterLogs(opts, "SetContractDomain", nameRule, addrRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RegistrySetContractDomainIterator{contract: _Registry.contract, event: "SetContractDomain", logs: logs, sub: sub}, nil
+}
+
+// WatchSetContractDomain is a free log subscription operation binding the contract event 0x37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db.
+//
+// Solidity: e SetContractDomain(setter address, name indexed bytes32, addr indexed address)
+func (_Registry *RegistryFilterer) WatchSetContractDomain(opts *bind.WatchOpts, sink chan<- *RegistrySetContractDomain, name [][32]byte, addr []common.Address) (event.Subscription, error) {
+
+	var nameRule []interface{}
+	for _, nameItem := range name {
+		nameRule = append(nameRule, nameItem)
+	}
+	var addrRule []interface{}
+	for _, addrItem := range addr {
+		addrRule = append(addrRule, addrItem)
+	}
+
+	logs, sub, err := _Registry.contract.WatchLogs(opts, "SetContractDomain", nameRule, addrRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RegistrySetContractDomain)
+				if err := _Registry.contract.UnpackLog(event, "SetContractDomain", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// RegistrySetPermissionIterator is returned from FilterSetPermission and is used to iterate over the raw logs and unpacked data for SetPermission events raised by the Registry contract.
+type RegistrySetPermissionIterator struct {
+	Event *RegistrySetPermission // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *RegistrySetPermissionIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(RegistrySetPermission)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(RegistrySetPermission)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *RegistrySetPermissionIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *RegistrySetPermissionIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// RegistrySetPermission represents a SetPermission event raised by the Registry contract.
+type RegistrySetPermission struct {
+	Contract [32]byte
+	Granted  common.Address
+	Status   bool
+	Raw      types.Log // Blockchain specific contextual infos
+}
+
+// FilterSetPermission is a free log retrieval operation binding the contract event 0xe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818.
+//
+// Solidity: e SetPermission(_contract indexed bytes32, granted indexed address, status bool)
+func (_Registry *RegistryFilterer) FilterSetPermission(opts *bind.FilterOpts, _contract [][32]byte, granted []common.Address) (*RegistrySetPermissionIterator, error) {
+
+	var _contractRule []interface{}
+	for _, _contractItem := range _contract {
+		_contractRule = append(_contractRule, _contractItem)
+	}
+	var grantedRule []interface{}
+	for _, grantedItem := range granted {
+		grantedRule = append(grantedRule, grantedItem)
+	}
+
+	logs, sub, err := _Registry.contract.FilterLogs(opts, "SetPermission", _contractRule, grantedRule)
+	if err != nil {
+		return nil, err
+	}
+	return &RegistrySetPermissionIterator{contract: _Registry.contract, event: "SetPermission", logs: logs, sub: sub}, nil
+}
+
+// WatchSetPermission is a free log subscription operation binding the contract event 0xe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818.
+//
+// Solidity: e SetPermission(_contract indexed bytes32, granted indexed address, status bool)
+func (_Registry *RegistryFilterer) WatchSetPermission(opts *bind.WatchOpts, sink chan<- *RegistrySetPermission, _contract [][32]byte, granted []common.Address) (event.Subscription, error) {
+
+	var _contractRule []interface{}
+	for _, _contractItem := range _contract {
+		_contractRule = append(_contractRule, _contractItem)
+	}
+	var grantedRule []interface{}
+	for _, grantedItem := range granted {
+		grantedRule = append(grantedRule, grantedItem)
+	}
+
+	logs, sub, err := _Registry.contract.WatchLogs(opts, "SetPermission", _contractRule, grantedRule)
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(RegistrySetPermission)
+				if err := _Registry.contract.UnpackLog(event, "SetPermission", log); err != nil {
 					return err
 				}
 				event.Raw = log
