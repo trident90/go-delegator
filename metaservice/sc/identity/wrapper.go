@@ -86,6 +86,50 @@ func CallDelegatedExecute(instance *Identity, mgtAddress common.Address, to comm
 	return trx, nil
 }
 
+//CallDelegatedApprove DelegatedApprove function call
+func CallDelegatedApprove(instance *Identity, mgtAddress common.Address, id *big.Int, approve bool, metaNonce *big.Int, signature hexutil.Bytes) (*types.Transaction, error) {
+	var trx *types.Transaction
+	var err error
+
+	// instance, err := getInstance(mgtAddress)
+	// //session, err := getSession()
+
+	// if err != nil {
+	// 	log.Error(err)
+	// 	return nil, err
+	// }
+	if instance == nil {
+		err = fmt.Errorf("Error - Identity nil")
+		return nil, err
+	}
+
+	tx := func(nonce uint64) error {
+		_rpc := rpc.GetInstance()
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
+		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
+		log.Debug("gas price : ", auth.GasPrice)
+		trx, err = instance.DelegatedApprove(auth, id, approve, metaNonce, signature)
+
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
+
+	if !res {
+		if err == nil {
+			err = fmt.Errorf("call function Error - CallDelegatedApprove")
+		}
+		return nil, err
+	}
+
+	return trx, nil
+}
+
 func CallGetTransactionCount(instance *Identity) (*big.Int, error) {
 	var err error
 	if instance == nil {
@@ -155,6 +199,36 @@ func CheckDelegateExecutePermission(instance *Identity, from common.Address, to 
 			}
 		}
 	}
+	return fmt.Errorf("Not permission")
+}
+
+func CheckDelegateApprovePermission(instance *Identity, from common.Address) error {
+	var err error
+
+	//1. convert addr to key
+	keyBytes := CallAddrToKey(from)
+
+	//2. get Key
+	key, err := CallGetKey(instance, keyBytes)
+	if err != nil {
+		return err
+	}
+	if key == nil {
+		return fmt.Errorf("Not found key")
+	}
+	//3. check purpose
+	//For Action
+	for _, p := range key.Purposes {
+		//management or action key
+		if common.Big1.Cmp(p) == 0 {
+			log.Debug("vaild permission - management Key")
+			return nil
+		} else if common.Big2.Cmp(p) == 0 {
+			log.Debug("vaild permission - action Key")
+			return nil
+		}
+	}
+
 	return fmt.Errorf("Not permission")
 }
 
