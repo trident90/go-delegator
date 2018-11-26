@@ -52,8 +52,10 @@ func checkRecaptcha(response string) error {
 
 func intToByte32(_val *big.Int) [32]byte {
 	result := [32]byte{}
-	_bytes := _val.Bytes()
-	copy(result[32-len(_bytes):], _bytes)
+	if _val != nil {
+		_bytes := _val.Bytes()
+		copy(result[32-len(_bytes):], _bytes)
+	}
 	return result
 }
 func concatBytes(args ...[]byte) []byte {
