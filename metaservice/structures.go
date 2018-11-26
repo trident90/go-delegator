@@ -40,9 +40,19 @@ type metaIDExecuteParams struct {
 	Signature hexutil.Bytes  `json:"signature" validate:"len=65"`
 }
 
+type metaIDApproveParams struct {
+	MetaID common.Address `json:"meta_id" validate:"len=20"`
+	From   common.Address `json:"from" validate:"len=20"`
+	//	To        common.Address `json:"to" validate:"len=20"`
+	Id        hexutil.Bytes `json:"id" validate:"len=32"`
+	Approve   bool          `json:"approve"`
+	Nonce     *big.Int      `json:"nonce"`
+	Signature hexutil.Bytes `json:"signature" validate:"len=65"`
+}
+
 type metaIDBackupParams struct {
 	Address   common.Address `json:"address" validate:"len=20"`
-	MetaID    hexutil.Bytes  `json:"meta_id" validate:"len=32"`
+	MetaID    hexutil.Bytes  `json:"meta_id" validate:"len=20"`
 	EncData   hexutil.Bytes  `json:"enc_data" validate:"min=66"`
 	Signature hexutil.Bytes  `json:"signature" validate:"len=65"` // Sign(MetaId)
 }
@@ -98,6 +108,14 @@ func getParameter(method string, params []interface{}) (interface{}, Error) {
 
 	case "delegated_execute":
 		var reqParam metaIDExecuteParams
+		err := fillParam(&reqParam, obj)
+		if err != nil {
+			return nil, err
+		}
+		return reqParam, nil
+
+	case "delegated_approve":
+		var reqParam metaIDApproveParams
 		err := fillParam(&reqParam, obj)
 		if err != nil {
 			return nil, err

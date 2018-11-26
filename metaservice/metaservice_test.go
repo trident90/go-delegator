@@ -363,6 +363,126 @@ func TestAddSelfClaim(t *testing.T) {
 	fmt.Println("Response : ", resp.String())
 
 }
+
+func TestDelegatedApprove(t *testing.T) {
+	defaultSetting()
+	req := json.RPCRequest{
+		Jsonrpc: "2.0",
+		Method:  "delegated_approve",
+		ID:      1,
+	}
+	fromAddr := common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA")
+	scAddr := common.HexToAddress("0xe052cb04e4fe4d3ca69d247b4eff2aff35613b0e")
+	// toAddr := common.HexToAddress("0xe052cb04e4fe4d3ca69d247b4eff2aff35613b0e")
+	signPrivkey, _ := ethCrypto.HexToECDSA("01b149603ca8f537bbb4e45d22e77df9054e50d826bb5f0a34e9ce460432b596")
+
+	ins, err := identity.GetInstance(scAddr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nonce, err := identity.CallGetTransactionCount(ins)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println("nonce :", nonce)
+
+	var executeSigData hexutil.Bytes
+	_executeID := common.Big0
+	var _executeBytes hexutil.Bytes
+	_executeBytes32 := intToByte32(_executeID)
+	_executeBytes = _executeBytes32[:]
+	approve := true
+
+	_approve := hexutil.MustDecode("0x00")
+	if approve {
+		_approve = hexutil.MustDecode("0x01")
+	}
+
+	nonceBytes := intToByte32(nonce)
+	executeSigData = concatBytes(_executeBytes, _approve, nonceBytes[:])
+
+	/*
+		//
+		//1. claim Data
+		_topic := common.Big1
+		_scheme := common.Big1
+		_issuer := common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA")
+		_data := hexutil.MustDecode("0x1b442640e0333cb03054940e3cda07da982d2b57af68c3df8d0557b47a77d0bc")
+		_uri := "MetaPrint"
+
+		//2. claim.signature 생성
+		//2-1. Sign Data 생성
+		// signdata : scAddr + _topic + data
+		var _signData hexutil.Bytes
+
+		//_topicBytes, err := claimSignArgs.Pack(_topic)
+		_topicBytes := intToByte32(_topic)
+		_signData = concatBytes(_signData, _topicBytes[:], _data)
+		fmt.Println("_signData : ", _signData.String())
+
+		//2-2 sign  data
+		var _signature hexutil.Bytes
+		_signature, err = signBytes(_signData, signPrivkey)
+		fmt.Println("signature : ", _signature.String())
+
+		//3.  data(DelegateExcute parameter) 생성
+		identityAbi, err := abi.JSON(strings.NewReader(identity.IdentityABI))
+		if err != nil {
+			t.Fatal(err)
+		}
+		// "addClaim":  _topic, _scheme, issuer, _signature, _data, _uri
+		var executeData hexutil.Bytes
+		executeData, err = identityAbi.Pack("addClaim", _topic, _scheme, _issuer, _signature, _data, _uri)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Printf("executeData : %v \n", executeData)
+
+		//4. Make signature (DelegateExcute parameter) 생성
+		var executeSigData hexutil.Bytes
+		valueBytes := intToByte32(common.Big0)
+		nonceBytes := intToByte32(nonce)
+		executeSigData = concatBytes(toAddr.Bytes(), valueBytes[:], executeData, nonceBytes[:])
+	*/
+	fmt.Printf("executeSigData :  %v \n", executeSigData)
+	var executeSig hexutil.Bytes
+	executeSig, err = signBytes(executeSigData, signPrivkey)
+	if err != nil {
+		t.Fatalf("Failed to sign %s", err)
+	}
+	fmt.Printf("exec signature : %v \n", executeSig)
+	/*
+	   	MetaID    common.Address `json:"meta_id" validate:"len=20"`
+	   	From      common.Address `json:"from" validate:"len=20"`
+	   //	To        common.Address `json:"to" validate:"len=20"`
+	   	Id     *big.Int       `json:"id"`
+	   	Approve      bool  `json:"approve"`
+	   	Nonce     *big.Int       `json:"nonce"`
+	   	Signature hexutil.Bytes  `json:"signature" validate:"len=65"`
+	*/
+
+	//5. make Request Data
+	param := map[string]interface{}{
+		"meta_id": scAddr,
+		"from":    fromAddr,
+		//"to":        toAddr,
+		"id":        _executeBytes,
+		"approve":   approve,
+		"nonce":     nonce,
+		"signature": executeSig,
+	}
+
+	req.Params = append(req.Params, param)
+	fmt.Println("request : ", req.String())
+	resp, err := Forward(req)
+	if resp.String() == "" || err != nil {
+		fmt.Println("Error : ", err)
+		t.Errorf("Failed to start main")
+	}
+	fmt.Println("Response : ", resp.String())
+
+}
+
 func signBytes(bmsg []byte, privKey *ecdsa.PrivateKey) ([]byte, error) {
 	bMsg := ethCrypto.Keccak256(bmsg)
 	return ethCrypto.Sign(signHash(bMsg), privKey)

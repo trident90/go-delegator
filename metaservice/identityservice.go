@@ -3,8 +3,8 @@ package metaservice
 import (
 	"bytes"
 	"fmt"
+	"math/big"
 
-	proxyCommon "bitbucket.org/coinplugin/proxy/common"
 	"bitbucket.org/coinplugin/proxy/crypto"
 	"bitbucket.org/coinplugin/proxy/ipfs"
 	"bitbucket.org/coinplugin/proxy/json"
@@ -95,7 +95,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 01. Get Identity")
+	log.Debugd(reqID, "PASS - 02. Get Identity")
 
 	//2. validate signature
 	//   - get sign address
@@ -105,7 +105,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 	nonceBytes := intToByte32(reqParam.Nonce)
 	executeSigData = concatBytes(reqParam.To.Bytes(), valueBytes[:], reqParam.Data, nonceBytes[:])
 
-	fmt.Println("executeSigData : ", executeSigData.String())
+	log.Debugd(reqID, "executeSigData : ", executeSigData.String())
 
 	signAddr, errObj := verifySignature(reqID, hexutil.Encode(ethCrypto.Keccak256(executeSigData)), reqParam.Signature.String(), &reqParam.From)
 	// if err != nil {
@@ -117,7 +117,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 02. Verify Sign : ", signAddr.String())
+	log.Debugd(reqID, "PASS - 03. Verify Sign : ", signAddr.String())
 
 	//3. Check permission
 	err = identity.CheckDelegateExecutePermission(instance, reqParam.From, reqParam.To, reqParam.Data)
@@ -126,7 +126,7 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(reqID, "PASS - 03. Check Permission ")
+	log.Debugd(reqID, "PASS - 04. Check Permission ")
 
 	// 4. CallDelegatedExecute
 	trx, err := identity.CallDelegatedExecute(instance, reqParam.From, reqParam.To, reqParam.Value, reqParam.Data, reqParam.Nonce, reqParam.Signature)
@@ -136,10 +136,99 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugfd(reqID, "PASS 04. Call DelegatedExecute : %v", trx.Hash().String())
+	log.Debugfd(reqID, "PASS 05. Call DelegatedExecute : %v", trx.Hash().String())
 
 	//  return txid
 	resp.Result = trx.Hash().String()
+	return
+}
+
+func delegatedApprove(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
+	log.Debugd(reqID, " Call delegatedApprove Function")
+
+	resp.ID = req.ID
+	resp.Jsonrpc = req.Jsonrpc
+	tmpParams, errObj := getParameter(req.Method, req.Params)
+	if errObj != nil {
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	reqParam := tmpParams.(metaIDApproveParams)
+	log.Debugfd(reqID, "parameter[MetaID] : %x", reqParam.MetaID)
+	log.Debugfd(reqID, "parameter[from] : %x", reqParam.From)
+
+	log.Debugfd(reqID, "parameter[id] : %v", reqParam.Id)
+	log.Debugfd(reqID, "parameter[approve] : %v", reqParam.Approve)
+	log.Debugfd(reqID, "parameter[nonce] : %v", reqParam.Nonce)
+	log.Debugfd(reqID, "parameter[Signature] : %v", reqParam.Signature)
+	log.Debugd(reqID, "PASS - 01. Check Parameter")
+
+	//1. get instance MetaID
+	instance, err := identity.GetInstance(reqParam.MetaID)
+	if err != nil {
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	if instance == nil {
+		err = fmt.Errorf("Cannot get MetaID Instance")
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugd(reqID, "PASS - 02. Get Identity")
+	//2. validate signature
+	//   - get sign address
+
+	var executeSigData hexutil.Bytes
+	// idBytes := intToByte32(reqParam.Id)
+	idBigInt := new(big.Int)
+	idBigInt.SetBytes(reqParam.Id)
+
+	nonceBytes := intToByte32(reqParam.Nonce)
+	_approve := hexutil.MustDecode("0x00")
+	if reqParam.Approve {
+		_approve = hexutil.MustDecode("0x01")
+	}
+	executeSigData = concatBytes(reqParam.Id, _approve[:], nonceBytes[:])
+
+	log.Debugd(reqID, "executeSigData : ", executeSigData.String())
+
+	signAddr, errObj := verifySignature(reqID, hexutil.Encode(ethCrypto.Keccak256(executeSigData)), reqParam.Signature.String(), &reqParam.From)
+	// if err != nil {
+	// 	errObj := &internalError{err.Error()}
+	// 	resp.Error = makeErrorResponse(errObj)
+	// 	return
+	// }
+	if errObj != nil {
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugd(reqID, "PASS - 03. Verify Sign : ", signAddr.String())
+
+	//3. Check permission
+	err = identity.CheckDelegateApprovePermission(instance, reqParam.From)
+	if err != nil {
+		errObj := &invalidPermissionError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugd(reqID, "PASS - 04. Check Permission ")
+
+	// 4. CallDelegatedApprove
+	trx, err := identity.CallDelegatedApprove(instance, reqParam.From, idBigInt, reqParam.Approve, reqParam.Nonce, reqParam.Signature)
+	if err != nil {
+		log.Errorfd(reqID, "CallDelegatedApprove Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+	log.Debugfd(reqID, "PASS 05. Call DelegatedApprove : %v", trx.Hash().String())
+
+	//return txid
+	resp.Result = trx.Hash().String()
+
 	return
 }
 
@@ -236,9 +325,9 @@ func backupUserData(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, e
 	return
 }
 
-func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
-	requestTmpID := proxyCommon.RandomUint64()
-	log.Debugd(requestTmpID, "Call getUserData Function")
+func getUserData(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
+	//requestTmpID := proxyCommon.RandomUint64()
+	log.Debugd(reqID, "Call getUserData Function")
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
@@ -250,21 +339,21 @@ func getUserData(req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	}
 	reqParam := tmpParams.(metaIDGetUserDataParams)
 	//log.Debugfd(requestTmpID, "parameter[NewAddress] : %v", reqParam.NewAddress.String())
-	log.Debugfd(requestTmpID, "parameter[FileID] : %v", reqParam.FileID)
+	log.Debugfd(reqID, "parameter[FileID] : %v", reqParam.FileID)
 	//log.Debugfd(requestTmpID, "parameter[Sig] : %v", reqParam.Signature)
-	log.Debugd(requestTmpID, "PASS - 01. Check Parameter")
+	log.Debugd(reqID, "PASS - 01. Check Parameter")
 
 	//2. GET User Data from IPFS
 	//return data
 	ins := ipfs.GetInstance()
 	ret := ins.Cat(reqParam.FileID)
 	if ret == "" {
-		log.Debugd(requestTmpID, "Error : Cannot find file ")
+		log.Debugd(reqID, "Error : Cannot find file ")
 		errObj := &notFoundFileError{"not found backup file"}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
-	log.Debugd(requestTmpID, "PASS - 02. ipfs.Cat")
+	log.Debugd(reqID, "PASS - 02. ipfs.Cat")
 	// //  return fileID
 	resp.Result = ret
 

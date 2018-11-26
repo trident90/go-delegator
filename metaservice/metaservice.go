@@ -57,6 +57,7 @@ func Contains(path string) bool {
 var predefinedPaths = map[string]interface{}{
 	"create_meta_id":                          createMetaID,
 	"delegated_execute":                       delegatedExecute,
+	"delegated_approve":                       delegatedApprove,
 	"backup_user_data":                        backupUserData,
 	"get_user_data":                           getUserData,
 	"get_registry_address":                    getRegistryAddress,
