@@ -1,3 +1,3 @@
 package ipfs
 
-var ipfsUrls = []string{"localhost:5001"}
+var ipfsUrls = []string{"REPLACE WITH YOUR IPFS URL"}
