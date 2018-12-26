@@ -84,14 +84,14 @@ func delegatedExecute(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 	//1. get instance MetaID
 	instance, err := identity.GetInstance(reqParam.MetaID)
 	if err != nil {
-		errObj := &internalError{err.Error()}
+		errObj := &notExistsAddressError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
 
 	if instance == nil {
 		err = fmt.Errorf("Cannot get MetaID Instance")
-		errObj := &internalError{err.Error()}
+		errObj := &notExistsAddressError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
@@ -166,14 +166,14 @@ func delegatedApprove(reqID uint64, req json.RPCRequest) (resp json.RPCResponse,
 	//1. get instance MetaID
 	instance, err := identity.GetInstance(reqParam.MetaID)
 	if err != nil {
-		errObj := &internalError{err.Error()}
+		errObj := &notExistsAddressError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
 
 	if instance == nil {
 		err = fmt.Errorf("Cannot get MetaID Instance")
-		errObj := &internalError{err.Error()}
+		errObj := &notExistsAddressError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
 		return
 	}
