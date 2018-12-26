@@ -59,13 +59,13 @@ func init() {
 		}
 	}
 	if logPath != "" {
-		if f, err := os.OpenFile(logPath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
+		if f, err := os.OpenFile(logPath+".log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
 			logger.Out = io.MultiWriter(f, os.Stdout)
 		} else {
 			Panic("Failed to create log file")
 		}
 		// Stderr
-		if f, err := os.OpenFile(logPath+".stderr", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
+		if f, err := os.OpenFile(logPath+".err.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666); err == nil {
 			redirectStderr(f)
 		}
 	}

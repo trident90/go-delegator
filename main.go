@@ -29,7 +29,7 @@ const (
 )
 
 func handler(req json.RPCRequest) (body string, statusCode int) {
-	log.Info("request:", req.String())
+	//log.Info("request:", req.String())
 	var resp json.RPCResponse
 	var err error
 	if metaservice.Contains(req.Method) {
@@ -81,8 +81,10 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Info("request:", r.RemoteAddr, string(b))
 	req := json.GetRPCRequestFromJSON(string(b))
 	respBody, statusCode := handler(req)
+	log.Info("response:", r.RemoteAddr, statusCode, respBody)
 	w.WriteHeader(statusCode)
 	w.Write([]byte(respBody))
 }
