@@ -6,9 +6,9 @@ import (
 
 	"github.com/metadium/go-delegator/log"
 
-	"github.com/metadium/go-delegator/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/metadium/go-delegator/rpc"
 )
 
 var once sync.Once

@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/metadium/go-delegator/crypto"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/metadium/go-delegator/crypto"
 )
 
 func defaultSetting() {

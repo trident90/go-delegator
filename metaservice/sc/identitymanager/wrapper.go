@@ -7,12 +7,12 @@ import (
 
 	"github.com/metadium/go-delegator/log"
 
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/metaservice/sc/registry"
-	"github.com/metadium/go-delegator/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/metadium/go-delegator/crypto"
+	"github.com/metadium/go-delegator/metaservice/sc/registry"
+	"github.com/metadium/go-delegator/rpc"
 	//	"github.com/ethereum/go-ethereum/crypto"
 )
 
