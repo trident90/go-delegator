@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 	"github.com/metadium/go-delegator/crypto"
 	"github.com/metadium/go-delegator/ipfs"
 	"github.com/metadium/go-delegator/json"
 	"github.com/metadium/go-delegator/log"
 	"github.com/metadium/go-delegator/metaservice/sc/identity"
 	"github.com/metadium/go-delegator/metaservice/sc/identitymanager"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
@@ -241,7 +241,7 @@ func backupUserData(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, e
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	//1. Check paramter format
+	//1. Check parameter format
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)
@@ -333,7 +333,7 @@ func getUserData(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errR
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	//1. Check paramter format
+	//1. Check parameter format
 	tmpParams, errObj := getParameter(req.Method, req.Params)
 	if errObj != nil {
 		resp.Error = makeErrorResponse(errObj)

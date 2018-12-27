@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/metadium/go-delegator/log"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/metadium/go-delegator/log"
 	"gopkg.in/validator.v2"
 )
 
@@ -169,7 +169,7 @@ func checkBytesLength(v interface{}, param string) error {
 	return nil
 }
 
-// asInt retuns the parameter as a int64
+// asInt returns the parameter as a int64
 // or panics if it can't convert
 func asInt(param string) (int64, error) {
 	i, err := strconv.ParseInt(param, 0, 32)
