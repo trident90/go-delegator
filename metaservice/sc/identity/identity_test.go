@@ -20,7 +20,7 @@ func defaultSetting() {
 	}
 	defer file.Close()
 	r := bufio.NewReader(file)
-	data, _, err := r.ReadLine()
+	data, _, _ := r.ReadLine()
 	passphrase := string(data)
 
 	go func() { crypto.PathChan <- path }()
@@ -81,7 +81,9 @@ func TestCallGetKeysByPurpose(t *testing.T) {
 	scAddress := common.HexToAddress("0xe052cb04e4fe4d3ca69d247b4eff2aff35613b0e")
 
 	instance, err := GetInstance(scAddress)
-
+	if err != nil {
+		t.Error("Error getInstance", err)
+	}
 	keys, err := CallGetKeysByPurpose(instance, common.Big2)
 	if err != nil {
 		t.Error("Error getKey", err)

@@ -213,6 +213,7 @@ func TestEcRecover(t *testing.T) {
 	}
 
 	addr, err = EcRecover(testmsgraw3, testsigraw3)
+	saddr := fmt.Sprintf("0x%x", addr)
 	if err != nil || saddr != testaddr {
 		t.Errorf("Failed to EcRecover %s", err)
 	}

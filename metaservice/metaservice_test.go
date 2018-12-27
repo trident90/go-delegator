@@ -30,7 +30,7 @@ func defaultSetting() {
 	}
 	defer file.Close()
 	r := bufio.NewReader(file)
-	data, _, err := r.ReadLine()
+	data, _, _ := r.ReadLine()
 	passphrase := string(data)
 
 	go func() { crypto.PathChan <- path }()
