@@ -8,14 +8,14 @@
 
 ## Contents
 
-* [Features](#markdown-header-features)
-* [Prerequisite](#markdown-header-prerequisite)
-* [Build](#markdown-header-build)
-* [Test](#markdown-header-test)
-* [Usage](#markdown-header-usage)
-* [Deploy (for AWS Lambda)](#markdown-header-deploy-for-aws-lambda)
-* [Reference](#markdown-header-reference)
-* [License](#markdown-header-license)
+* [Features](#features)
+* [Prerequisite](#prerequisite)
+* [Build](#build)
+* [Test](#test)
+* [Usage](#usage)
+* [Deploy (for AWS Lambda)](#deploy-for-aws-lambda)
+* [Reference](#reference)
+* [License](#license)
 
 ## Features
 
@@ -108,4 +108,5 @@ go get github.com/karalabe/xgo
 [7] Dep, https://github.com/golang/dep
 
 ## License
+
 MIT
