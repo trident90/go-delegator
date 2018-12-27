@@ -1,5 +1,10 @@
 # Metadium Proxy
-Main functions are MetaID CRUD and relaying JSON-RPC result with metadium node. In addition, this project try porting web3 to Golang. Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
+
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/metadium/go-delegator/master/LICENSE)
+[![Go Report Card](https://goreportcard.com/badge/github.com/metadium/go-delegator)](https://goreportcard.com/report/github.com/metadium/go-delegator)
+[![GoDoc](https://godoc.org/github.com/metadium/go-delegator?status.svg)](https://godoc.org/github.com/metadium/go-delegator)
+
+> Main functions are MetaID CRUD and relaying JSON-RPC result with metadium node. In addition, this project try porting web3 to Golang. Furthermore it applied IPFS here to overwhelm limited storage of blockchain.
 
 ## Contents
 * [Features](#markdown-header-features)
