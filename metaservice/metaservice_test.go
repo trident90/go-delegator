@@ -313,6 +313,9 @@ func TestAddSelfClaim(t *testing.T) {
 	//2-2 sign  data
 	var _signature hexutil.Bytes
 	_signature, err = signBytes(_signData, signPrivkey)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Println("signature : ", _signature.String())
 
 	//3.  data(DelegateExcute parameter) 생성
