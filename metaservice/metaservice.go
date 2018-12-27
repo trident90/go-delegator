@@ -1,4 +1,4 @@
-// Package predefined manages predefined functions for RPC request
+// Package metaservice manages metaservice functions for RPC request
 package metaservice
 
 import (
