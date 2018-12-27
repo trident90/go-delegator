@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/log"
 )
 
 type reCaptchaResponse struct {

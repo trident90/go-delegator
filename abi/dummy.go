@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/big"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
-	"bitbucket.org/coinplugin/proxy/json"
-	"bitbucket.org/coinplugin/proxy/rpc"
+	"github.com/metadium/go-delegator/crypto"
+	"github.com/metadium/go-delegator/json"
+	"github.com/metadium/go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

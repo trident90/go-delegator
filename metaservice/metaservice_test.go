@@ -8,16 +8,16 @@ import (
 	"strings"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/metaservice/sc/identity"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
+	"github.com/metadium/go-delegator/metaservice/sc/identity"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	log "github.com/sirupsen/logrus"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
-	"bitbucket.org/coinplugin/proxy/json"
+	"github.com/metadium/go-delegator/crypto"
+	"github.com/metadium/go-delegator/json"
 )
 
 func defaultSetting() {

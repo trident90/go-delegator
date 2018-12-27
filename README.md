@@ -89,7 +89,7 @@ go get github.com/karalabe/xgo
     godoc -http=:6060
     ```  
 2. Open url
-    - http://localhost:6060/pkg/bitbucket.org/coinplugin/proxy/
+    - http://localhost:6060/pkg/github.com/metadium/go-delegator/
     - If you change port at 1., it should be applied to url
 
 ## Reference

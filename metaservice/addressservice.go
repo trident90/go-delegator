@@ -1,9 +1,9 @@
 package metaservice
 
 import (
-	"bitbucket.org/coinplugin/proxy/json"
-	"bitbucket.org/coinplugin/proxy/log"
-	"bitbucket.org/coinplugin/proxy/metaservice/sc/registry"
+	"github.com/metadium/go-delegator/json"
+	"github.com/metadium/go-delegator/log"
+	"github.com/metadium/go-delegator/metaservice/sc/registry"
 )
 
 func getRegistryAddress(reqId uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {

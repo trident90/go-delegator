@@ -6,10 +6,10 @@ import (
 	"math/big"
 	"sync"
 
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/log"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
-	"bitbucket.org/coinplugin/proxy/rpc"
+	"github.com/metadium/go-delegator/crypto"
+	"github.com/metadium/go-delegator/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"

@@ -206,6 +206,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/metadium/go-metadium"
+  packages = ["."]
+  revision = "dea1ce052a10cd7d401a5c04f83f371a06fe293c"
+  version = "v1.8.11"
+
+[[projects]]
   branch = "master"
   name = "github.com/minio/blake2b-simd"
   packages = ["."]
@@ -386,6 +392,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "002f1380c17aaffba1c53824c003f8dd4b78ba4ea5ec101fcd48f7b13de0d700"
+  inputs-digest = "9255decca9d8dd2579ec75e9d3ceb9a617b31abdd463279773e1083a2a74ac85"
   solver-name = "gps-cdcl"
   solver-version = 1

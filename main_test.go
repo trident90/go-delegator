@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
-	"bitbucket.org/coinplugin/proxy/json"
+	"github.com/metadium/go-delegator/crypto"
+	"github.com/metadium/go-delegator/json"
 
 	"github.com/aws/aws-lambda-go/events"
 )

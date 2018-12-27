@@ -16,9 +16,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"bitbucket.org/coinplugin/proxy/common"
-	"bitbucket.org/coinplugin/proxy/db"
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/common"
+	"github.com/metadium/go-delegator/db"
+	"github.com/metadium/go-delegator/log"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ethcommon "github.com/ethereum/go-ethereum/common"

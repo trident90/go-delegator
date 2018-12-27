@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sync"
 
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/log"
 
-	"bitbucket.org/coinplugin/proxy/rpc"
+	"github.com/metadium/go-delegator/rpc"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 )

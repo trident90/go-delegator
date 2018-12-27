@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/json"
+	"github.com/metadium/go-delegator/json"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"

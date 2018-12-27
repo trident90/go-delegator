@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/coinplugin/proxy/common"
-	"bitbucket.org/coinplugin/proxy/json"
+	"github.com/metadium/go-delegator/common"
+	"github.com/metadium/go-delegator/json"
 )
 
 func TestTelegramBot(t *testing.T) {

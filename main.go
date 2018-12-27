@@ -8,12 +8,12 @@ import (
 	"os"
 	"strings"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
-	_ "bitbucket.org/coinplugin/proxy/ipfs"
-	"bitbucket.org/coinplugin/proxy/json"
-	"bitbucket.org/coinplugin/proxy/log"
-	"bitbucket.org/coinplugin/proxy/metaservice"
-	"bitbucket.org/coinplugin/proxy/rpc"
+	"github.com/metadium/go-delegator/crypto"
+	_ "github.com/metadium/go-delegator/ipfs"
+	"github.com/metadium/go-delegator/json"
+	"github.com/metadium/go-delegator/log"
+	"github.com/metadium/go-delegator/metaservice"
+	"github.com/metadium/go-delegator/rpc"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"

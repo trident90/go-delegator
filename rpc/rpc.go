@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"bitbucket.org/coinplugin/proxy/common"
-	"bitbucket.org/coinplugin/proxy/crypto"
-	ethjson "bitbucket.org/coinplugin/proxy/json"
+	"github.com/metadium/go-delegator/common"
+	"github.com/metadium/go-delegator/crypto"
+	ethjson "github.com/metadium/go-delegator/json"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"

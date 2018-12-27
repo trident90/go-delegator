@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/common"
+	"github.com/metadium/go-delegator/common"
 )
 
 func TestUnit(t *testing.T) {

@@ -11,16 +11,16 @@ $(shell go get github.com/karalabe/xgo)
 
 lambda:
 	xgo --deps=https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2 \
-			--targets=linux/amd64 -out bin/proxy \
+			--targets=linux/amd64 -out bin/delegator \
 			./
-	mv bin/proxy-linux-amd64 bin/proxy
+	mv bin/delegator-linux-amd64 bin/delegator
 
 remote:
 	xgo --deps=https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2 \
-			--targets=linux/amd64 -out bin/proxy \
+			--targets=linux/amd64 -out bin/delegator \
 			--branch=$(branch) \
-			bitbucket.org/coinplugin/proxy
-	mv bin/proxy-linux-amd64 bin/proxy
+			github.com/metadium/go-delegator
+	mv bin/delegator-linux-amd64 bin/delegator
 
 local:
-	go build -o bin/proxy
+	go build -o bin/delegator

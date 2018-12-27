@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/log"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"gopkg.in/validator.v2"

@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/coinplugin/proxy/crypto"
+	"github.com/metadium/go-delegator/crypto"
 	"github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
 )

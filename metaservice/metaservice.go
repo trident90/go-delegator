@@ -6,9 +6,9 @@ import (
 	"math/big"
 	"runtime/debug"
 
-	proxyCommon "bitbucket.org/coinplugin/proxy/common"
-	"bitbucket.org/coinplugin/proxy/json"
-	"bitbucket.org/coinplugin/proxy/log"
+	proxyCommon "github.com/metadium/go-delegator/common"
+	"github.com/metadium/go-delegator/json"
+	"github.com/metadium/go-delegator/log"
 )
 
 var (

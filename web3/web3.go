@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"strings"
 
-	"bitbucket.org/coinplugin/proxy/common"
-	"bitbucket.org/coinplugin/proxy/log"
+	"github.com/metadium/go-delegator/common"
+	"github.com/metadium/go-delegator/log"
 )
 
 // GetValueOfUnit returns a value about given unit
