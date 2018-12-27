@@ -50,6 +50,8 @@ func getRegistry() (*Registry, error) {
 	}
 	return instance, nil
 }
+
+//GetRegistryContractAddress get Registry Contract Address
 func GetRegistryContractAddress() (*common.Address, error) {
 
 	return &nsAddress, nil
@@ -77,7 +79,7 @@ func callGetContractAddress(name string) (*common.Address, error) {
 	return &result, nil
 }
 
-// GetIMContractAddress  retrun IdentityManager Contract Address
+// GetIMContractAddress  get IdentityManager Contract Address
 func GetIMContractAddress() (*common.Address, error) {
 
 	result, err := callGetContractAddress("IdentityManager")
@@ -85,7 +87,7 @@ func GetIMContractAddress() (*common.Address, error) {
 	return result, err
 }
 
-// GetTRContractAddress  retrun Topic Registry Contract Address
+// GetTRContractAddress  get Topic Registry Contract Address
 func GetTRContractAddress() (*common.Address, error) {
 
 	result, err := callGetContractAddress("TopicRegistry")
@@ -93,28 +95,28 @@ func GetTRContractAddress() (*common.Address, error) {
 	return result, err
 }
 
-// GetAARContractAddress  retrun Attestation Agency Registry Contract Address
+// GetAARContractAddress  get Attestation Agency Registry Contract Address
 func GetAARContractAddress() (*common.Address, error) {
 	result, err := callGetContractAddress("AttestationAgencyRegistry")
 	log.Infof("Attestation Agency Registry Address: %x ", result)
 	return result, err
 }
 
-// GetAMContractAddress  retrun Achievement Manager Contract Address
+// GetAMContractAddress  get Achievement Manager Contract Address
 func GetAMContractAddress() (*common.Address, error) {
 	result, err := callGetContractAddress("AchievementManager")
 	log.Infof("Achievement Manager Address: %x ", result)
 	return result, err
 }
 
-// GetAcContractAddress  retrun Achievement Contract Address
+// GetAcContractAddress  get Achievement Contract Address
 func GetAcContractAddress() (*common.Address, error) {
 	result, err := callGetContractAddress("Achievement")
 	log.Infof("Achievement Address: %x ", result)
 	return result, err
 }
 
-// GetAcContractAddress  retrun Achievement Contract Address
+// GetAllContractAddress  get All System Contract Addresses
 func GetAllContractAddress() (map[string]*common.Address, error) {
 
 	regAddr, err := GetRegistryContractAddress()

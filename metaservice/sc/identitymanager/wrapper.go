@@ -7,7 +7,6 @@ import (
 
 	"github.com/metadium/go-delegator/log"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/metadium/go-delegator/crypto"
@@ -87,6 +86,7 @@ func CallCreateMetaID(mgtAddress common.Address) (*types.Transaction, error) {
 	return trx, nil
 }
 
+/* Not Used
 func CallGetDeployedMetaIds() ([]common.Address, error) {
 	service, err := getService()
 
@@ -102,8 +102,8 @@ func CallGetDeployedMetaIds() ([]common.Address, error) {
 	log.Debug("Address List: ", addrs)
 	return addrs, nil
 }
-
-/*
+*/
+/* Not Used
 func CreateAddress(b common.Address, nonce uint64) common.Address {
     data, _ := rlp.EncodeToBytes([]interface{}{b, nonce})
     return common.BytesToAddress(Keccak256(data)[12:])

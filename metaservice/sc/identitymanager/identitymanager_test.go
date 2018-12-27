@@ -44,6 +44,7 @@ func TestCallCreateMetaID(t *testing.T) {
 	fmt.Printf("trxid : %v", trx.Hash().String())
 }
 
+/* Not Used
 func TestCallGetDeployedMetaIds(t *testing.T) {
 	defaultSetting()
 	addrs, err := CallGetDeployedMetaIds()
@@ -56,11 +57,5 @@ func TestCallGetDeployedMetaIds(t *testing.T) {
 		//management
 		fmt.Printf("%x \n", p)
 	}
-
 }
-
-func TestCreateAddress(t *testing.T) {
-	address := common.HexToAddress("0x1318ca3CD01CFa04C7D129Aa5f9cF7145736C0be")
-	scAddress := ethCrypto.CreateAddress(address, 1)
-	fmt.Printf("Meta ID Address: %x \n", scAddress)
-}
+*/

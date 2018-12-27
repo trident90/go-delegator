@@ -26,6 +26,7 @@ var (
 	emptyKeyVal      = new([32]byte)
 )
 
+//GetInstance get MetaID Instance
 func GetInstance(address common.Address) (*Identity, error) {
 	_rpc := rpc.GetInstance()
 	client := _rpc.GetEthClient()
@@ -130,6 +131,7 @@ func CallDelegatedApprove(instance *Identity, mgtAddress common.Address, id *big
 	return trx, nil
 }
 
+//CallGetTransactionCount  get Transaction count for MetaID
 func CallGetTransactionCount(instance *Identity) (*big.Int, error) {
 	var err error
 	if instance == nil {
@@ -151,6 +153,7 @@ func CallGetTransactionCount(instance *Identity) (*big.Int, error) {
 
 }
 
+//CheckDelegateExecutePermission Check permission for DelegateExecute
 func CheckDelegateExecutePermission(instance *Identity, from common.Address, to common.Address, data hexutil.Bytes) error {
 	var err error
 
@@ -202,6 +205,7 @@ func CheckDelegateExecutePermission(instance *Identity, from common.Address, to 
 	return fmt.Errorf("Not permission")
 }
 
+//CheckDelegateApprovePermission Check permission for DelegateApprove
 func CheckDelegateApprovePermission(instance *Identity, from common.Address) error {
 	var err error
 
@@ -232,6 +236,7 @@ func CheckDelegateApprovePermission(instance *Identity, from common.Address) err
 	return fmt.Errorf("Not permission")
 }
 
+//CallGetFunctionSignature Get FunctionSignature
 func CallGetFunctionSignature(instance *Identity, data hexutil.Bytes) (*[4]byte, error) {
 	var err error
 	if instance == nil {
@@ -252,6 +257,7 @@ func CallGetFunctionSignature(instance *Identity, data hexutil.Bytes) (*[4]byte,
 	return &result, nil
 }
 
+//CallGetKey get Key Info by key
 func CallGetKey(instance *Identity, key [32]byte) (*metaIDKey, error) {
 	var err error
 	if instance == nil {
@@ -271,6 +277,7 @@ func CallGetKey(instance *Identity, key [32]byte) (*metaIDKey, error) {
 	return &result, nil
 }
 
+//CallGetKeysByPurpose  get Key Info list by purpose
 func CallGetKeysByPurpose(instance *Identity, purpose *big.Int) ([][32]byte, error) {
 	var err error
 	if instance == nil {
@@ -290,23 +297,7 @@ func CallGetKeysByPurpose(instance *Identity, purpose *big.Int) ([][32]byte, err
 	return result, nil
 }
 
-/*
-func CallAddrToKey(instance *Identity, address common.Address) ([32]byte, error) {
-
-	var err error
-	if instance == nil {
-		err = fmt.Errorf("Error - Identity nil")
-		return *emptyKeyVal, err
-	}
-	result, err := instance.AddrToKey(&bind.CallOpts{}, address)
-	if err != nil {
-		log.Error(err)
-		return *emptyKeyVal, err
-	}
-	log.Debugf("address to key: %x ", result)
-	return result, nil
-}
-*/
+//CallAddrToKey  Convert Address to Byte32
 func CallAddrToKey(address common.Address) [32]byte {
 	var result [32]byte
 	copy(result[12:], address.Bytes())
