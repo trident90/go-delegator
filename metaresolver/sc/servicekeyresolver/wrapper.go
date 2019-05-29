@@ -159,11 +159,11 @@ func CallRemoveKeysDelegated(reqID uint64, instance *Servicekeyresolver, associa
 }
 
 //GetAddress return current ServiceKeyResolver contract address
-func GetAddress() (*common.Address, error) {
-	return &skrAddress, nil
+func GetAddress() *common.Address {
+	return &skrAddress
 }
 
 //GetAddressList() Return all old and current ServiceKeyResolver contract address list
-func GetAddressList() ([]common.Address, error) {
-	return allSkrAddress, nil
+func GetAddressList() []common.Address {
+	return allSkrAddress
 }
