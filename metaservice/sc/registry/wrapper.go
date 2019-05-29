@@ -28,7 +28,7 @@ func getSession() (*RegistrySession, error) {
 		session = &RegistrySession{
 			Contract: registry,
 			CallOpts: bind.CallOpts{
-				Pending: true,
+				Pending: false,
 			},
 			//			TransactOpts: *auth,
 		}
