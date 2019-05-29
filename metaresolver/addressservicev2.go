@@ -32,13 +32,13 @@ func getServiceKeyAddress(reqID uint64, req json.RPCRequest) (resp json.RPCRespo
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	address, err := servicekeyresolver.GetAddress()
-	if err != nil {
-		log.Errorfd(reqID, "getServiceKeyAddress Error : %v", err)
-		errObj := &internalError{err.Error()}
-		resp.Error = makeErrorResponse(errObj)
-		return
-	}
+	address := servicekeyresolver.GetAddress()
+	// if err != nil {
+	// 	log.Errorfd(reqID, "getServiceKeyAddress Error : %v", err)
+	// 	errObj := &internalError{err.Error()}
+	// 	resp.Error = makeErrorResponse(errObj)
+	// 	return
+	// }
 
 	if address != nil {
 		resp.Result = address.String()
@@ -50,13 +50,13 @@ func getServiceKeyAllAddresses(reqID uint64, req json.RPCRequest) (resp json.RPC
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	addresses, err := servicekeyresolver.GetAddressList()
-	if err != nil {
-		log.Errorfd(reqID, "getServiceKeyAllAddresses Error : %v", err)
-		errObj := &internalError{err.Error()}
-		resp.Error = makeErrorResponse(errObj)
-		return
-	}
+	addresses := servicekeyresolver.GetAddressList()
+	// if err != nil {
+	// 	log.Errorfd(reqID, "getServiceKeyAllAddresses Error : %v", err)
+	// 	errObj := &internalError{err.Error()}
+	// 	resp.Error = makeErrorResponse(errObj)
+	// 	return
+	// }
 
 	if addresses != nil {
 		resp.Result = addresses
@@ -68,7 +68,7 @@ func getResolverAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCRespo
 	log.Debugd(reqID, "Call getResolverAddresses Function")
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
-	resp.Result = resolverAddresses
+	resp.Result = makeResolverAddresses()
 	return
 }
 func getProviderAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
@@ -108,22 +108,23 @@ func makeAllServiceAddressMap() (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	skrAddr, err := servicekeyresolver.GetAddress()
-	if err != nil {
-		log.Error("getAllServiceAddress() ", err)
-		return nil, err
-	}
+	skrAddr := servicekeyresolver.GetAddress()
+	// if err != nil {
+	// 	log.Error("getAllServiceAddress() ", err)
+	// 	return nil, err
+	// }
 
-	skrAddrList, err := servicekeyresolver.GetAddressList()
-	if err != nil {
-		log.Error("getAllServiceAddress() ", err)
-		return nil, err
-	}
+	skrAddrList := servicekeyresolver.GetAddressList()
+	// if err != nil {
+	// 	log.Error("getAllServiceAddress() ", err)
+	// 	return nil, err
+	// }
+	resolverAddrs := makeResolverAddresses()
 
 	result := map[string]interface{}{
 		"identity_registry": irAddr,
 		"providers":         providerAddresses,
-		"resolvers":         resolverAddresses,
+		"resolvers":         resolverAddrs,
 		"service_key":       skrAddr,
 		"service_key_all":   skrAddrList,
 	}
@@ -132,4 +133,8 @@ func makeAllServiceAddressMap() (map[string]interface{}, error) {
 func getDelegatorAddress() (*common.Address, error) {
 	delegatorAddr := common.HexToAddress(crypto.GetInstance().GetAddress())
 	return &delegatorAddr, nil
+}
+func makeResolverAddresses() []common.Address {
+	addrs := []common.Address{*servicekeyresolver.GetAddress()}
+	return addrs
 }
