@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/metadium/go-delegator/metaresolver"
+
 	"github.com/metadium/go-delegator/crypto"
 	_ "github.com/metadium/go-delegator/ipfs"
 	"github.com/metadium/go-delegator/json"
@@ -32,7 +34,10 @@ func handler(req json.RPCRequest) (body string, statusCode int) {
 	//log.Info("request:", req.String())
 	var resp json.RPCResponse
 	var err error
-	if metaservice.Contains(req.Method) {
+	if metaresolver.Contains(req.Method) {
+		// Forward RPC request to metaservice function (v3)
+		resp, err = metaresolver.Forward(req)
+	} else if metaservice.Contains(req.Method) {
 		// Forward RPC request to metaservice function (v2)
 		resp, err = metaservice.Forward(req)
 	} else {
