@@ -4,9 +4,10 @@
 package registry
 
 import (
+	"math/big"
 	"strings"
 
-	ethereum "github.com/metadium/go-metadium"
+	ethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -14,11 +15,23 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 )
 
+// Reference imports to suppress errors if they are not otherwise used.
+var (
+	_ = big.NewInt
+	_ = strings.NewReader
+	_ = ethereum.NotFound
+	_ = abi.U256
+	_ = bind.Bind
+	_ = common.Big1
+	_ = types.BloomLookup
+	_ = event.NewSubscription
+)
+
 // RegistryABI is the input ABI used to generate the binding from.
-const RegistryABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"permissions\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"contracts\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"setter\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"name\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"SetContractDomain\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_contract\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"granted\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"status\",\"type\":\"bool\"}],\"name\":\"SetPermission\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"},{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setContractDomain\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"getContractAddress\",\"outputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"},{\"name\":\"_status\",\"type\":\"bool\"}],\"name\":\"setPermission\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"}],\"name\":\"getPermission\",\"outputs\":[{\"name\":\"found\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
+const RegistryABI = "[{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"},{\"name\":\"\",\"type\":\"address\"}],\"name\":\"permissions\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"isOwner\",\"outputs\":[{\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"contracts\",\"outputs\":[{\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"name\":\"setter\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"name\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"SetContractDomain\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"_contract\",\"type\":\"bytes32\"},{\"indexed\":true,\"name\":\"granted\",\"type\":\"address\"},{\"indexed\":false,\"name\":\"status\",\"type\":\"bool\"}],\"name\":\"SetPermission\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"},{\"name\":\"_addr\",\"type\":\"address\"}],\"name\":\"setContractDomain\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_name\",\"type\":\"bytes32\"}],\"name\":\"getContractAddress\",\"outputs\":[{\"name\":\"addr\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"},{\"name\":\"_status\",\"type\":\"bool\"}],\"name\":\"setPermission\",\"outputs\":[{\"name\":\"success\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"_contract\",\"type\":\"bytes32\"},{\"name\":\"_granted\",\"type\":\"address\"}],\"name\":\"getPermission\",\"outputs\":[{\"name\":\"found\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]"
 
 // RegistryBin is the compiled bytecode used for deploying new contracts.
-const RegistryBin = `608060405260008054600160a060020a0319163317905561059a806100256000396000f30060806040526004361061008d5763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166304af66ad81146100925780630d2020dd146100ca5780633ec50c6c146100fe578063599e4c701461012257806360d6c7cf1461014b5780638da5cb5b1461016f578063ec56a37314610184578063f2fde38b1461019c575b600080fd5b34801561009e57600080fd5b506100b6600435600160a060020a03602435166101bf565b604080519115158252519081900360200190f35b3480156100d657600080fd5b506100e26004356102c6565b60408051600160a060020a039092168252519081900360200190f35b34801561010a57600080fd5b506100b6600435600160a060020a0360243516610367565b34801561012e57600080fd5b506100b6600435600160a060020a03602435166044351515610387565b34801561015757600080fd5b506100b6600435600160a060020a0360243516610485565b34801561017b57600080fd5b506100e26104b0565b34801561019057600080fd5b506100e26004356104bf565b3480156101a857600080fd5b506101bd600160a060020a03600435166104da565b005b60008054600160a060020a031633146101d757600080fd5b600160a060020a038216151561024e57604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601a60248201527f616464726573732073686f756c64206265206e6f6e2d7a65726f000000000000604482015290519081900360640190fd5b600083815260016020908152604091829020805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03861690811790915582513381529251909286927f37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db92918290030190a350600192915050565b600081815260016020526040812054600160a060020a0316151561034b57604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601a60248201527f616464726573732073686f756c64206265206e6f6e2d7a65726f000000000000604482015290519081900360640190fd5b50600090815260016020526040902054600160a060020a031690565b600260209081526000928352604080842090915290825290205460ff1681565b60008054600160a060020a0316331461039f57600080fd5b600160a060020a038316151561041657604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601a60248201527f616464726573732073686f756c64206265206e6f6e2d7a65726f000000000000604482015290519081900360640190fd5b6000848152600260209081526040808320600160a060020a03871680855290835292819020805460ff19168615159081179091558151908152905187927fe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818928290030190a35060019392505050565b6000918252600260209081526040808420600160a060020a0393909316845291905290205460ff1690565b600054600160a060020a031681565b600160205260009081526040902054600160a060020a031681565b600054600160a060020a031633146104f157600080fd5b600160a060020a038116151561050657600080fd5b60008054604051600160a060020a03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a36000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03929092169190911790555600a165627a7a72305820fdff7bf855d2278cc858686fbe566ea3437cb39f9567787f1a3866731c2c1ecb0029`
+const RegistryBin = `6080604052336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16600073ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3610bd1806100cf6000396000f3006080604052600436106100a4576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806304af66ad146100a95780630d2020dd146101125780633ec50c6c14610183578063599e4c70146101ec57806360d6c7cf14610261578063715018a6146102ca5780638da5cb5b146102e15780638f32d59b14610338578063ec56a37314610367578063f2fde38b146103d8575b600080fd5b3480156100b557600080fd5b506100f86004803603810190808035600019169060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919050505061041b565b604051808215151515815260200191505060405180910390f35b34801561011e57600080fd5b5061014160048036038101908080356000191690602001909291905050506105b8565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561018f57600080fd5b506101d26004803603810190808035600019169060200190929190803573ffffffffffffffffffffffffffffffffffffffff1690602001909291905050506106dc565b604051808215151515815260200191505060405180910390f35b3480156101f857600080fd5b506102476004803603810190808035600019169060200190929190803573ffffffffffffffffffffffffffffffffffffffff16906020019092919080351515906020019092919050505061070b565b604051808215151515815260200191505060405180910390f35b34801561026d57600080fd5b506102b06004803603810190808035600019169060200190929190803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610897565b604051808215151515815260200191505060405180910390f35b3480156102d657600080fd5b506102df610907565b005b3480156102ed57600080fd5b506102f66109d9565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34801561034457600080fd5b5061034d610a02565b604051808215151515815260200191505060405180910390f35b34801561037357600080fd5b506103966004803603810190808035600019169060200190929190505050610a59565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b3480156103e457600080fd5b50610419600480360381019080803573ffffffffffffffffffffffffffffffffffffffff169060200190929190505050610a8c565b005b6000610425610a02565b151561043057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff16141515156104d5576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f616464726573732073686f756c64206265206e6f6e2d7a65726f00000000000081525060200191505060405180910390fd5b8160016000856000191660001916815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055508173ffffffffffffffffffffffffffffffffffffffff1683600019167f37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db33604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a36001905092915050565b60008073ffffffffffffffffffffffffffffffffffffffff1660016000846000191660001916815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff1614151515610699576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f616464726573732073686f756c64206265206e6f6e2d7a65726f00000000000081525060200191505060405180910390fd5b60016000836000191660001916815260200190815260200160002060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff169050919050565b60026020528160005260406000206020528060005260406000206000915091509054906101000a900460ff1681565b6000610715610a02565b151561072057600080fd5b600073ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff16141515156107c5576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252601a8152602001807f616464726573732073686f756c64206265206e6f6e2d7a65726f00000000000081525060200191505060405180910390fd5b8160026000866000191660001916815260200190815260200160002060008573ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060006101000a81548160ff0219169083151502179055508273ffffffffffffffffffffffffffffffffffffffff1684600019167fe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e781884604051808215151515815260200191505060405180910390a3600190509392505050565b600060026000846000191660001916815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060009054906101000a900460ff16905092915050565b61090f610a02565b151561091a57600080fd5b600073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a360008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614905090565b60016020528060005260406000206000915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b610a94610a02565b1515610a9f57600080fd5b610aa881610aab565b50565b600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614151515610ae757600080fd5b8073ffffffffffffffffffffffffffffffffffffffff166000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff167f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e060405160405180910390a3806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505600a165627a7a72305820c032addddf69a134bf55809cba5578a5c0178d1c90ad5aed0690f231cda6b66e0029`
 
 // DeployRegistry deploys a new Ethereum contract, binding an instance of Registry to it.
 func DeployRegistry(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Registry, error) {
@@ -177,7 +190,7 @@ func (_Registry *RegistryTransactorRaw) Transact(opts *bind.TransactOpts, method
 
 // Contracts is a free data retrieval call binding the contract method 0xec56a373.
 //
-// Solidity: function contracts( bytes32) constant returns(address)
+// Solidity: function contracts(bytes32 ) constant returns(address)
 func (_Registry *RegistryCaller) Contracts(opts *bind.CallOpts, arg0 [32]byte) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -189,21 +202,21 @@ func (_Registry *RegistryCaller) Contracts(opts *bind.CallOpts, arg0 [32]byte) (
 
 // Contracts is a free data retrieval call binding the contract method 0xec56a373.
 //
-// Solidity: function contracts( bytes32) constant returns(address)
+// Solidity: function contracts(bytes32 ) constant returns(address)
 func (_Registry *RegistrySession) Contracts(arg0 [32]byte) (common.Address, error) {
 	return _Registry.Contract.Contracts(&_Registry.CallOpts, arg0)
 }
 
 // Contracts is a free data retrieval call binding the contract method 0xec56a373.
 //
-// Solidity: function contracts( bytes32) constant returns(address)
+// Solidity: function contracts(bytes32 ) constant returns(address)
 func (_Registry *RegistryCallerSession) Contracts(arg0 [32]byte) (common.Address, error) {
 	return _Registry.Contract.Contracts(&_Registry.CallOpts, arg0)
 }
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
+// Solidity: function getContractAddress(bytes32 _name) constant returns(address addr)
 func (_Registry *RegistryCaller) GetContractAddress(opts *bind.CallOpts, _name [32]byte) (common.Address, error) {
 	var (
 		ret0 = new(common.Address)
@@ -215,21 +228,21 @@ func (_Registry *RegistryCaller) GetContractAddress(opts *bind.CallOpts, _name [
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
+// Solidity: function getContractAddress(bytes32 _name) constant returns(address addr)
 func (_Registry *RegistrySession) GetContractAddress(_name [32]byte) (common.Address, error) {
 	return _Registry.Contract.GetContractAddress(&_Registry.CallOpts, _name)
 }
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
 //
-// Solidity: function getContractAddress(_name bytes32) constant returns(addr address)
+// Solidity: function getContractAddress(bytes32 _name) constant returns(address addr)
 func (_Registry *RegistryCallerSession) GetContractAddress(_name [32]byte) (common.Address, error) {
 	return _Registry.Contract.GetContractAddress(&_Registry.CallOpts, _name)
 }
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
+// Solidity: function getPermission(bytes32 _contract, address _granted) constant returns(bool found)
 func (_Registry *RegistryCaller) GetPermission(opts *bind.CallOpts, _contract [32]byte, _granted common.Address) (bool, error) {
 	var (
 		ret0 = new(bool)
@@ -241,16 +254,42 @@ func (_Registry *RegistryCaller) GetPermission(opts *bind.CallOpts, _contract [3
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
+// Solidity: function getPermission(bytes32 _contract, address _granted) constant returns(bool found)
 func (_Registry *RegistrySession) GetPermission(_contract [32]byte, _granted common.Address) (bool, error) {
 	return _Registry.Contract.GetPermission(&_Registry.CallOpts, _contract, _granted)
 }
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
 //
-// Solidity: function getPermission(_contract bytes32, _granted address) constant returns(found bool)
+// Solidity: function getPermission(bytes32 _contract, address _granted) constant returns(bool found)
 func (_Registry *RegistryCallerSession) GetPermission(_contract [32]byte, _granted common.Address) (bool, error) {
 	return _Registry.Contract.GetPermission(&_Registry.CallOpts, _contract, _granted)
+}
+
+// IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
+//
+// Solidity: function isOwner() constant returns(bool)
+func (_Registry *RegistryCaller) IsOwner(opts *bind.CallOpts) (bool, error) {
+	var (
+		ret0 = new(bool)
+	)
+	out := ret0
+	err := _Registry.contract.Call(opts, out, "isOwner")
+	return *ret0, err
+}
+
+// IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
+//
+// Solidity: function isOwner() constant returns(bool)
+func (_Registry *RegistrySession) IsOwner() (bool, error) {
+	return _Registry.Contract.IsOwner(&_Registry.CallOpts)
+}
+
+// IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
+//
+// Solidity: function isOwner() constant returns(bool)
+func (_Registry *RegistryCallerSession) IsOwner() (bool, error) {
+	return _Registry.Contract.IsOwner(&_Registry.CallOpts)
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
@@ -281,7 +320,7 @@ func (_Registry *RegistryCallerSession) Owner() (common.Address, error) {
 
 // Permissions is a free data retrieval call binding the contract method 0x3ec50c6c.
 //
-// Solidity: function permissions( bytes32,  address) constant returns(bool)
+// Solidity: function permissions(bytes32 , address ) constant returns(bool)
 func (_Registry *RegistryCaller) Permissions(opts *bind.CallOpts, arg0 [32]byte, arg1 common.Address) (bool, error) {
 	var (
 		ret0 = new(bool)
@@ -293,77 +332,98 @@ func (_Registry *RegistryCaller) Permissions(opts *bind.CallOpts, arg0 [32]byte,
 
 // Permissions is a free data retrieval call binding the contract method 0x3ec50c6c.
 //
-// Solidity: function permissions( bytes32,  address) constant returns(bool)
+// Solidity: function permissions(bytes32 , address ) constant returns(bool)
 func (_Registry *RegistrySession) Permissions(arg0 [32]byte, arg1 common.Address) (bool, error) {
 	return _Registry.Contract.Permissions(&_Registry.CallOpts, arg0, arg1)
 }
 
 // Permissions is a free data retrieval call binding the contract method 0x3ec50c6c.
 //
-// Solidity: function permissions( bytes32,  address) constant returns(bool)
+// Solidity: function permissions(bytes32 , address ) constant returns(bool)
 func (_Registry *RegistryCallerSession) Permissions(arg0 [32]byte, arg1 common.Address) (bool, error) {
 	return _Registry.Contract.Permissions(&_Registry.CallOpts, arg0, arg1)
 }
 
+// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
+//
+// Solidity: function renounceOwnership() returns()
+func (_Registry *RegistryTransactor) RenounceOwnership(opts *bind.TransactOpts) (*types.Transaction, error) {
+	return _Registry.contract.Transact(opts, "renounceOwnership")
+}
+
+// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
+//
+// Solidity: function renounceOwnership() returns()
+func (_Registry *RegistrySession) RenounceOwnership() (*types.Transaction, error) {
+	return _Registry.Contract.RenounceOwnership(&_Registry.TransactOpts)
+}
+
+// RenounceOwnership is a paid mutator transaction binding the contract method 0x715018a6.
+//
+// Solidity: function renounceOwnership() returns()
+func (_Registry *RegistryTransactorSession) RenounceOwnership() (*types.Transaction, error) {
+	return _Registry.Contract.RenounceOwnership(&_Registry.TransactOpts)
+}
+
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
+// Solidity: function setContractDomain(bytes32 _name, address _addr) returns(bool success)
 func (_Registry *RegistryTransactor) SetContractDomain(opts *bind.TransactOpts, _name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.contract.Transact(opts, "setContractDomain", _name, _addr)
 }
 
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
+// Solidity: function setContractDomain(bytes32 _name, address _addr) returns(bool success)
 func (_Registry *RegistrySession) SetContractDomain(_name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.SetContractDomain(&_Registry.TransactOpts, _name, _addr)
 }
 
 // SetContractDomain is a paid mutator transaction binding the contract method 0x04af66ad.
 //
-// Solidity: function setContractDomain(_name bytes32, _addr address) returns(success bool)
+// Solidity: function setContractDomain(bytes32 _name, address _addr) returns(bool success)
 func (_Registry *RegistryTransactorSession) SetContractDomain(_name [32]byte, _addr common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.SetContractDomain(&_Registry.TransactOpts, _name, _addr)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
+// Solidity: function setPermission(bytes32 _contract, address _granted, bool _status) returns(bool success)
 func (_Registry *RegistryTransactor) SetPermission(opts *bind.TransactOpts, _contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.contract.Transact(opts, "setPermission", _contract, _granted, _status)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
+// Solidity: function setPermission(bytes32 _contract, address _granted, bool _status) returns(bool success)
 func (_Registry *RegistrySession) SetPermission(_contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.Contract.SetPermission(&_Registry.TransactOpts, _contract, _granted, _status)
 }
 
 // SetPermission is a paid mutator transaction binding the contract method 0x599e4c70.
 //
-// Solidity: function setPermission(_contract bytes32, _granted address, _status bool) returns(success bool)
+// Solidity: function setPermission(bytes32 _contract, address _granted, bool _status) returns(bool success)
 func (_Registry *RegistryTransactorSession) SetPermission(_contract [32]byte, _granted common.Address, _status bool) (*types.Transaction, error) {
 	return _Registry.Contract.SetPermission(&_Registry.TransactOpts, _contract, _granted, _status)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(newOwner address) returns()
+// Solidity: function transferOwnership(address newOwner) returns()
 func (_Registry *RegistryTransactor) TransferOwnership(opts *bind.TransactOpts, newOwner common.Address) (*types.Transaction, error) {
 	return _Registry.contract.Transact(opts, "transferOwnership", newOwner)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(newOwner address) returns()
+// Solidity: function transferOwnership(address newOwner) returns()
 func (_Registry *RegistrySession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.TransferOwnership(&_Registry.TransactOpts, newOwner)
 }
 
 // TransferOwnership is a paid mutator transaction binding the contract method 0xf2fde38b.
 //
-// Solidity: function transferOwnership(newOwner address) returns()
+// Solidity: function transferOwnership(address newOwner) returns()
 func (_Registry *RegistryTransactorSession) TransferOwnership(newOwner common.Address) (*types.Transaction, error) {
 	return _Registry.Contract.TransferOwnership(&_Registry.TransactOpts, newOwner)
 }
@@ -444,7 +504,7 @@ type RegistryOwnershipTransferred struct {
 
 // FilterOwnershipTransferred is a free log retrieval operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
 //
-// Solidity: e OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
+// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 func (_Registry *RegistryFilterer) FilterOwnershipTransferred(opts *bind.FilterOpts, previousOwner []common.Address, newOwner []common.Address) (*RegistryOwnershipTransferredIterator, error) {
 
 	var previousOwnerRule []interface{}
@@ -465,7 +525,7 @@ func (_Registry *RegistryFilterer) FilterOwnershipTransferred(opts *bind.FilterO
 
 // WatchOwnershipTransferred is a free log subscription operation binding the contract event 0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0.
 //
-// Solidity: e OwnershipTransferred(previousOwner indexed address, newOwner indexed address)
+// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
 func (_Registry *RegistryFilterer) WatchOwnershipTransferred(opts *bind.WatchOpts, sink chan<- *RegistryOwnershipTransferred, previousOwner []common.Address, newOwner []common.Address) (event.Subscription, error) {
 
 	var previousOwnerRule []interface{}
@@ -586,7 +646,7 @@ type RegistrySetContractDomain struct {
 
 // FilterSetContractDomain is a free log retrieval operation binding the contract event 0x37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db.
 //
-// Solidity: e SetContractDomain(setter address, name indexed bytes32, addr indexed address)
+// Solidity: event SetContractDomain(address setter, bytes32 indexed name, address indexed addr)
 func (_Registry *RegistryFilterer) FilterSetContractDomain(opts *bind.FilterOpts, name [][32]byte, addr []common.Address) (*RegistrySetContractDomainIterator, error) {
 
 	var nameRule []interface{}
@@ -607,7 +667,7 @@ func (_Registry *RegistryFilterer) FilterSetContractDomain(opts *bind.FilterOpts
 
 // WatchSetContractDomain is a free log subscription operation binding the contract event 0x37724a4a9968ac9654e6ee52f3d0c93e5ef8863e057254ee2e36e8ad3e8429db.
 //
-// Solidity: e SetContractDomain(setter address, name indexed bytes32, addr indexed address)
+// Solidity: event SetContractDomain(address setter, bytes32 indexed name, address indexed addr)
 func (_Registry *RegistryFilterer) WatchSetContractDomain(opts *bind.WatchOpts, sink chan<- *RegistrySetContractDomain, name [][32]byte, addr []common.Address) (event.Subscription, error) {
 
 	var nameRule []interface{}
@@ -728,7 +788,7 @@ type RegistrySetPermission struct {
 
 // FilterSetPermission is a free log retrieval operation binding the contract event 0xe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818.
 //
-// Solidity: e SetPermission(_contract indexed bytes32, granted indexed address, status bool)
+// Solidity: event SetPermission(bytes32 indexed _contract, address indexed granted, bool status)
 func (_Registry *RegistryFilterer) FilterSetPermission(opts *bind.FilterOpts, _contract [][32]byte, granted []common.Address) (*RegistrySetPermissionIterator, error) {
 
 	var _contractRule []interface{}
@@ -749,7 +809,7 @@ func (_Registry *RegistryFilterer) FilterSetPermission(opts *bind.FilterOpts, _c
 
 // WatchSetPermission is a free log subscription operation binding the contract event 0xe9f5231bbfb4b32867755b94562215cff6c8998489de8ba20926f8d0980e7818.
 //
-// Solidity: e SetPermission(_contract indexed bytes32, granted indexed address, status bool)
+// Solidity: event SetPermission(bytes32 indexed _contract, address indexed granted, bool status)
 func (_Registry *RegistryFilterer) WatchSetPermission(opts *bind.WatchOpts, sink chan<- *RegistrySetPermission, _contract [][32]byte, granted []common.Address) (event.Subscription, error) {
 
 	var _contractRule []interface{}
