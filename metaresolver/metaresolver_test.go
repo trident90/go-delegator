@@ -257,7 +257,7 @@ func TestAddKeyDelegated(t *testing.T) {
 
 	time := big.NewInt(1558404392)
 
-	resolverAddr, _ := servicekeyresolver.GetAddress()
+	resolverAddr := servicekeyresolver.GetAddress()
 	reqParam := addKeyDelegatedParams{
 		ResolverAddress:   *resolverAddr,
 		AssociatedAddress: common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA"),
@@ -290,7 +290,7 @@ func TestRemoveKeyDelegated(t *testing.T) {
 
 	time := big.NewInt(1558404392)
 
-	resolverAddr, _ := servicekeyresolver.GetAddress()
+	resolverAddr := servicekeyresolver.GetAddress()
 	reqParam := removeKeyDelegatedParams{
 		ResolverAddress:   *resolverAddr,
 		AssociatedAddress: common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA"),
@@ -321,7 +321,7 @@ func TestRemoveKeysDelegated(t *testing.T) {
 
 	time := big.NewInt(1558404392)
 
-	resolverAddr, _ := servicekeyresolver.GetAddress()
+	resolverAddr := servicekeyresolver.GetAddress()
 	reqParam := removeKeyDelegatedParams{
 		ResolverAddress:   *resolverAddr,
 		AssociatedAddress: common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA"),
