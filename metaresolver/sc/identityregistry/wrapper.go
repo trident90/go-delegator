@@ -11,13 +11,12 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/metadium/go-delegator/crypto"
 	"github.com/metadium/go-delegator/rpc"
-	//	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var (
 	once   sync.Once
 	zero   = big.NewInt(0)
-	glimit = uint64(4000000)
+	glimit = uint64(2000000)
 )
 
 var instance *Identityregistry
@@ -27,12 +26,7 @@ func getService() (*Identityregistry, error) {
 		_rpc := rpc.GetInstance()
 		client := _rpc.GetEthClient()
 		var err error
-		//irAddress, _ := registry.GetIRContractAddress()
-		// imAddress, err := registry.GetIMContractAddress()
-		// if err != nil {
-		// 	log.Error(err)
-		// 	return
-		// }
+
 		instance, err = NewIdentityregistry(irAddress, client)
 		if err != nil {
 			log.Error(err)
@@ -61,11 +55,11 @@ func CallCreateIdentity(reqID uint64, recoveryAddress common.Address, associated
 	}
 
 	tx := func(nonce uint64) error {
-
 		_rpc := rpc.GetInstance()
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
 		trx, err = service.CreateIdentityDelegated(auth, recoveryAddress, associatedAddress, providers, resolvers, v, r, s, timestamp)
 		if err != nil {
 			log.Error(err)
@@ -107,7 +101,7 @@ func CallAddAssociatedAddressDelegated(reqID uint64, approvingAddress common.Add
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
-
+		auth.GasLimit = glimit
 		trx, err = service.AddAssociatedAddressDelegated(auth, approvingAddress, addressToAdd, v, r, s, timestamp)
 		if err != nil {
 			log.Error(err)
@@ -148,7 +142,7 @@ func CallRemoveAssociatedAddressDelegated(reqID uint64, addressToRemove common.A
 		auth := crypto.GetTransactionOpts()
 		auth.Nonce = big.NewInt(int64(nonce))
 		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
-
+		auth.GasLimit = glimit
 		trx, err = service.RemoveAssociatedAddressDelegated(auth, addressToRemove, v, r, s, timestamp)
 		if err != nil {
 			log.Error(err)
@@ -172,6 +166,6 @@ func CallRemoveAssociatedAddressDelegated(reqID uint64, addressToRemove common.A
 }
 
 //GetAddress Get IdentityRegistry Contract Address deployed by metadium
-func GetAddress() (*common.Address, error) {
-	return &irAddress, nil
+func GetAddress() *common.Address {
+	return &irAddress
 }

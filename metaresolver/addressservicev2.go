@@ -1,6 +1,8 @@
 package metaresolver
 
 import (
+	"fmt"
+
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/metadium/go-delegator/crypto"
 	"github.com/metadium/go-delegator/json"
@@ -14,16 +16,14 @@ func getIdentityRegistryAddress(reqID uint64, req json.RPCRequest) (resp json.RP
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	address, err := identityregistry.GetAddress()
-	if err != nil {
+	address := identityregistry.GetAddress()
+	if address != nil {
+		resp.Result = address
+	} else {
+		err := fmt.Errorf("address is nil")
 		log.Errorfd(reqID, "getIdentityRegistryAddress Error : %v", err)
 		errObj := &internalError{err.Error()}
 		resp.Error = makeErrorResponse(errObj)
-		return
-	}
-
-	if address != nil {
-		resp.Result = address.String()
 	}
 	return
 }
@@ -33,15 +33,13 @@ func getServiceKeyAddress(reqID uint64, req json.RPCRequest) (resp json.RPCRespo
 	resp.Jsonrpc = req.Jsonrpc
 
 	address := servicekeyresolver.GetAddress()
-	// if err != nil {
-	// 	log.Errorfd(reqID, "getServiceKeyAddress Error : %v", err)
-	// 	errObj := &internalError{err.Error()}
-	// 	resp.Error = makeErrorResponse(errObj)
-	// 	return
-	// }
-
 	if address != nil {
-		resp.Result = address.String()
+		resp.Result = address
+	} else {
+		err := fmt.Errorf("address is nil")
+		log.Errorfd(reqID, "getServiceKeyAddress Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
 	}
 	return
 }
@@ -51,15 +49,15 @@ func getServiceKeyAllAddresses(reqID uint64, req json.RPCRequest) (resp json.RPC
 	resp.Jsonrpc = req.Jsonrpc
 
 	addresses := servicekeyresolver.GetAddressList()
-	// if err != nil {
-	// 	log.Errorfd(reqID, "getServiceKeyAllAddresses Error : %v", err)
-	// 	errObj := &internalError{err.Error()}
-	// 	resp.Error = makeErrorResponse(errObj)
-	// 	return
-	// }
+	resp.Result = addresses
 
 	if addresses != nil {
 		resp.Result = addresses
+	} else {
+		err := fmt.Errorf("address is nil")
+		log.Errorfd(reqID, "getServiceKeyAllAddresses Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
 	}
 
 	return
@@ -102,23 +100,9 @@ func getAllServiceAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCRes
 // getAllServiceAddress  get All Contract Addresses for metaresovler
 func makeAllServiceAddressMap() (map[string]interface{}, error) {
 
-	irAddr, err := identityregistry.GetAddress()
-	if err != nil {
-		log.Error("getAllServiceAddress() ", err)
-		return nil, err
-	}
-
+	irAddr := identityregistry.GetAddress()
 	skrAddr := servicekeyresolver.GetAddress()
-	// if err != nil {
-	// 	log.Error("getAllServiceAddress() ", err)
-	// 	return nil, err
-	// }
-
 	skrAddrList := servicekeyresolver.GetAddressList()
-	// if err != nil {
-	// 	log.Error("getAllServiceAddress() ", err)
-	// 	return nil, err
-	// }
 	resolverAddrs := makeResolverAddresses()
 
 	result := map[string]interface{}{
