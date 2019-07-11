@@ -256,51 +256,6 @@ func getParameter(method string, params []interface{}) (interface{}, Error) {
 		}
 		return reqParam, nil
 
-	case "create_identity_test":
-		var reqParam identityCreateParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-	case "add_associated_address_delegated_test":
-		var reqParam addAssociatedAddressDelegatedParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-	case "remove_associated_address_delegated_test":
-		var reqParam removeAssociatedAddressDelegatedParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-	case "add_key_delegated_test":
-		var reqParam addKeyDelegatedParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-
-	case "remove_key_delegated_test":
-		var reqParam removeKeyDelegatedParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-
-	case "remove_keys_delegated_test":
-		var reqParam removeKeysDelegatedParams
-		err := fillParam(&reqParam, obj)
-		if err != nil {
-			return nil, err
-		}
-		return reqParam, nil
-
 	default:
 		return nil, &methodNotFoundError{method}
 

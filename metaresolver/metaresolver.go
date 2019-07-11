@@ -69,11 +69,4 @@ var predefinedPaths = map[string]interface{}{
 	"get_service_key_all_addresses": getServiceKeyAllAddresses,
 	"get_resolver_addresses":        getResolverAddresses,
 	"get_all_service_addresses":     getAllServiceAddresses,
-
-	"create_identity_test":                     createIdentityTest,
-	"add_associated_address_delegated_test":    addAssociatedAddressDelegatedTest,
-	"remove_associated_address_delegated_test": removeAssociatedAddressDelegatedTest,
-	"add_key_delegated_test":                   addKeyDelegatedTest,
-	"remove_key_delegated_test":                removeKeyDelegatedTest,
-	"remove_keys_delegated_test":               removeKeysDelegatedTest,
 }
