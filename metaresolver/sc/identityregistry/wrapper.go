@@ -7,6 +7,7 @@ import (
 
 	"github.com/metadium/go-delegator/log"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/metadium/go-delegator/crypto"
@@ -163,6 +164,122 @@ func CallRemoveAssociatedAddressDelegated(reqID uint64, addressToRemove common.A
 	}
 
 	return trx, nil
+}
+
+//CallAddResolversFor  AddResolversFor function call
+func CallAddResolversFor(reqID uint64, ein *big.Int, resolvers []common.Address) (*types.Transaction, error) {
+
+	var trx *types.Transaction
+	var err error
+	service, err := getService()
+	//session, err := getSession()
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	tx := func(nonce uint64) error {
+
+		_rpc := rpc.GetInstance()
+		auth := crypto.GetTransactionOpts()
+		auth.Nonce = big.NewInt(int64(nonce))
+		auth.GasPrice = big.NewInt(int64(_rpc.GetGasPrice()))
+		auth.GasLimit = glimit
+		trx, err = service.AddResolversFor(auth, ein, resolvers)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		log.Debugfd(reqID, "trxid : %v", trx.Hash().String())
+
+		return nil
+	}
+	c := crypto.GetInstance()
+	res := c.ApplyNonce(tx)
+	if !res {
+		if err == nil {
+			err = fmt.Errorf("call function Error - AddAssociatedAddressDelegated")
+		}
+		return nil, err
+	}
+
+	return trx, nil
+}
+
+//CallGetEIN  get ein for associated address
+func CallGetEIN(reqID uint64, associatedAddress common.Address) (*big.Int, error) {
+	var err error
+
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	result, err := service.GetEIN(&bind.CallOpts{}, associatedAddress)
+	if err != nil {
+		// if err.Error() == "abi: unmarshalling empty output" {
+		// 	return common.Big0, nil
+		// }
+		log.Error(err)
+		return nil, err
+	}
+
+	log.Debugfd(reqID, "EIN for (%x): %x ", associatedAddress, result)
+	return result, nil
+
+}
+
+//CallIsProviderFor Checks whether the passed provider is set for the passed EIN.
+func CallIsProviderFor(reqID uint64, ein *big.Int, provider common.Address) (bool, error) {
+	var err error
+
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return false, err
+	}
+
+	result, err := service.IsProviderFor(&bind.CallOpts{}, ein, provider)
+	if err != nil {
+		// if err.Error() == "abi: unmarshalling empty output" {
+		// 	return common.Big0, nil
+		// }
+		log.Error(err)
+		return false, err
+	}
+
+	log.Debugfd(reqID, "IsProviderFor for (%v): %v ", ein, result)
+	return result, nil
+
+}
+
+//CallIsResolverFor Checks whether the passed resolver is set for the passed EIN.
+func CallIsResolverFor(reqID uint64, ein *big.Int, provider common.Address) (bool, error) {
+	var err error
+
+	service, err := getService()
+
+	if err != nil {
+		log.Error(err)
+		return false, err
+	}
+
+	result, err := service.IsResolverFor(&bind.CallOpts{}, ein, provider)
+	if err != nil {
+		// if err.Error() == "abi: unmarshalling empty output" {
+		// 	return common.Big0, nil
+		// }
+		log.Error(err)
+		return false, err
+	}
+
+	log.Debugfd(reqID, "IsResolverFor for (%v): %v ", ein, result)
+	return result, nil
+
 }
 
 //GetAddress Get IdentityRegistry Contract Address deployed by metadium
