@@ -1,6 +1,7 @@
 package servicekeyresolver
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 	"sync"
@@ -159,4 +160,14 @@ func GetAddress() *common.Address {
 //GetAddressList Return all old and current ServiceKeyResolver contract address list
 func GetAddressList() []common.Address {
 	return allSkrAddress
+}
+
+func ContainsInAddresses(_address common.Address) bool {
+
+	for _, a := range allSkrAddress {
+		if bytes.Equal(a.Bytes(), _address.Bytes()) {
+			return true
+		}
+	}
+	return false
 }

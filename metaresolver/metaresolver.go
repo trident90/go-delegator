@@ -67,6 +67,11 @@ var predefinedPaths = map[string]interface{}{
 	"get_identity_registry_address": getIdentityRegistryAddress,
 	"get_service_key_address":       getServiceKeyAddress,
 	"get_service_key_all_addresses": getServiceKeyAllAddresses,
+	"get_public_key_address":        getPublicKeyAddress,
+	"get_public_key_all_addresses":  getPublicKeyAllAddresses,
 	"get_resolver_addresses":        getResolverAddresses,
 	"get_all_service_addresses":     getAllServiceAddresses,
+
+	"add_public_key_delegated":    addPublicKeyDelegated,
+	"remove_public_key_delegated": removePublicKeyDelegated,
 }

@@ -30,7 +30,17 @@ func addKeyDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, 
 	log.Debugfd(reqID, "parameter[Timestamp] : %v", reqParam.Timestamp)
 	log.Debugd(reqID, "PASS - 01. Check Parameter")
 
-	//2. get instance ServiceKeyResolver
+	//2.  is in servicekeyresolver.GetAddressList
+	isValidResovlerAddress := servicekeyresolver.ContainsInAddresses(reqParam.ResolverAddress)
+	log.Debugfd(reqID, "Reslover Address[%x] is Valid : %v", reqParam.ResolverAddress, isValidResovlerAddress)
+	if !isValidResovlerAddress {
+		err := fmt.Errorf("Is not valid resolver address")
+		errObj = &invalidAddressError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	//3. get instance ServiceKeyResolver
 	instance, err := servicekeyresolver.GetInstance(reqParam.ResolverAddress)
 	if err != nil {
 		errObj := &notExistsAddressError{err.Error()}
@@ -46,7 +56,7 @@ func addKeyDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, 
 	}
 	log.Debugd(reqID, "PASS - 02. Get ServiceKeyResolver")
 
-	// 3. CallAddKeyDelegated
+	// 4. CallAddKeyDelegated
 	var rBytes, sBytes [32]byte
 	copy(rBytes[:], reqParam.R)
 	copy(sBytes[:], reqParam.S)
@@ -84,7 +94,17 @@ func removeKeyDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCRespons
 	log.Debugfd(reqID, "parameter[Timestamp] : %v", reqParam.Timestamp)
 	log.Debugd(reqID, "PASS - 01. Check Parameter")
 
-	//2. get instance ServiceKeyResolver
+	//2.  is in servicekeyresolver.GetAddressList
+	isValidResovlerAddress := servicekeyresolver.ContainsInAddresses(reqParam.ResolverAddress)
+	log.Debugfd(reqID, "Reslover Address[%x] is Valid : %v", reqParam.ResolverAddress, isValidResovlerAddress)
+	if !isValidResovlerAddress {
+		err := fmt.Errorf("Is not valid resolver address")
+		errObj = &invalidAddressError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	//3. get instance ServiceKeyResolver
 	instance, err := servicekeyresolver.GetInstance(reqParam.ResolverAddress)
 	if err != nil {
 		errObj := &notExistsAddressError{err.Error()}
@@ -100,7 +120,7 @@ func removeKeyDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCRespons
 	}
 	log.Debugd(reqID, "PASS - 02. Get ServiceKeyResolver")
 
-	// 3. CallDelegatedApprove
+	// 4. CallDelegatedApprove
 	var rBytes, sBytes [32]byte
 	copy(rBytes[:], reqParam.R)
 	copy(sBytes[:], reqParam.S)
@@ -138,7 +158,17 @@ func removeKeysDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCRespon
 	log.Debugfd(reqID, "parameter[Timestamp] : %v", reqParam.Timestamp)
 	log.Debugd(reqID, "PASS - 01. Check Parameter")
 
-	//2. get instance ServiceKeyResolver
+	//2.  is in servicekeyresolver.GetAddressList
+	isValidResovlerAddress := servicekeyresolver.ContainsInAddresses(reqParam.ResolverAddress)
+	log.Debugfd(reqID, "Reslover Address[%x] is Valid : %v", reqParam.ResolverAddress, isValidResovlerAddress)
+	if !isValidResovlerAddress {
+		err := fmt.Errorf("Is not valid resolver address")
+		errObj = &invalidAddressError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+		return
+	}
+
+	//3. get instance ServiceKeyResolver
 	instance, err := servicekeyresolver.GetInstance(reqParam.ResolverAddress)
 	if err != nil {
 		errObj := &notExistsAddressError{err.Error()}
@@ -154,7 +184,7 @@ func removeKeysDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCRespon
 	}
 	log.Debugd(reqID, "PASS - 02. Get ServiceKeyResolver")
 
-	// 3. CallDelegatedApprove
+	// 4. CallDelegatedApprove
 	var rBytes, sBytes [32]byte
 	copy(rBytes[:], reqParam.R)
 	copy(sBytes[:], reqParam.S)
