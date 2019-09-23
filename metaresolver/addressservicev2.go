@@ -8,6 +8,7 @@ import (
 	"github.com/metadium/go-delegator/json"
 	"github.com/metadium/go-delegator/log"
 	"github.com/metadium/go-delegator/metaresolver/sc/identityregistry"
+	"github.com/metadium/go-delegator/metaresolver/sc/publickeyresolver"
 	"github.com/metadium/go-delegator/metaresolver/sc/servicekeyresolver"
 )
 
@@ -62,6 +63,43 @@ func getServiceKeyAllAddresses(reqID uint64, req json.RPCRequest) (resp json.RPC
 
 	return
 }
+
+func getPublicKeyAddress(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
+	log.Debugd(reqID, "Call getPublicKeyAddress Function")
+	resp.ID = req.ID
+	resp.Jsonrpc = req.Jsonrpc
+
+	address := publickeyresolver.GetAddress()
+	if address != nil {
+		resp.Result = address
+	} else {
+		err := fmt.Errorf("address is nil")
+		log.Errorfd(reqID, "getPublicKeyAddress Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+	}
+	return
+}
+func getPublicKeyAllAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
+	log.Debugd(reqID, "Call getPublicKeyAllAddresses Function")
+	resp.ID = req.ID
+	resp.Jsonrpc = req.Jsonrpc
+
+	addresses := publickeyresolver.GetAddressList()
+	resp.Result = addresses
+
+	if addresses != nil {
+		resp.Result = addresses
+	} else {
+		err := fmt.Errorf("address is nil")
+		log.Errorfd(reqID, "getPublicKeyAllAddresses Error : %v", err)
+		errObj := &internalError{err.Error()}
+		resp.Error = makeErrorResponse(errObj)
+	}
+
+	return
+}
+
 func getResolverAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
 	log.Debugd(reqID, "Call getResolverAddresses Function")
 	resp.ID = req.ID
@@ -104,6 +142,8 @@ func makeAllServiceAddressMap() (map[string]interface{}, error) {
 	skrAddr := servicekeyresolver.GetAddress()
 	skrAddrList := servicekeyresolver.GetAddressList()
 	resolverAddrs := makeResolverAddresses()
+	pkrAddr := publickeyresolver.GetAddress()
+	pkrAddrList := publickeyresolver.GetAddressList()
 
 	result := map[string]interface{}{
 		"identity_registry": irAddr,
@@ -111,6 +151,8 @@ func makeAllServiceAddressMap() (map[string]interface{}, error) {
 		"resolvers":         resolverAddrs,
 		"service_key":       skrAddr,
 		"service_key_all":   skrAddrList,
+		"public_key":        pkrAddr,
+		"public_key_all":    pkrAddrList,
 	}
 	return result, nil
 }
@@ -119,6 +161,6 @@ func getDelegatorAddress() (*common.Address, error) {
 	return &delegatorAddr, nil
 }
 func makeResolverAddresses() []common.Address {
-	addrs := []common.Address{*servicekeyresolver.GetAddress()}
+	addrs := []common.Address{*servicekeyresolver.GetAddress(), *publickeyresolver.GetAddress()}
 	return addrs
 }

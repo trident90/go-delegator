@@ -175,6 +175,48 @@ func (p *removeKeysDelegatedParams) Keccak256() (hash []byte, data []byte) {
 	return hash, data
 }
 
+type addPublicKeyDelegatedParams struct {
+	ResolverAddress   common.Address `json:"resolver_address"`
+	AssociatedAddress common.Address `json:"associated_address"`
+	PublicKey         hexutil.Bytes  `json:"public_key"`
+	V                 hexutil.Bytes  `json:"v" validate:"len=1"`
+	R                 hexutil.Bytes  `json:"r" validate:"len=32"`
+	S                 hexutil.Bytes  `json:"s" validate:"len=32"`
+	Timestamp         *big.Int       `json:"timestamp"`
+}
+
+func (p *addPublicKeyDelegatedParams) Keccak256() (hash []byte, data []byte) {
+	timestampBytes := bigIntToByte32(p.Timestamp)
+	data = append(data, headerBytes...)
+	data = append(data, p.ResolverAddress.Bytes()...)
+	data = append(data, []byte("I authorize the addition of a public key on my behalf.")...)
+	data = append(data, p.AssociatedAddress.Bytes()...)
+	data = append(data, p.PublicKey...)
+	data = append(data, timestampBytes[:]...)
+	hash = ethCrypto.Keccak256(data)
+	return hash, data
+}
+
+type removePublicKeyDelegatedParams struct {
+	ResolverAddress   common.Address `json:"resolver_address"`
+	AssociatedAddress common.Address `json:"associated_address"`
+	V                 hexutil.Bytes  `json:"v" validate:"len=1"`
+	R                 hexutil.Bytes  `json:"r" validate:"len=32"`
+	S                 hexutil.Bytes  `json:"s" validate:"len=32"`
+	Timestamp         *big.Int       `json:"timestamp"`
+}
+
+func (p *removePublicKeyDelegatedParams) Keccak256() (hash []byte, data []byte) {
+	timestampBytes := bigIntToByte32(p.Timestamp)
+	data = append(data, headerBytes...)
+	data = append(data, p.ResolverAddress.Bytes()...)
+	data = append(data, []byte("I authorize the removal of a public key on my behalf.")...)
+	data = append(data, p.AssociatedAddress.Bytes()...)
+	data = append(data, timestampBytes[:]...)
+	hash = ethCrypto.Keccak256(data)
+	return hash, data
+}
+
 func init() {
 	validator.SetValidationFunc("itemlen", checkBytesLength)
 }
@@ -250,6 +292,22 @@ func getParameter(method string, params []interface{}) (interface{}, Error) {
 
 	case "remove_keys_delegated":
 		var reqParam removeKeysDelegatedParams
+		err := fillParam(&reqParam, obj)
+		if err != nil {
+			return nil, err
+		}
+		return reqParam, nil
+
+	case "add_public_key_delegated":
+		var reqParam addPublicKeyDelegatedParams
+		err := fillParam(&reqParam, obj)
+		if err != nil {
+			return nil, err
+		}
+		return reqParam, nil
+
+	case "remove_public_key_delegated":
+		var reqParam removePublicKeyDelegatedParams
 		err := fillParam(&reqParam, obj)
 		if err != nil {
 			return nil, err
