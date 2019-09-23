@@ -11,6 +11,7 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/metadium/go-delegator/crypto"
 	"github.com/metadium/go-delegator/json"
+	"github.com/metadium/go-delegator/metaresolver/sc/publickeyresolver"
 	"github.com/metadium/go-delegator/metaresolver/sc/servicekeyresolver"
 	log "github.com/sirupsen/logrus"
 )
@@ -110,6 +111,46 @@ func TestGetServiceKeyAllAddresses(t *testing.T) {
 	}
 	fmt.Println("Response : ", resp.String())
 }
+
+func TestGetPublicKeyAddress(t *testing.T) {
+	defaultSetting()
+	req := json.RPCRequest{
+		Jsonrpc: "2.0",
+		Method:  "get_public_key_address",
+		ID:      1,
+	}
+
+	//param := map[string]interface{}{}
+	//req.Params = append(req.Params, param)
+	fmt.Println("request : ", req.String())
+
+	resp, err := Forward(req)
+	if resp.String() == "" || err != nil {
+		fmt.Println("Error : ", err)
+		t.Errorf("Failed to start main")
+	}
+	fmt.Println("Response : ", resp.String())
+}
+func TestGetPublicKeyAllAddresses(t *testing.T) {
+	defaultSetting()
+	req := json.RPCRequest{
+		Jsonrpc: "2.0",
+		Method:  "get_public_key_all_addresses",
+		ID:      1,
+	}
+
+	//param := map[string]interface{}{}
+	//req.Params = append(req.Params, param)
+	fmt.Println("request : ", req.String())
+
+	resp, err := Forward(req)
+	if resp.String() == "" || err != nil {
+		fmt.Println("Error : ", err)
+		t.Errorf("Failed to start main")
+	}
+	fmt.Println("Response : ", resp.String())
+}
+
 func TestGetResolverAddresses(t *testing.T) {
 	defaultSetting()
 	req := json.RPCRequest{
@@ -328,6 +369,69 @@ func TestRemoveKeysDelegated(t *testing.T) {
 		V:                 hexutil.MustDecode("0x1c"),
 		R:                 hexutil.MustDecode("0x56a0b769505922060ccae317aa473519661cdc95b22c5d6a0557bb74c1102b57"),
 		S:                 hexutil.MustDecode("0x29750cdc324005a0b834844c33fb533c148888ab8490058d93524498ebd51b9b"),
+		Timestamp:         time,
+	}
+
+	req.Params = append(req.Params, reqParam)
+	fmt.Println("request : ", req.String())
+
+	resp, err := Forward(req)
+	if resp.String() == "" || err != nil {
+		fmt.Println("Error : ", err)
+		t.Errorf("Failed to start main")
+	}
+	fmt.Println("Response : ", resp.String())
+}
+
+func TestAddPublicKeyDelegated(t *testing.T) {
+	defaultSetting()
+	req := json.RPCRequest{
+		Jsonrpc: "2.0",
+		Method:  "add_public_key_delegated",
+		ID:      1,
+	}
+
+	time := big.NewInt(1563850141)
+
+	resolverAddr := publickeyresolver.GetAddress()
+	reqParam := addPublicKeyDelegatedParams{
+		ResolverAddress:   *resolverAddr,
+		AssociatedAddress: common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA"),
+		PublicKey:         hexutil.MustDecode("0x68677ff9dcf2fcb23c3e8633b651fefe9d0da82c99f738642f0967abc6dd653710d8750b522c738ffde22983ab384017783b95bd7512e1b929843db3d28a8b2d"),
+		V:                 hexutil.MustDecode("0x1b"),
+		R:                 hexutil.MustDecode("0xb328a436a8e6028a06c077e083d505491bccf3e97acf6d99987b714b58c3f1d5"),
+		S:                 hexutil.MustDecode("0x26df3fe420622a8ac2c3569c577024cc82d6f8f69171c0bb67fa20f623c06b53"),
+		Timestamp:         time,
+	}
+
+	req.Params = append(req.Params, reqParam)
+	fmt.Println("request : ", req.String())
+
+	resp, err := Forward(req)
+	if resp.String() == "" || err != nil {
+		fmt.Println("Error : ", err)
+		t.Errorf("Failed to start main")
+	}
+	fmt.Println("Response : ", resp.String())
+}
+
+func TestRemovePublicKeyDelegated(t *testing.T) {
+	defaultSetting()
+	req := json.RPCRequest{
+		Jsonrpc: "2.0",
+		Method:  "remove_public_key_delegated",
+		ID:      1,
+	}
+
+	time := big.NewInt(1563167570)
+
+	resolverAddr := publickeyresolver.GetAddress()
+	reqParam := removePublicKeyDelegatedParams{
+		ResolverAddress:   *resolverAddr,
+		AssociatedAddress: common.HexToAddress("0x961c20596e7EC441723FBb168461f4B51371D8aA"),
+		V:                 hexutil.MustDecode("0x1c"),
+		R:                 hexutil.MustDecode("0xdf81c0bb19ae4b986e48de45ec3fd874f0219f8ab02b021f4130a576dd30abe8"),
+		S:                 hexutil.MustDecode("0x3980eda4663018468496862c119433d9a29e439742640de2c76ee4853016a02f"),
 		Timestamp:         time,
 	}
 
