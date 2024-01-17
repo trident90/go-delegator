@@ -50,7 +50,7 @@ func DeriveSha(txs []common.Hash) (common.Hash, *trie.Trie) {
 // VerifyProof checks if root hash for transactions is valid
 func VerifyProof(txs []common.Hash, tr *trie.Trie) (bool, error) {
 	root := tr.Hash()
-	proofs := ethdb.NewMemDatabase()
+	proofs := ethdb.New()
 	for _, tx := range txs {
 		if tr.Prove(tx.Bytes(), 0, proofs) != nil {
 			return false, fmt.Errorf("VerifyProof error missing key %x while constructing proof", tx.Bytes())
