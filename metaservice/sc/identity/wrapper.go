@@ -6,14 +6,14 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/log"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/rpc"
+	"go-delegator/crypto"
+	"go-delegator/rpc"
 	//	"github.com/ethereum/go-ethereum/crypto"
 )
 

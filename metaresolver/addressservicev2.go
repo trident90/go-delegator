@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
-	"github.com/metadium/go-delegator/metaresolver/sc/identityregistry"
-	"github.com/metadium/go-delegator/metaresolver/sc/publickeyresolver"
-	"github.com/metadium/go-delegator/metaresolver/sc/servicekeyresolver"
+	"go-delegator/crypto"
+	"go-delegator/json"
+	"go-delegator/log"
+	"go-delegator/metaresolver/sc/identityregistry"
+	"go-delegator/metaresolver/sc/publickeyresolver"
+	"go-delegator/metaresolver/sc/servicekeyresolver"
 )
 
 func getIdentityRegistryAddress(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {

@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/metadium/go-delegator/common"
-	"github.com/metadium/go-delegator/json"
+	"go-delegator/common"
+	"go-delegator/json"
 )
 
 func TestTelegramBot(t *testing.T) {

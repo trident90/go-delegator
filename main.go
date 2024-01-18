@@ -8,14 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/metadium/go-delegator/metaresolver"
+	"go-delegator/metaresolver"
 
-	"github.com/metadium/go-delegator/crypto"
-	_ "github.com/metadium/go-delegator/ipfs"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
-	"github.com/metadium/go-delegator/metaservice"
-	"github.com/metadium/go-delegator/rpc"
+	"go-delegator/crypto"
+	_ "go-delegator/ipfs"
+	"go-delegator/json"
+	"go-delegator/log"
+	"go-delegator/metaservice"
+	"go-delegator/rpc"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"

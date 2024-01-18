@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +154,10 @@ func bindServicekeyresolver(address common.Address, caller bind.ContractCaller, 
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Servicekeyresolver *ServicekeyresolverRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Servicekeyresolver.Contract.ServicekeyresolverCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Servicekeyresolver.Contract.ServicekeyresolverCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,10 @@ func (_Servicekeyresolver *ServicekeyresolverRaw) Transact(opts *bind.TransactOp
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Servicekeyresolver *ServicekeyresolverCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Servicekeyresolver.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Servicekeyresolver.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -192,12 +197,9 @@ func (_Servicekeyresolver *ServicekeyresolverTransactorRaw) Transact(opts *bind.
 //
 // Solidity: function getKeys(uint256 ein) constant returns(address[])
 func (_Servicekeyresolver *ServicekeyresolverCaller) GetKeys(opts *bind.CallOpts, ein *big.Int) ([]common.Address, error) {
-	var (
-		ret0 = new([]common.Address)
-	)
-	out := ret0
-	err := _Servicekeyresolver.contract.Call(opts, out, "getKeys", ein)
-	return *ret0, err
+	var results []interface{}
+	err := _Servicekeyresolver.contract.Call(opts, &results, "getKeys", ein)
+	return results[0].([]common.Address), err
 }
 
 // GetKeys is a free data retrieval call binding the contract method 0x8d357fa3.
@@ -218,12 +220,9 @@ func (_Servicekeyresolver *ServicekeyresolverCallerSession) GetKeys(ein *big.Int
 //
 // Solidity: function getSymbol(address key) constant returns(string)
 func (_Servicekeyresolver *ServicekeyresolverCaller) GetSymbol(opts *bind.CallOpts, key common.Address) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _Servicekeyresolver.contract.Call(opts, out, "getSymbol", key)
-	return *ret0, err
+	var results []interface{}
+	err := _Servicekeyresolver.contract.Call(opts, &results, "getSymbol", key)
+	return results[0].(string), err
 }
 
 // GetSymbol is a free data retrieval call binding the contract method 0xc9b2e522.
@@ -244,12 +243,9 @@ func (_Servicekeyresolver *ServicekeyresolverCallerSession) GetSymbol(key common
 //
 // Solidity: function isKeyFor(address key, uint256 ein) constant returns(bool)
 func (_Servicekeyresolver *ServicekeyresolverCaller) IsKeyFor(opts *bind.CallOpts, key common.Address, ein *big.Int) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Servicekeyresolver.contract.Call(opts, out, "isKeyFor", key, ein)
-	return *ret0, err
+	var results []interface{}
+	err := _Servicekeyresolver.contract.Call(opts, &results, "isKeyFor", key, ein)
+	return results[0].(bool), err
 }
 
 // IsKeyFor is a free data retrieval call binding the contract method 0x7f1ccc25.
@@ -270,12 +266,9 @@ func (_Servicekeyresolver *ServicekeyresolverCallerSession) IsKeyFor(key common.
 //
 // Solidity: function isSigned(address _address, bytes32 messageHash, uint8 v, bytes32 r, bytes32 s) constant returns(bool)
 func (_Servicekeyresolver *ServicekeyresolverCaller) IsSigned(opts *bind.CallOpts, _address common.Address, messageHash [32]byte, v uint8, r [32]byte, s [32]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Servicekeyresolver.contract.Call(opts, out, "isSigned", _address, messageHash, v, r, s)
-	return *ret0, err
+	var results []interface{}
+	err := _Servicekeyresolver.contract.Call(opts, &results, "isSigned", _address, messageHash, v, r, s)
+	return results[0].(bool), err
 }
 
 // IsSigned is a free data retrieval call binding the contract method 0x8677ebe8.
@@ -296,12 +289,9 @@ func (_Servicekeyresolver *ServicekeyresolverCallerSession) IsSigned(_address co
 //
 // Solidity: function signatureTimeout() constant returns(uint256)
 func (_Servicekeyresolver *ServicekeyresolverCaller) SignatureTimeout(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Servicekeyresolver.contract.Call(opts, out, "signatureTimeout")
-	return *ret0, err
+	var results []interface{}
+	err := _Servicekeyresolver.contract.Call(opts, &results, "signatureTimeout")
+	return results[0].(*big.Int), err
 }
 
 // SignatureTimeout is a free data retrieval call binding the contract method 0x5437b67c.

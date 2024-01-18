@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/metadium/go-delegator/common"
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/common"
+	"go-delegator/log"
 )
 
 // GetValueOfUnit returns a value about given unit

@@ -3,9 +3,9 @@ package metaresolver
 import (
 	"fmt"
 
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
-	"github.com/metadium/go-delegator/metaresolver/sc/servicekeyresolver"
+	"go-delegator/json"
+	"go-delegator/log"
+	"go-delegator/metaresolver/sc/servicekeyresolver"
 )
 
 func addKeyDelegated(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {

@@ -1,9 +1,9 @@
 package metaresolver
 
 import (
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
-	"github.com/metadium/go-delegator/metaresolver/sc/identityregistry"
+	"go-delegator/json"
+	"go-delegator/log"
+	"go-delegator/metaresolver/sc/identityregistry"
 )
 
 func createIdentity(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {

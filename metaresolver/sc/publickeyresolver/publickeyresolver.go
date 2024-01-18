@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +154,10 @@ func bindPublickeyresolver(address common.Address, caller bind.ContractCaller, t
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Publickeyresolver *PublickeyresolverRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Publickeyresolver.Contract.PublickeyresolverCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Publickeyresolver.Contract.PublickeyresolverCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,10 @@ func (_Publickeyresolver *PublickeyresolverRaw) Transact(opts *bind.TransactOpts
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Publickeyresolver *PublickeyresolverCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Publickeyresolver.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Publickeyresolver.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -192,12 +197,9 @@ func (_Publickeyresolver *PublickeyresolverTransactorRaw) Transact(opts *bind.Tr
 //
 // Solidity: function NAME() constant returns(string)
 func (_Publickeyresolver *PublickeyresolverCaller) NAME(opts *bind.CallOpts) (string, error) {
-	var (
-		ret0 = new(string)
-	)
-	out := ret0
-	err := _Publickeyresolver.contract.Call(opts, out, "NAME")
-	return *ret0, err
+	var results []interface{}
+	err := _Publickeyresolver.contract.Call(opts, &results, "NAME")
+	return results[0].(string), err
 }
 
 // NAME is a free data retrieval call binding the contract method 0xa3f4df7e.
@@ -218,12 +220,9 @@ func (_Publickeyresolver *PublickeyresolverCallerSession) NAME() (string, error)
 //
 // Solidity: function calculateAddress(bytes publicKey) constant returns(address addr)
 func (_Publickeyresolver *PublickeyresolverCaller) CalculateAddress(opts *bind.CallOpts, publicKey []byte) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Publickeyresolver.contract.Call(opts, out, "calculateAddress", publicKey)
-	return *ret0, err
+	var results []interface{}
+	err := _Publickeyresolver.contract.Call(opts, &results, "calculateAddress", publicKey)
+	return results[0].(common.Address), err
 }
 
 // CalculateAddress is a free data retrieval call binding the contract method 0xe8a4c04e.
@@ -244,12 +243,9 @@ func (_Publickeyresolver *PublickeyresolverCallerSession) CalculateAddress(publi
 //
 // Solidity: function getPublicKey(address addr) constant returns(bytes)
 func (_Publickeyresolver *PublickeyresolverCaller) GetPublicKey(opts *bind.CallOpts, addr common.Address) ([]byte, error) {
-	var (
-		ret0 = new([]byte)
-	)
-	out := ret0
-	err := _Publickeyresolver.contract.Call(opts, out, "getPublicKey", addr)
-	return *ret0, err
+	var results []interface{}
+	err := _Publickeyresolver.contract.Call(opts, &results, "getPublicKey", addr)
+	return results[0].([]byte), err
 }
 
 // GetPublicKey is a free data retrieval call binding the contract method 0x857cdbb8.
@@ -270,12 +266,9 @@ func (_Publickeyresolver *PublickeyresolverCallerSession) GetPublicKey(addr comm
 //
 // Solidity: function isSigned(address _address, bytes32 messageHash, uint8 v, bytes32 r, bytes32 s) constant returns(bool)
 func (_Publickeyresolver *PublickeyresolverCaller) IsSigned(opts *bind.CallOpts, _address common.Address, messageHash [32]byte, v uint8, r [32]byte, s [32]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Publickeyresolver.contract.Call(opts, out, "isSigned", _address, messageHash, v, r, s)
-	return *ret0, err
+	var results []interface{}
+	err := _Publickeyresolver.contract.Call(opts, &results, "isSigned", _address, messageHash, v, r, s)
+	return results[0].(bool), err
 }
 
 // IsSigned is a free data retrieval call binding the contract method 0x8677ebe8.
@@ -296,12 +289,9 @@ func (_Publickeyresolver *PublickeyresolverCallerSession) IsSigned(_address comm
 //
 // Solidity: function signatureTimeout() constant returns(uint256)
 func (_Publickeyresolver *PublickeyresolverCaller) SignatureTimeout(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Publickeyresolver.contract.Call(opts, out, "signatureTimeout")
-	return *ret0, err
+	var results []interface{}
+	err := _Publickeyresolver.contract.Call(opts, &results, "signatureTimeout")
+	return results[0].(*big.Int), err
 }
 
 // SignatureTimeout is a free data retrieval call binding the contract method 0x5437b67c.

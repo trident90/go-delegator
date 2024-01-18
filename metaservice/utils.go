@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/log"
 )
 
 type reCaptchaResponse struct {

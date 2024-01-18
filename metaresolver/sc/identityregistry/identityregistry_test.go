@@ -10,7 +10,7 @@ import (
 	abi "github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/metadium/go-delegator/crypto"
+	"go-delegator/crypto"
 )
 
 func defaultSetting() {

@@ -16,9 +16,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/metadium/go-delegator/common"
-	"github.com/metadium/go-delegator/db"
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/common"
+	"go-delegator/db"
+	"go-delegator/log"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	ethcommon "github.com/ethereum/go-ethereum/common"

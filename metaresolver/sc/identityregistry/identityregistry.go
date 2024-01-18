@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +154,10 @@ func bindIdentityregistry(address common.Address, caller bind.ContractCaller, tr
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identityregistry *IdentityregistryRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identityregistry.Contract.IdentityregistryCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identityregistry.Contract.IdentityregistryCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,10 @@ func (_Identityregistry *IdentityregistryRaw) Transact(opts *bind.TransactOpts, 
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identityregistry *IdentityregistryCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identityregistry.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identityregistry.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -192,12 +197,9 @@ func (_Identityregistry *IdentityregistryTransactorRaw) Transact(opts *bind.Tran
 //
 // Solidity: function getEIN(address _address) constant returns(uint256 ein)
 func (_Identityregistry *IdentityregistryCaller) GetEIN(opts *bind.CallOpts, _address common.Address) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "getEIN", _address)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "getEIN", _address)
+	return results[0].(*big.Int), err
 }
 
 // GetEIN is a free data retrieval call binding the contract method 0x05c62c2f.
@@ -214,24 +216,20 @@ func (_Identityregistry *IdentityregistryCallerSession) GetEIN(_address common.A
 	return _Identityregistry.Contract.GetEIN(&_Identityregistry.CallOpts, _address)
 }
 
-// GetIdentity is a free data retrieval call binding the contract method 0x85e3f058.
-//
-// Solidity: function getIdentity(uint256 ein) constant returns(address recoveryAddress, address[] associatedAddresses, address[] providers, address[] resolvers)
-func (_Identityregistry *IdentityregistryCaller) GetIdentity(opts *bind.CallOpts, ein *big.Int) (struct {
+type IdentityArgs struct {
 	RecoveryAddress     common.Address
 	AssociatedAddresses []common.Address
 	Providers           []common.Address
 	Resolvers           []common.Address
-}, error) {
-	ret := new(struct {
-		RecoveryAddress     common.Address
-		AssociatedAddresses []common.Address
-		Providers           []common.Address
-		Resolvers           []common.Address
-	})
-	out := ret
-	err := _Identityregistry.contract.Call(opts, out, "getIdentity", ein)
-	return *ret, err
+} 
+
+// GetIdentity is a free data retrieval call binding the contract method 0x85e3f058.
+//
+// Solidity: function getIdentity(uint256 ein) constant returns(address recoveryAddress, address[] associatedAddresses, address[] providers, address[] resolvers)
+func (_Identityregistry *IdentityregistryCaller) GetIdentity(opts *bind.CallOpts, ein *big.Int) ( IdentityArgs, error) {
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "getIdentity", ein)
+	return results[0].(IdentityArgs), err
 }
 
 // GetIdentity is a free data retrieval call binding the contract method 0x85e3f058.
@@ -262,12 +260,9 @@ func (_Identityregistry *IdentityregistryCallerSession) GetIdentity(ein *big.Int
 //
 // Solidity: function hasIdentity(address _address) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) HasIdentity(opts *bind.CallOpts, _address common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "hasIdentity", _address)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "hasIdentity", _address)
+	return results[0].(bool), err
 }
 
 // HasIdentity is a free data retrieval call binding the contract method 0x237f1a21.
@@ -288,12 +283,9 @@ func (_Identityregistry *IdentityregistryCallerSession) HasIdentity(_address com
 //
 // Solidity: function identityExists(uint256 ein) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) IdentityExists(opts *bind.CallOpts, ein *big.Int) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "identityExists", ein)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "identityExists", ein)
+	return results[0].(bool), err
 }
 
 // IdentityExists is a free data retrieval call binding the contract method 0x5b5aed3a.
@@ -314,12 +306,9 @@ func (_Identityregistry *IdentityregistryCallerSession) IdentityExists(ein *big.
 //
 // Solidity: function isAssociatedAddressFor(uint256 ein, address _address) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) IsAssociatedAddressFor(opts *bind.CallOpts, ein *big.Int, _address common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "isAssociatedAddressFor", ein, _address)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "isAssociatedAddressFor", ein, _address)
+	return results[0].(bool), err
 }
 
 // IsAssociatedAddressFor is a free data retrieval call binding the contract method 0xa687662d.
@@ -340,12 +329,9 @@ func (_Identityregistry *IdentityregistryCallerSession) IsAssociatedAddressFor(e
 //
 // Solidity: function isProviderFor(uint256 ein, address provider) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) IsProviderFor(opts *bind.CallOpts, ein *big.Int, provider common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "isProviderFor", ein, provider)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "isProviderFor", ein, provider)
+	return results[0].(bool), err
 }
 
 // IsProviderFor is a free data retrieval call binding the contract method 0x53a9698a.
@@ -366,12 +352,9 @@ func (_Identityregistry *IdentityregistryCallerSession) IsProviderFor(ein *big.I
 //
 // Solidity: function isResolverFor(uint256 ein, address resolver) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) IsResolverFor(opts *bind.CallOpts, ein *big.Int, resolver common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "isResolverFor", ein, resolver)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "isResolverFor", ein, resolver)
+	return results[0].(bool), err
 }
 
 // IsResolverFor is a free data retrieval call binding the contract method 0xd4b1cdcc.
@@ -392,12 +375,9 @@ func (_Identityregistry *IdentityregistryCallerSession) IsResolverFor(ein *big.I
 //
 // Solidity: function isSigned(address _address, bytes32 messageHash, uint8 v, bytes32 r, bytes32 s) constant returns(bool)
 func (_Identityregistry *IdentityregistryCaller) IsSigned(opts *bind.CallOpts, _address common.Address, messageHash [32]byte, v uint8, r [32]byte, s [32]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "isSigned", _address, messageHash, v, r, s)
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "isSigned", _address, messageHash, v, r, s)
+	return results[0].(bool), err
 }
 
 // IsSigned is a free data retrieval call binding the contract method 0x8677ebe8.
@@ -418,12 +398,9 @@ func (_Identityregistry *IdentityregistryCallerSession) IsSigned(_address common
 //
 // Solidity: function maxAssociatedAddresses() constant returns(uint256)
 func (_Identityregistry *IdentityregistryCaller) MaxAssociatedAddresses(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "maxAssociatedAddresses")
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "maxAssociatedAddresses")
+	return results[0].(*big.Int), err
 }
 
 // MaxAssociatedAddresses is a free data retrieval call binding the contract method 0xab9a8538.
@@ -444,12 +421,9 @@ func (_Identityregistry *IdentityregistryCallerSession) MaxAssociatedAddresses()
 //
 // Solidity: function nextEIN() constant returns(uint256)
 func (_Identityregistry *IdentityregistryCaller) NextEIN(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "nextEIN")
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "nextEIN")
+	return results[0].(*big.Int), err
 }
 
 // NextEIN is a free data retrieval call binding the contract method 0xa1707e7b.
@@ -470,12 +444,9 @@ func (_Identityregistry *IdentityregistryCallerSession) NextEIN() (*big.Int, err
 //
 // Solidity: function recoveryTimeout() constant returns(uint256)
 func (_Identityregistry *IdentityregistryCaller) RecoveryTimeout(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "recoveryTimeout")
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "recoveryTimeout")
+	return results[0].(*big.Int), err
 }
 
 // RecoveryTimeout is a free data retrieval call binding the contract method 0x14d8b821.
@@ -496,12 +467,9 @@ func (_Identityregistry *IdentityregistryCallerSession) RecoveryTimeout() (*big.
 //
 // Solidity: function signatureTimeout() constant returns(uint256)
 func (_Identityregistry *IdentityregistryCaller) SignatureTimeout(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identityregistry.contract.Call(opts, out, "signatureTimeout")
-	return *ret0, err
+	var results []interface{}
+	err := _Identityregistry.contract.Call(opts, &results, "signatureTimeout")
+	return results[0].(*big.Int), err
 }
 
 // SignatureTimeout is a free data retrieval call binding the contract method 0x5437b67c.

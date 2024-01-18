@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/log"
 )
 
 func verifySignature(reqID uint64, hash []byte, v uint8, r hexutil.Bytes, s hexutil.Bytes, address common.Address) Error {

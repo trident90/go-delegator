@@ -8,7 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/metadium/go-delegator/crypto"
+	"go-delegator/crypto"
 )
 
 func defaultSetting() {

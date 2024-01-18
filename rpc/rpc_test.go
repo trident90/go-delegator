@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/metadium/go-delegator/json"
+	"go-delegator/json"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"

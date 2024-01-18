@@ -9,15 +9,15 @@ import (
 	"testing"
 
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/metadium/go-delegator/metaservice/sc/identity"
+	"go-delegator/metaservice/sc/identity"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
+	"go-delegator/crypto"
+	"go-delegator/json"
 )
 
 func defaultSetting() {

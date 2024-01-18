@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/rpc"
+	"go-delegator/crypto"
+	"go-delegator/json"
+	"go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"

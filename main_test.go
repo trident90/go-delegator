@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
+	"go-delegator/crypto"
+	"go-delegator/json"
 
 	"github.com/aws/aws-lambda-go/events"
 )

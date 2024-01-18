@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +154,10 @@ func bindRegistry(address common.Address, caller bind.ContractCaller, transactor
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Registry *RegistryRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Registry.Contract.RegistryCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Registry.Contract.RegistryCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,10 @@ func (_Registry *RegistryRaw) Transact(opts *bind.TransactOpts, method string, p
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Registry *RegistryCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Registry.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Registry.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -192,12 +197,9 @@ func (_Registry *RegistryTransactorRaw) Transact(opts *bind.TransactOpts, method
 //
 // Solidity: function contracts(bytes32 ) constant returns(address)
 func (_Registry *RegistryCaller) Contracts(opts *bind.CallOpts, arg0 [32]byte) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "contracts", arg0)
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "contracts", arg0)
+	return results[0].(common.Address), err
 }
 
 // Contracts is a free data retrieval call binding the contract method 0xec56a373.
@@ -218,12 +220,9 @@ func (_Registry *RegistryCallerSession) Contracts(arg0 [32]byte) (common.Address
 //
 // Solidity: function getContractAddress(bytes32 _name) constant returns(address addr)
 func (_Registry *RegistryCaller) GetContractAddress(opts *bind.CallOpts, _name [32]byte) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "getContractAddress", _name)
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "getContractAddress", _name)
+	return results[0].(common.Address), err
 }
 
 // GetContractAddress is a free data retrieval call binding the contract method 0x0d2020dd.
@@ -244,12 +243,9 @@ func (_Registry *RegistryCallerSession) GetContractAddress(_name [32]byte) (comm
 //
 // Solidity: function getPermission(bytes32 _contract, address _granted) constant returns(bool found)
 func (_Registry *RegistryCaller) GetPermission(opts *bind.CallOpts, _contract [32]byte, _granted common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "getPermission", _contract, _granted)
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "getPermission", _contract, _granted)
+	return results[0].(bool), err
 }
 
 // GetPermission is a free data retrieval call binding the contract method 0x60d6c7cf.
@@ -270,12 +266,9 @@ func (_Registry *RegistryCallerSession) GetPermission(_contract [32]byte, _grant
 //
 // Solidity: function isOwner() constant returns(bool)
 func (_Registry *RegistryCaller) IsOwner(opts *bind.CallOpts) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "isOwner")
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "isOwner")
+	return results[0].(bool), err
 }
 
 // IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
@@ -296,12 +289,9 @@ func (_Registry *RegistryCallerSession) IsOwner() (bool, error) {
 //
 // Solidity: function owner() constant returns(address)
 func (_Registry *RegistryCaller) Owner(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "owner")
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "owner")
+	return results[0].(common.Address), err
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
@@ -322,12 +312,9 @@ func (_Registry *RegistryCallerSession) Owner() (common.Address, error) {
 //
 // Solidity: function permissions(bytes32 , address ) constant returns(bool)
 func (_Registry *RegistryCaller) Permissions(opts *bind.CallOpts, arg0 [32]byte, arg1 common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Registry.contract.Call(opts, out, "permissions", arg0, arg1)
-	return *ret0, err
+	var results []interface{}
+	err := _Registry.contract.Call(opts, &results, "permissions", arg0, arg1)
+	return results[0].(bool), err
 }
 
 // Permissions is a free data retrieval call binding the contract method 0x3ec50c6c.

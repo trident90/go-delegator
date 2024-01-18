@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/log"
 	"gopkg.in/validator.v2"
 )
 

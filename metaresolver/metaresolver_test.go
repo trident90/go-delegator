@@ -9,10 +9,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/metaresolver/sc/publickeyresolver"
-	"github.com/metadium/go-delegator/metaresolver/sc/servicekeyresolver"
+	"go-delegator/crypto"
+	"go-delegator/json"
+	"go-delegator/metaresolver/sc/publickeyresolver"
+	"go-delegator/metaresolver/sc/servicekeyresolver"
 	log "github.com/sirupsen/logrus"
 )
 

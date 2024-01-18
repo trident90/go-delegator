@@ -6,9 +6,9 @@ import (
 	"math/big"
 	"runtime/debug"
 
-	proxyCommon "github.com/metadium/go-delegator/common"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
+	proxyCommon "go-delegator/common"
+	"go-delegator/json"
+	"go-delegator/log"
 )
 
 var (

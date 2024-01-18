@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/metadium/go-delegator/common"
-	"github.com/metadium/go-delegator/crypto"
-	ethjson "github.com/metadium/go-delegator/json"
+	"go-delegator/common"
+	"go-delegator/crypto"
+	ethjson "go-delegator/json"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/ethclient"

@@ -8,12 +8,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethCrypto "github.com/ethereum/go-ethereum/crypto"
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/ipfs"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/log"
-	"github.com/metadium/go-delegator/metaservice/sc/identity"
-	"github.com/metadium/go-delegator/metaservice/sc/identitymanager"
+	"go-delegator/crypto"
+	"go-delegator/ipfs"
+	"go-delegator/json"
+	"go-delegator/log"
+	"go-delegator/metaservice/sc/identity"
+	"go-delegator/metaservice/sc/identitymanager"
 )
 
 func createMetaID(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {

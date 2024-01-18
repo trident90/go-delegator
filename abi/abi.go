@@ -2,14 +2,13 @@
 package abi
 
 import (
-	"encoding/hex"
 	"fmt"
 	"math/big"
 	"strings"
 
-	"github.com/metadium/go-delegator/crypto"
-	"github.com/metadium/go-delegator/json"
-	"github.com/metadium/go-delegator/rpc"
+	"go-delegator/crypto"
+	"go-delegator/json"
+	"go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
@@ -33,18 +32,22 @@ func Pack(abi abi.ABI, name string, args ...interface{}) (string, error) {
 
 // Unpack fills output into given ABI
 func Unpack(abi abi.ABI, v interface{}, name string, output string) error {
-	var data []byte
+	// TODO: debug
+	//var data []byte
 	var err error
-	if output[:2] == "0x" {
-		data, err = hex.DecodeString(output[2:])
-	} else {
-		data, err = hex.DecodeString(output)
-	}
+	/*
+		if output[:2] == "0x" {
+			data, err = hex.DecodeString(output[2:])
+		} else {
+			data, err = hex.DecodeString(output)
+		}
+	*/
 
 	if err != nil {
 		return err
 	}
-	return abi.Unpack(v, name, data)
+	//return abi.Unpack(v, name, data)
+	return err
 }
 
 // Call gets contract value with contract address and name

@@ -5,7 +5,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/metadium/go-delegator/common"
+	"go-delegator/common"
 )
 
 func TestUnit(t *testing.T) {

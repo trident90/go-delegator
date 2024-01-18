@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -155,7 +154,10 @@ func bindIdentitymanager(address common.Address, caller bind.ContractCaller, tra
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identitymanager *IdentitymanagerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identitymanager.Contract.IdentitymanagerCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identitymanager.Contract.IdentitymanagerCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -174,7 +176,10 @@ func (_Identitymanager *IdentitymanagerRaw) Transact(opts *bind.TransactOpts, me
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identitymanager *IdentitymanagerCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identitymanager.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identitymanager.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -192,12 +197,9 @@ func (_Identitymanager *IdentitymanagerTransactorRaw) Transact(opts *bind.Transa
 //
 // Solidity: function REG() constant returns(address)
 func (_Identitymanager *IdentitymanagerCaller) REG(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "REG")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "REG")
+	return results[0].(common.Address), err
 }
 
 // REG is a free data retrieval call binding the contract method 0x39363112.
@@ -218,12 +220,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) REG() (common.Address, err
 //
 // Solidity: function THIS_NAME() constant returns(bytes32)
 func (_Identitymanager *IdentitymanagerCaller) THISNAME(opts *bind.CallOpts) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "THIS_NAME")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "THIS_NAME")
+	return results[0].([32]byte), err
 }
 
 // THISNAME is a free data retrieval call binding the contract method 0x64319d0b.
@@ -244,12 +243,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) THISNAME() ([32]byte, erro
 //
 // Solidity: function getDeployedMetaIds() constant returns(address[] addrs)
 func (_Identitymanager *IdentitymanagerCaller) GetDeployedMetaIds(opts *bind.CallOpts) ([]common.Address, error) {
-	var (
-		ret0 = new([]common.Address)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "getDeployedMetaIds")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "getDeployedMetaIds")
+	return results[0].([]common.Address), err
 }
 
 // GetDeployedMetaIds is a free data retrieval call binding the contract method 0xab1796cf.
@@ -270,12 +266,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) GetDeployedMetaIds() ([]co
 //
 // Solidity: function getLengthOfMetaIds() constant returns(uint256 length)
 func (_Identitymanager *IdentitymanagerCaller) GetLengthOfMetaIds(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "getLengthOfMetaIds")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "getLengthOfMetaIds")
+	return results[0].(*big.Int), err
 }
 
 // GetLengthOfMetaIds is a free data retrieval call binding the contract method 0x57296f07.
@@ -296,12 +289,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) GetLengthOfMetaIds() (*big
 //
 // Solidity: function isMetaId(address _addr) constant returns(bool found)
 func (_Identitymanager *IdentitymanagerCaller) IsMetaId(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "isMetaId", _addr)
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "isMetaId", _addr)
+	return results[0].(bool), err
 }
 
 // IsMetaId is a free data retrieval call binding the contract method 0x12459b00.
@@ -322,12 +312,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) IsMetaId(_addr common.Addr
 //
 // Solidity: function isOwner() constant returns(bool)
 func (_Identitymanager *IdentitymanagerCaller) IsOwner(opts *bind.CallOpts) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "isOwner")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "isOwner")
+	return results[0].(bool), err
 }
 
 // IsOwner is a free data retrieval call binding the contract method 0x8f32d59b.
@@ -348,12 +335,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) IsOwner() (bool, error) {
 //
 // Solidity: function isPermitted(address _addr) constant returns(bool found)
 func (_Identitymanager *IdentitymanagerCaller) IsPermitted(opts *bind.CallOpts, _addr common.Address) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "isPermitted", _addr)
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "isPermitted", _addr)
+	return results[0].(bool), err
 }
 
 // IsPermitted is a free data retrieval call binding the contract method 0x3fd8cc4e.
@@ -374,12 +358,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) IsPermitted(_addr common.A
 //
 // Solidity: function metaIds(uint256 ) constant returns(address)
 func (_Identitymanager *IdentitymanagerCaller) MetaIds(opts *bind.CallOpts, arg0 *big.Int) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "metaIds", arg0)
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "metaIds", arg0)
+	return results[0].(common.Address), err
 }
 
 // MetaIds is a free data retrieval call binding the contract method 0x73fd4e8f.
@@ -400,12 +381,9 @@ func (_Identitymanager *IdentitymanagerCallerSession) MetaIds(arg0 *big.Int) (co
 //
 // Solidity: function owner() constant returns(address)
 func (_Identitymanager *IdentitymanagerCaller) Owner(opts *bind.CallOpts) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Identitymanager.contract.Call(opts, out, "owner")
-	return *ret0, err
+	var results []interface{}
+	err := _Identitymanager.contract.Call(opts, &results, "owner")
+	return results[0].(common.Address), err
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.

@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/metadium/go-delegator/log"
+	"go-delegator/log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"

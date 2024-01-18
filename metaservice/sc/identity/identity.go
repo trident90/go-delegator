@@ -20,7 +20,6 @@ var (
 	_ = big.NewInt
 	_ = strings.NewReader
 	_ = ethereum.NotFound
-	_ = abi.U256
 	_ = bind.Bind
 	_ = common.Big1
 	_ = types.BloomLookup
@@ -156,7 +155,10 @@ func bindIdentity(address common.Address, caller bind.ContractCaller, transactor
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identity *IdentityRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identity.Contract.IdentityCaller.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identity.Contract.IdentityCaller.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -175,7 +177,10 @@ func (_Identity *IdentityRaw) Transact(opts *bind.TransactOpts, method string, p
 // returns, a slice of interfaces for anonymous returns and a struct for named
 // returns.
 func (_Identity *IdentityCallerRaw) Call(opts *bind.CallOpts, result interface{}, method string, params ...interface{}) error {
-	return _Identity.Contract.contract.Call(opts, result, method, params...)
+	var results []interface{}
+	err := _Identity.Contract.contract.Call(opts, &results, method, params...)
+	result = results[0]
+	return err
 }
 
 // Transfer initiates a plain transaction to move funds to the contract, calling
@@ -193,12 +198,9 @@ func (_Identity *IdentityTransactorRaw) Transact(opts *bind.TransactOpts, method
 //
 // Solidity: function ACTION_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) ACTIONKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ACTION_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ACTION_KEY")
+	return results[0].(*big.Int), err
 }
 
 // ACTIONKEY is a free data retrieval call binding the contract method 0x75e5598c.
@@ -219,12 +221,9 @@ func (_Identity *IdentityCallerSession) ACTIONKEY() (*big.Int, error) {
 //
 // Solidity: function ASSIST_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) ASSISTKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ASSIST_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ASSIST_KEY")
+	return results[0].(*big.Int), err
 }
 
 // ASSISTKEY is a free data retrieval call binding the contract method 0xdbfa74b7.
@@ -245,12 +244,9 @@ func (_Identity *IdentityCallerSession) ASSISTKEY() (*big.Int, error) {
 //
 // Solidity: function CLAIM_SIGNER_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) CLAIMSIGNERKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "CLAIM_SIGNER_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "CLAIM_SIGNER_KEY")
+	return results[0].(*big.Int), err
 }
 
 // CLAIMSIGNERKEY is a free data retrieval call binding the contract method 0xc6702187.
@@ -271,12 +267,9 @@ func (_Identity *IdentityCallerSession) CLAIMSIGNERKEY() (*big.Int, error) {
 //
 // Solidity: function CONTRACT_SCHEME() constant returns(uint256)
 func (_Identity *IdentityCaller) CONTRACTSCHEME(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "CONTRACT_SCHEME")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "CLAIM_SIGNER_KEY")
+	return results[0].(*big.Int), err
 }
 
 // CONTRACTSCHEME is a free data retrieval call binding the contract method 0x251de3e9.
@@ -297,12 +290,9 @@ func (_Identity *IdentityCallerSession) CONTRACTSCHEME() (*big.Int, error) {
 //
 // Solidity: function CUSTOM_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) CUSTOMKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "CUSTOM_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "CUSTOM_KEY")
+	return results[0].(*big.Int), err
 }
 
 // CUSTOMKEY is a free data retrieval call binding the contract method 0xb132734e.
@@ -323,12 +313,9 @@ func (_Identity *IdentityCallerSession) CUSTOMKEY() (*big.Int, error) {
 //
 // Solidity: function DELEGATE_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) DELEGATEKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "DELEGATE_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "DELEGATE_KEY")
+	return results[0].(*big.Int), err
 }
 
 // DELEGATEKEY is a free data retrieval call binding the contract method 0xead09fab.
@@ -349,12 +336,9 @@ func (_Identity *IdentityCallerSession) DELEGATEKEY() (*big.Int, error) {
 //
 // Solidity: function ECDSA_SCHEME() constant returns(uint256)
 func (_Identity *IdentityCaller) ECDSASCHEME(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ECDSA_SCHEME")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ECDSA_SCHEME")
+	return results[0].(*big.Int), err
 }
 
 // ECDSASCHEME is a free data retrieval call binding the contract method 0x82d09446.
@@ -375,12 +359,9 @@ func (_Identity *IdentityCallerSession) ECDSASCHEME() (*big.Int, error) {
 //
 // Solidity: function ECDSA_TYPE() constant returns(uint256)
 func (_Identity *IdentityCaller) ECDSATYPE(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ECDSA_TYPE")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ECDSA_TYPE")
+	return results[0].(*big.Int), err
 }
 
 // ECDSATYPE is a free data retrieval call binding the contract method 0x49991ec8.
@@ -401,12 +382,9 @@ func (_Identity *IdentityCallerSession) ECDSATYPE() (*big.Int, error) {
 //
 // Solidity: function ENCRYPTION_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) ENCRYPTIONKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ENCRYPTION_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ENCRYPTION_KEY")
+	return results[0].(*big.Int), err
 }
 
 // ENCRYPTIONKEY is a free data retrieval call binding the contract method 0x9e140cc8.
@@ -427,12 +405,9 @@ func (_Identity *IdentityCallerSession) ENCRYPTIONKEY() (*big.Int, error) {
 //
 // Solidity: function ERC165ID() constant returns(bytes4)
 func (_Identity *IdentityCaller) ERC165ID(opts *bind.CallOpts) ([4]byte, error) {
-	var (
-		ret0 = new([4]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ERC165ID")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ERC165ID")
+	return results[0].([4]byte), err
 }
 
 // ERC165ID is a free data retrieval call binding the contract method 0x02e7491e.
@@ -453,12 +428,9 @@ func (_Identity *IdentityCallerSession) ERC165ID() ([4]byte, error) {
 //
 // Solidity: function ERC725ID() constant returns(bytes4)
 func (_Identity *IdentityCaller) ERC725ID(opts *bind.CallOpts) ([4]byte, error) {
-	var (
-		ret0 = new([4]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ERC725ID")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ERC725ID")
+	return results[0].([4]byte), err
 }
 
 // ERC725ID is a free data retrieval call binding the contract method 0x7d96fa58.
@@ -479,12 +451,9 @@ func (_Identity *IdentityCallerSession) ERC725ID() ([4]byte, error) {
 //
 // Solidity: function ERC735ID() constant returns(bytes4)
 func (_Identity *IdentityCaller) ERC735ID(opts *bind.CallOpts) ([4]byte, error) {
-	var (
-		ret0 = new([4]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "ERC735ID")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "ERC735ID")
+	return results[0].([4]byte), err
 }
 
 // ERC735ID is a free data retrieval call binding the contract method 0xbf2f20ad.
@@ -505,12 +474,9 @@ func (_Identity *IdentityCallerSession) ERC735ID() ([4]byte, error) {
 //
 // Solidity: function LABEL_TOPIC() constant returns(uint256)
 func (_Identity *IdentityCaller) LABELTOPIC(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "LABEL_TOPIC")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "LABEL_TOPIC")
+	return results[0].(*big.Int), err
 }
 
 // LABELTOPIC is a free data retrieval call binding the contract method 0xb1e9f64c.
@@ -531,12 +497,9 @@ func (_Identity *IdentityCallerSession) LABELTOPIC() (*big.Int, error) {
 //
 // Solidity: function MANAGEMENT_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) MANAGEMENTKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "MANAGEMENT_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "MANAGEMENT_KEY")
+	return results[0].(*big.Int), err
 }
 
 // MANAGEMENTKEY is a free data retrieval call binding the contract method 0x058b316c.
@@ -557,12 +520,9 @@ func (_Identity *IdentityCallerSession) MANAGEMENTKEY() (*big.Int, error) {
 //
 // Solidity: function METAID_TOPIC() constant returns(uint256)
 func (_Identity *IdentityCaller) METAIDTOPIC(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "METAID_TOPIC")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "METAID_TOPIC")
+	return results[0].(*big.Int), err
 }
 
 // METAIDTOPIC is a free data retrieval call binding the contract method 0x710ca550.
@@ -583,12 +543,9 @@ func (_Identity *IdentityCallerSession) METAIDTOPIC() (*big.Int, error) {
 //
 // Solidity: function PROFILE_TOPIC() constant returns(uint256)
 func (_Identity *IdentityCaller) PROFILETOPIC(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "PROFILE_TOPIC")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "PROFILE_TOPIC")
+	return results[0].(*big.Int), err
 }
 
 // PROFILETOPIC is a free data retrieval call binding the contract method 0xae628386.
@@ -609,12 +566,9 @@ func (_Identity *IdentityCallerSession) PROFILETOPIC() (*big.Int, error) {
 //
 // Solidity: function REGISTRY_TOPIC() constant returns(uint256)
 func (_Identity *IdentityCaller) REGISTRYTOPIC(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "REGISTRY_TOPIC")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "REGISTRY_TOPIC")
+	return results[0].(*big.Int), err
 }
 
 // REGISTRYTOPIC is a free data retrieval call binding the contract method 0x0440b43a.
@@ -635,12 +589,9 @@ func (_Identity *IdentityCallerSession) REGISTRYTOPIC() (*big.Int, error) {
 //
 // Solidity: function RESIDENCE_TOPIC() constant returns(uint256)
 func (_Identity *IdentityCaller) RESIDENCETOPIC(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "RESIDENCE_TOPIC")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "RESIDENCE_TOPIC")
+	return results[0].(*big.Int), err
 }
 
 // RESIDENCETOPIC is a free data retrieval call binding the contract method 0xa550f0c7.
@@ -661,12 +612,9 @@ func (_Identity *IdentityCallerSession) RESIDENCETOPIC() (*big.Int, error) {
 //
 // Solidity: function RESTORE_KEY() constant returns(uint256)
 func (_Identity *IdentityCaller) RESTOREKEY(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "RESTORE_KEY")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "RESTORE_KEY")
+	return results[0].(*big.Int), err
 }
 
 // RESTOREKEY is a free data retrieval call binding the contract method 0xb9133d63.
@@ -687,12 +635,9 @@ func (_Identity *IdentityCallerSession) RESTOREKEY() (*big.Int, error) {
 //
 // Solidity: function RSA_SCHEME() constant returns(uint256)
 func (_Identity *IdentityCaller) RSASCHEME(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "RSA_SCHEME")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "RSA_SCHEME")
+	return results[0].(*big.Int), err
 }
 
 // RSASCHEME is a free data retrieval call binding the contract method 0xf22d08a6.
@@ -713,12 +658,9 @@ func (_Identity *IdentityCallerSession) RSASCHEME() (*big.Int, error) {
 //
 // Solidity: function RSA_TYPE() constant returns(uint256)
 func (_Identity *IdentityCaller) RSATYPE(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "RSA_TYPE")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "RSA_TYPE")
+	return results[0].(*big.Int), err
 }
 
 // RSATYPE is a free data retrieval call binding the contract method 0x2d32d442.
@@ -739,12 +681,9 @@ func (_Identity *IdentityCallerSession) RSATYPE() (*big.Int, error) {
 //
 // Solidity: function actionThreshold() constant returns(uint256)
 func (_Identity *IdentityCaller) ActionThreshold(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "actionThreshold")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "actionThreshold")
+	return results[0].(*big.Int), err
 }
 
 // ActionThreshold is a free data retrieval call binding the contract method 0x38f4edd4.
@@ -765,12 +704,9 @@ func (_Identity *IdentityCallerSession) ActionThreshold() (*big.Int, error) {
 //
 // Solidity: function addrToKey(address addr) constant returns(bytes32)
 func (_Identity *IdentityCaller) AddrToKey(opts *bind.CallOpts, addr common.Address) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "addrToKey", addr)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "addrToKey", addr)
+	return results[0].([32]byte), err
 }
 
 // AddrToKey is a free data retrieval call binding the contract method 0x63f14c3c.
@@ -791,12 +727,9 @@ func (_Identity *IdentityCallerSession) AddrToKey(addr common.Address) ([32]byte
 //
 // Solidity: function approved(uint256 , uint256 ) constant returns(address)
 func (_Identity *IdentityCaller) Approved(opts *bind.CallOpts, arg0 *big.Int, arg1 *big.Int) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "approved", arg0, arg1)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "approved", arg0, arg1)
+	return results[0].(common.Address), err
 }
 
 // Approved is a free data retrieval call binding the contract method 0x6e4c4311.
@@ -817,12 +750,9 @@ func (_Identity *IdentityCallerSession) Approved(arg0 *big.Int, arg1 *big.Int) (
 //
 // Solidity: function claimToSign(address subject, uint256 topic, bytes data) constant returns(bytes32)
 func (_Identity *IdentityCaller) ClaimToSign(opts *bind.CallOpts, subject common.Address, topic *big.Int, data []byte) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "claimToSign", subject, topic, data)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "claimToSign", subject, topic, data)
+	return results[0].([32]byte), err
 }
 
 // ClaimToSign is a free data retrieval call binding the contract method 0x1d203be8.
@@ -839,99 +769,63 @@ func (_Identity *IdentityCallerSession) ClaimToSign(subject common.Address, topi
 	return _Identity.Contract.ClaimToSign(&_Identity.CallOpts, subject, topic, data)
 }
 
-// Execution is a free data retrieval call binding the contract method 0x5dccebba.
-//
-// Solidity: function execution(uint256 ) constant returns(address to, uint256 value, bytes data, uint256 needsApprove)
-func (_Identity *IdentityCaller) Execution(opts *bind.CallOpts, arg0 *big.Int) (struct {
+type Method5dccebbaData struct {
 	To           common.Address
 	Value        *big.Int
 	Data         []byte
 	NeedsApprove *big.Int
-}, error) {
-	ret := new(struct {
-		To           common.Address
-		Value        *big.Int
-		Data         []byte
-		NeedsApprove *big.Int
-	})
-	out := ret
-	err := _Identity.contract.Call(opts, out, "execution", arg0)
-	return *ret, err
+}
+// Execution is a free data retrieval call binding the contract method 0x5dccebba.
+//
+// Solidity: function execution(uint256 ) constant returns(address to, uint256 value, bytes data, uint256 needsApprove)
+func (_Identity *IdentityCaller) Execution(opts *bind.CallOpts, arg0 *big.Int) (Method5dccebbaData, error) {
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "execution", arg0)
+	return results[0].(Method5dccebbaData), err
 }
 
 // Execution is a free data retrieval call binding the contract method 0x5dccebba.
 //
 // Solidity: function execution(uint256 ) constant returns(address to, uint256 value, bytes data, uint256 needsApprove)
-func (_Identity *IdentitySession) Execution(arg0 *big.Int) (struct {
-	To           common.Address
-	Value        *big.Int
-	Data         []byte
-	NeedsApprove *big.Int
-}, error) {
+func (_Identity *IdentitySession) Execution(arg0 *big.Int) (Method5dccebbaData, error) {
 	return _Identity.Contract.Execution(&_Identity.CallOpts, arg0)
 }
 
 // Execution is a free data retrieval call binding the contract method 0x5dccebba.
 //
 // Solidity: function execution(uint256 ) constant returns(address to, uint256 value, bytes data, uint256 needsApprove)
-func (_Identity *IdentityCallerSession) Execution(arg0 *big.Int) (struct {
-	To           common.Address
-	Value        *big.Int
-	Data         []byte
-	NeedsApprove *big.Int
-}, error) {
+func (_Identity *IdentityCallerSession) Execution(arg0 *big.Int) (Method5dccebbaData, error) {
 	return _Identity.Contract.Execution(&_Identity.CallOpts, arg0)
 }
 
-// GetClaim is a free data retrieval call binding the contract method 0xc9100bcb.
-//
-// Solidity: function getClaim(bytes32 _claimId) constant returns(uint256 topic, uint256 scheme, address issuer, bytes signature, bytes data, string uri)
-func (_Identity *IdentityCaller) GetClaim(opts *bind.CallOpts, _claimId [32]byte) (struct {
+type Methodc9100bcbData struct {
 	Topic     *big.Int
 	Scheme    *big.Int
 	Issuer    common.Address
 	Signature []byte
 	Data      []byte
 	Uri       string
-}, error) {
-	ret := new(struct {
-		Topic     *big.Int
-		Scheme    *big.Int
-		Issuer    common.Address
-		Signature []byte
-		Data      []byte
-		Uri       string
-	})
-	out := ret
-	err := _Identity.contract.Call(opts, out, "getClaim", _claimId)
-	return *ret, err
+}
+// GetClaim is a free data retrieval call binding the contract method 0xc9100bcb.
+//
+// Solidity: function getClaim(bytes32 _claimId) constant returns(uint256 topic, uint256 scheme, address issuer, bytes signature, bytes data, string uri)
+func (_Identity *IdentityCaller) GetClaim(opts *bind.CallOpts, _claimId [32]byte) (Methodc9100bcbData, error) {
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getClaim", _claimId)
+	return results[0].(Methodc9100bcbData), err
 }
 
 // GetClaim is a free data retrieval call binding the contract method 0xc9100bcb.
 //
 // Solidity: function getClaim(bytes32 _claimId) constant returns(uint256 topic, uint256 scheme, address issuer, bytes signature, bytes data, string uri)
-func (_Identity *IdentitySession) GetClaim(_claimId [32]byte) (struct {
-	Topic     *big.Int
-	Scheme    *big.Int
-	Issuer    common.Address
-	Signature []byte
-	Data      []byte
-	Uri       string
-}, error) {
+func (_Identity *IdentitySession) GetClaim(_claimId [32]byte) (Methodc9100bcbData, error) {
 	return _Identity.Contract.GetClaim(&_Identity.CallOpts, _claimId)
 }
 
 // GetClaim is a free data retrieval call binding the contract method 0xc9100bcb.
 //
 // Solidity: function getClaim(bytes32 _claimId) constant returns(uint256 topic, uint256 scheme, address issuer, bytes signature, bytes data, string uri)
-func (_Identity *IdentityCallerSession) GetClaim(_claimId [32]byte) (struct {
-	Topic     *big.Int
-	Scheme    *big.Int
-	Issuer    common.Address
-	Signature []byte
-	Data      []byte
-	Uri       string
-}, error) {
+func (_Identity *IdentityCallerSession) GetClaim(_claimId [32]byte) (Methodc9100bcbData, error) {
 	return _Identity.Contract.GetClaim(&_Identity.CallOpts, _claimId)
 }
 
@@ -939,12 +833,9 @@ func (_Identity *IdentityCallerSession) GetClaim(_claimId [32]byte) (struct {
 //
 // Solidity: function getClaimId(address issuer, uint256 topic) constant returns(bytes32)
 func (_Identity *IdentityCaller) GetClaimId(opts *bind.CallOpts, issuer common.Address, topic *big.Int) ([32]byte, error) {
-	var (
-		ret0 = new([32]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getClaimId", issuer, topic)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getClaimId", issuer, topic)
+	return results[0].([32]byte), err
 }
 
 // GetClaimId is a free data retrieval call binding the contract method 0x190db862.
@@ -965,12 +856,9 @@ func (_Identity *IdentityCallerSession) GetClaimId(issuer common.Address, topic 
 //
 // Solidity: function getClaimIdsByType(uint256 _topic) constant returns(bytes32[] claimIds)
 func (_Identity *IdentityCaller) GetClaimIdsByType(opts *bind.CallOpts, _topic *big.Int) ([][32]byte, error) {
-	var (
-		ret0 = new([][32]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getClaimIdsByType", _topic)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getClaimIdsByType", _topic)
+	return results[0].([][32]byte), err
 }
 
 // GetClaimIdsByType is a free data retrieval call binding the contract method 0x262b54f5.
@@ -991,12 +879,9 @@ func (_Identity *IdentityCallerSession) GetClaimIdsByType(_topic *big.Int) ([][3
 //
 // Solidity: function getExecutionId(address self, address _to, uint256 _value, bytes _data, uint256 _nonce) constant returns(uint256)
 func (_Identity *IdentityCaller) GetExecutionId(opts *bind.CallOpts, self common.Address, _to common.Address, _value *big.Int, _data []byte, _nonce *big.Int) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getExecutionId", self, _to, _value, _data, _nonce)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getExecutionId", self, _to, _value, _data, _nonce)
+	return results[0].(*big.Int), err
 }
 
 // GetExecutionId is a free data retrieval call binding the contract method 0xf7444137.
@@ -1017,12 +902,9 @@ func (_Identity *IdentityCallerSession) GetExecutionId(self common.Address, _to 
 //
 // Solidity: function getFunctionSignature(bytes b) constant returns(bytes4)
 func (_Identity *IdentityCaller) GetFunctionSignature(opts *bind.CallOpts, b []byte) ([4]byte, error) {
-	var (
-		ret0 = new([4]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getFunctionSignature", b)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getFunctionSignature", b)
+	return results[0].([4]byte), err
 }
 
 // GetFunctionSignature is a free data retrieval call binding the contract method 0xc32b3518.
@@ -1042,47 +924,23 @@ func (_Identity *IdentityCallerSession) GetFunctionSignature(b []byte) ([4]byte,
 // GetKey is a free data retrieval call binding the contract method 0x12aaac70.
 //
 // Solidity: function getKey(bytes32 _key) constant returns(uint256[] purposes, uint256 keyType, bytes32 key)
-func (_Identity *IdentityCaller) GetKey(opts *bind.CallOpts, _key [32]byte) (
-	// struct {
-	// Purposes []*big.Int
-	// KeyType  *big.Int
-	// Key      [32]byte
-	// }
-	metaIDKey, error) {
-	ret := new(metaIDKey)
-	// 	struct {
-	// 	Purposes []*big.Int
-	// 	KeyType  *big.Int
-	// 	Key      [32]byte
-	// })
-	out := ret
-	err := _Identity.contract.Call(opts, out, "getKey", _key)
-	return *ret, err
+func (_Identity *IdentityCaller) GetKey(opts *bind.CallOpts, _key [32]byte) (metaIDKey, error) {
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getKey", _key)
+	return results[0].(metaIDKey), err
 }
 
 // GetKey is a free data retrieval call binding the contract method 0x12aaac70.
 //
 // Solidity: function getKey(bytes32 _key) constant returns(uint256[] purposes, uint256 keyType, bytes32 key)
-func (_Identity *IdentitySession) GetKey(_key [32]byte) (
-	// struct {
-	// Purposes []*big.Int
-	// KeyType  *big.Int
-	// Key      [32]byte
-	// }
-	metaIDKey, error) {
+func (_Identity *IdentitySession) GetKey(_key [32]byte) (metaIDKey, error) {
 	return _Identity.Contract.GetKey(&_Identity.CallOpts, _key)
 }
 
 // GetKey is a free data retrieval call binding the contract method 0x12aaac70.
 //
 // Solidity: function getKey(bytes32 _key) constant returns(uint256[] purposes, uint256 keyType, bytes32 key)
-func (_Identity *IdentityCallerSession) GetKey(_key [32]byte) (
-	// struct {
-	// Purposes []*big.Int
-	// KeyType  *big.Int
-	// Key      [32]byte
-	// }
-	metaIDKey, error) {
+func (_Identity *IdentityCallerSession) GetKey(_key [32]byte) (metaIDKey, error) {
 	return _Identity.Contract.GetKey(&_Identity.CallOpts, _key)
 }
 
@@ -1090,12 +948,9 @@ func (_Identity *IdentityCallerSession) GetKey(_key [32]byte) (
 //
 // Solidity: function getKeysByPurpose(uint256 _purpose) constant returns(bytes32[] keys)
 func (_Identity *IdentityCaller) GetKeysByPurpose(opts *bind.CallOpts, _purpose *big.Int) ([][32]byte, error) {
-	var (
-		ret0 = new([][32]byte)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getKeysByPurpose", _purpose)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getKeysByPurpose", _purpose)
+	return results[0].([][32]byte), err
 }
 
 // GetKeysByPurpose is a free data retrieval call binding the contract method 0x9010f726.
@@ -1116,12 +971,9 @@ func (_Identity *IdentityCallerSession) GetKeysByPurpose(_purpose *big.Int) ([][
 //
 // Solidity: function getNonce() constant returns(uint256)
 func (_Identity *IdentityCaller) GetNonce(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getNonce")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getNonce")
+	return results[0].(*big.Int), err
 }
 
 // GetNonce is a free data retrieval call binding the contract method 0xd087d288.
@@ -1142,12 +994,9 @@ func (_Identity *IdentityCallerSession) GetNonce() (*big.Int, error) {
 //
 // Solidity: function getNumClaims() constant returns(uint256 num)
 func (_Identity *IdentityCaller) GetNumClaims(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getNumClaims")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getNumClaims")
+	return results[0].(*big.Int), err
 }
 
 // GetNumClaims is a free data retrieval call binding the contract method 0x19902986.
@@ -1168,12 +1017,9 @@ func (_Identity *IdentityCallerSession) GetNumClaims() (*big.Int, error) {
 //
 // Solidity: function getSignatureAddress(bytes32 toSign, bytes signature) constant returns(address)
 func (_Identity *IdentityCaller) GetSignatureAddress(opts *bind.CallOpts, toSign [32]byte, signature []byte) (common.Address, error) {
-	var (
-		ret0 = new(common.Address)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getSignatureAddress", toSign, signature)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getSignatureAddress", toSign, signature)
+	return results[0].(common.Address), err
 }
 
 // GetSignatureAddress is a free data retrieval call binding the contract method 0x3b8a12c8.
@@ -1194,12 +1040,9 @@ func (_Identity *IdentityCallerSession) GetSignatureAddress(toSign [32]byte, sig
 //
 // Solidity: function getTransactionCount() constant returns(uint256)
 func (_Identity *IdentityCaller) GetTransactionCount(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "getTransactionCount")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "getTransactionCount")
+	return results[0].(*big.Int), err
 }
 
 // GetTransactionCount is a free data retrieval call binding the contract method 0x2e7700f0.
@@ -1220,12 +1063,9 @@ func (_Identity *IdentityCallerSession) GetTransactionCount() (*big.Int, error) 
 //
 // Solidity: function isClaimExist(bytes32 _claimId) constant returns(bool)
 func (_Identity *IdentityCaller) IsClaimExist(opts *bind.CallOpts, _claimId [32]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "isClaimExist", _claimId)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "isClaimExist", _claimId)
+	return results[0].(bool), err
 }
 
 // IsClaimExist is a free data retrieval call binding the contract method 0x237434f0.
@@ -1246,12 +1086,9 @@ func (_Identity *IdentityCallerSession) IsClaimExist(_claimId [32]byte) (bool, e
 //
 // Solidity: function keyCanExecute(bytes32 _key, address _to, bytes4 _func) constant returns(bool executable)
 func (_Identity *IdentityCaller) KeyCanExecute(opts *bind.CallOpts, _key [32]byte, _to common.Address, _func [4]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "keyCanExecute", _key, _to, _func)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "keyCanExecute", _key, _to, _func)
+	return results[0].(bool), err
 }
 
 // KeyCanExecute is a free data retrieval call binding the contract method 0x765b3042.
@@ -1272,12 +1109,9 @@ func (_Identity *IdentityCallerSession) KeyCanExecute(_key [32]byte, _to common.
 //
 // Solidity: function keyHasPurpose(bytes32 _key, uint256 purpose) constant returns(bool exists)
 func (_Identity *IdentityCaller) KeyHasPurpose(opts *bind.CallOpts, _key [32]byte, purpose *big.Int) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "keyHasPurpose", _key, purpose)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "keyHasPurpose", _key, purpose)
+	return results[0].(bool), err
 }
 
 // KeyHasPurpose is a free data retrieval call binding the contract method 0xd202158d.
@@ -1298,12 +1132,9 @@ func (_Identity *IdentityCallerSession) KeyHasPurpose(_key [32]byte, purpose *bi
 //
 // Solidity: function managementThreshold() constant returns(uint256)
 func (_Identity *IdentityCaller) ManagementThreshold(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "managementThreshold")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "managementThreshold")
+	return results[0].(*big.Int), err
 }
 
 // ManagementThreshold is a free data retrieval call binding the contract method 0xaa0a5142.
@@ -1324,12 +1155,9 @@ func (_Identity *IdentityCallerSession) ManagementThreshold() (*big.Int, error) 
 //
 // Solidity: function nonce() constant returns(uint256)
 func (_Identity *IdentityCaller) Nonce(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "nonce")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "nonce")
+	return results[0].(*big.Int), err
 }
 
 // Nonce is a free data retrieval call binding the contract method 0xaffed0e0.
@@ -1350,12 +1178,9 @@ func (_Identity *IdentityCallerSession) Nonce() (*big.Int, error) {
 //
 // Solidity: function numClaims() constant returns(uint256)
 func (_Identity *IdentityCaller) NumClaims(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "numClaims")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "numClaims")
+	return results[0].(*big.Int), err
 }
 
 // NumClaims is a free data retrieval call binding the contract method 0xfc0fc849.
@@ -1376,12 +1201,9 @@ func (_Identity *IdentityCallerSession) NumClaims() (*big.Int, error) {
 //
 // Solidity: function numKeys() constant returns(uint256)
 func (_Identity *IdentityCaller) NumKeys(opts *bind.CallOpts) (*big.Int, error) {
-	var (
-		ret0 = new(*big.Int)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "numKeys")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "numKeys")
+	return results[0].(*big.Int), err
 }
 
 // NumKeys is a free data retrieval call binding the contract method 0xc9d24ecc.
@@ -1402,12 +1224,9 @@ func (_Identity *IdentityCallerSession) NumKeys() (*big.Int, error) {
 //
 // Solidity: function paused() constant returns(bool)
 func (_Identity *IdentityCaller) Paused(opts *bind.CallOpts) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "paused")
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "paused")
+	return results[0].(bool), err
 }
 
 // Paused is a free data retrieval call binding the contract method 0x5c975abb.
@@ -1428,12 +1247,9 @@ func (_Identity *IdentityCallerSession) Paused() (bool, error) {
 //
 // Solidity: function supportsInterface(bytes4 interfaceID) constant returns(bool)
 func (_Identity *IdentityCaller) SupportsInterface(opts *bind.CallOpts, interfaceID [4]byte) (bool, error) {
-	var (
-		ret0 = new(bool)
-	)
-	out := ret0
-	err := _Identity.contract.Call(opts, out, "supportsInterface", interfaceID)
-	return *ret0, err
+	var results []interface{}
+	err := _Identity.contract.Call(opts, &results, "supportsInterface", interfaceID)
+	return results[0].(bool), err
 }
 
 // SupportsInterface is a free data retrieval call binding the contract method 0x01ffc9a7.
