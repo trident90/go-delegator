@@ -5,13 +5,15 @@ import (
 	"math/big"
 	"sync"
 
+	"go-delegator/config"
 	"go-delegator/log"
+
+	"go-delegator/crypto"
+	"go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"go-delegator/crypto"
-	"go-delegator/rpc"
 )
 
 var (
@@ -28,7 +30,7 @@ func getService() (*Identityregistry, error) {
 		client := _rpc.GetEthClient()
 		var err error
 
-		instance, err = NewIdentityregistry(irAddress, client)
+		instance, err = NewIdentityregistry(common.HexToAddress(config.Config.IdentityRegistryAddress), client)
 		if err != nil {
 			log.Error(err)
 			return
@@ -42,7 +44,7 @@ func getService() (*Identityregistry, error) {
 	return instance, nil
 }
 
-//CallCreateIdentity CreateIdentity function call
+// CallCreateIdentity CreateIdentity function call
 func CallCreateIdentity(reqID uint64, recoveryAddress common.Address, associatedAddress common.Address, providers []common.Address, resolvers []common.Address, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 
 	var trx *types.Transaction
@@ -83,7 +85,7 @@ func CallCreateIdentity(reqID uint64, recoveryAddress common.Address, associated
 	return trx, nil
 }
 
-//CallAddAssociatedAddressDelegated  AddAssociatedAddressDelegated function call
+// CallAddAssociatedAddressDelegated  AddAssociatedAddressDelegated function call
 func CallAddAssociatedAddressDelegated(reqID uint64, approvingAddress common.Address, addressToAdd common.Address, v [2]uint8, r [2][32]byte, s [2][32]byte, timestamp [2]*big.Int) (*types.Transaction, error) {
 
 	var trx *types.Transaction
@@ -124,7 +126,7 @@ func CallAddAssociatedAddressDelegated(reqID uint64, approvingAddress common.Add
 	return trx, nil
 }
 
-//CallRemoveAssociatedAddressDelegated  RemoveAssociatedAddressDelegated function call
+// CallRemoveAssociatedAddressDelegated  RemoveAssociatedAddressDelegated function call
 func CallRemoveAssociatedAddressDelegated(reqID uint64, addressToRemove common.Address, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 
 	var trx *types.Transaction
@@ -166,7 +168,7 @@ func CallRemoveAssociatedAddressDelegated(reqID uint64, addressToRemove common.A
 	return trx, nil
 }
 
-//CallAddResolversFor  AddResolversFor function call
+// CallAddResolversFor  AddResolversFor function call
 func CallAddResolversFor(reqID uint64, ein *big.Int, resolvers []common.Address) (*types.Transaction, error) {
 
 	var trx *types.Transaction
@@ -207,7 +209,7 @@ func CallAddResolversFor(reqID uint64, ein *big.Int, resolvers []common.Address)
 	return trx, nil
 }
 
-//CallGetEIN  get ein for associated address
+// CallGetEIN  get ein for associated address
 func CallGetEIN(reqID uint64, associatedAddress common.Address) (*big.Int, error) {
 	var err error
 
@@ -232,7 +234,7 @@ func CallGetEIN(reqID uint64, associatedAddress common.Address) (*big.Int, error
 
 }
 
-//CallIsProviderFor Checks whether the passed provider is set for the passed EIN.
+// CallIsProviderFor Checks whether the passed provider is set for the passed EIN.
 func CallIsProviderFor(reqID uint64, ein *big.Int, provider common.Address) (bool, error) {
 	var err error
 
@@ -257,7 +259,7 @@ func CallIsProviderFor(reqID uint64, ein *big.Int, provider common.Address) (boo
 
 }
 
-//CallIsResolverFor Checks whether the passed resolver is set for the passed EIN.
+// CallIsResolverFor Checks whether the passed resolver is set for the passed EIN.
 func CallIsResolverFor(reqID uint64, ein *big.Int, provider common.Address) (bool, error) {
 	var err error
 
@@ -282,7 +284,8 @@ func CallIsResolverFor(reqID uint64, ein *big.Int, provider common.Address) (boo
 
 }
 
-//GetAddress Get IdentityRegistry Contract Address deployed by metadium
+// GetAddress Get IdentityRegistry Contract Address deployed by metadium
 func GetAddress() *common.Address {
-	return &irAddress
+	irAddr := common.HexToAddress(config.Config.IdentityRegistryAddress)
+	return &irAddr
 }

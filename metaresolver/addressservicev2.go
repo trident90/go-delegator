@@ -3,13 +3,15 @@ package metaresolver
 import (
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/common"
+	"go-delegator/config"
 	"go-delegator/crypto"
 	"go-delegator/json"
 	"go-delegator/log"
 	"go-delegator/metaresolver/sc/identityregistry"
 	"go-delegator/metaresolver/sc/publickeyresolver"
 	"go-delegator/metaresolver/sc/servicekeyresolver"
+
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func getIdentityRegistryAddress(reqID uint64, req json.RPCRequest) (resp json.RPCResponse, errRet error) {
@@ -112,7 +114,7 @@ func getProviderAddresses(reqID uint64, req json.RPCRequest) (resp json.RPCRespo
 	resp.ID = req.ID
 	resp.Jsonrpc = req.Jsonrpc
 
-	resp.Result = providerAddresses
+	resp.Result = config.Config.ProviderAddresses
 	return
 }
 
@@ -147,7 +149,7 @@ func makeAllServiceAddressMap() (map[string]interface{}, error) {
 
 	result := map[string]interface{}{
 		"identity_registry": irAddr,
-		"providers":         providerAddresses,
+		"providers":         config.Config.ProviderAddresses,
 		"resolvers":         resolverAddrs,
 		"service_key":       skrAddr,
 		"service_key_all":   skrAddrList,

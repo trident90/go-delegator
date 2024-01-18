@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"go-delegator/common"
+	"go-delegator/config"
 	"go-delegator/crypto"
 	ethjson "go-delegator/json"
 
@@ -43,6 +44,7 @@ const (
 	retryCnt = 3
 	// HTTP timeout
 	httpTimeout = 5
+	ContentType = "application/json"
 )
 
 var (
@@ -65,8 +67,8 @@ func GetInstance() *RPC {
 	once.Do(func() {
 		instance = &RPC{}
 		instance.InitClient()
-		availLen[Mainnet] = len(MainnetUrls)
-		availLen[Testnet] = len(TestnetUrls)
+		availLen[Mainnet] = len(config.Config.MainnetUrls)
+		availLen[Testnet] = len(config.Config.TestnetUrls)
 
 		instance.NetType = NetType
 		instance.NetVersion = instance.GetChainID()
@@ -84,10 +86,10 @@ func GetInstance() *RPC {
 func randomURL(netType string) (url string) {
 	switch netType {
 	case Mainnet:
-		url = MainnetUrls[rand.Intn(availLen[Mainnet])]
+		url = config.Config.MainnetUrls[rand.Intn(availLen[Mainnet])]
 		break
 	case Testnet:
-		url = TestnetUrls[rand.Intn(availLen[Testnet])]
+		url = config.Config.TestnetUrls[rand.Intn(availLen[Testnet])]
 		break
 	}
 	return
@@ -118,10 +120,10 @@ func (r *RPC) refreshURLList(url string) {
 	var p *[]string
 	switch r.NetType {
 	case Mainnet:
-		p = &MainnetUrls
+		p = &config.Config.MainnetUrls
 		break
 	case Testnet:
-		p = &TestnetUrls
+		p = &config.Config.TestnetUrls
 		break
 	}
 

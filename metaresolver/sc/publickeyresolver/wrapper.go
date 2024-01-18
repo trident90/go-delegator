@@ -8,12 +8,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 
+	"go-delegator/config"
 	"go-delegator/log"
+
+	"go-delegator/crypto"
+	"go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"go-delegator/crypto"
-	"go-delegator/rpc"
 )
 
 var (
@@ -22,7 +24,7 @@ var (
 	glimit = uint64(2000000)
 )
 
-//GetInstance get Servicekeyresolver Instance
+// GetInstance get Servicekeyresolver Instance
 func GetInstance(address common.Address) (*Publickeyresolver, error) {
 	_rpc := rpc.GetInstance()
 	client := _rpc.GetEthClient()
@@ -40,7 +42,7 @@ func GetInstance(address common.Address) (*Publickeyresolver, error) {
 	return instance, nil
 }
 
-//CallAddPublicKeyDelegated addKeyDelegated function call
+// CallAddPublicKeyDelegated addKeyDelegated function call
 func CallAddPublicKeyDelegated(reqID uint64, instance *Publickeyresolver, associatedAddress common.Address, publickey hexutil.Bytes, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 	var trx *types.Transaction
 	var err error
@@ -77,7 +79,7 @@ func CallAddPublicKeyDelegated(reqID uint64, instance *Publickeyresolver, associ
 
 }
 
-//CallRemovePublicKeyDelegated RemoveKeyDelegated function call
+// CallRemovePublicKeyDelegated RemoveKeyDelegated function call
 func CallRemovePublicKeyDelegated(reqID uint64, instance *Publickeyresolver, associatedAddress common.Address, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 	var trx *types.Transaction
 	var err error
@@ -115,20 +117,25 @@ func CallRemovePublicKeyDelegated(reqID uint64, instance *Publickeyresolver, ass
 
 }
 
-//GetAddress return current ServiceKeyResolver contract address
+// GetAddress return current ServiceKeyResolver contract address
 func GetAddress() *common.Address {
-	return &pkrAddress
+	pkrAddr := common.HexToAddress((config.Config.PublicKeyResolverAddresses[0]))
+	return &pkrAddr
 }
 
-//GetAddressList Return all old and current ServiceKeyResolver contract address list
+// GetAddressList Return all old and current ServiceKeyResolver contract address list
 func GetAddressList() []common.Address {
-	return allPkrAddress
+	var pkrAddrs []common.Address
+	for _, addr := range config.Config.PublicKeyResolverAddresses {
+		pkrAddrs = append(pkrAddrs, common.HexToAddress(addr))
+	}
+	return pkrAddrs
 }
 
 func ContainsInAddresses(_address common.Address) bool {
 
-	for _, a := range allPkrAddress {
-		if bytes.Equal(a.Bytes(), _address.Bytes()) {
+	for _, a := range config.Config.PublicKeyResolverAddresses {
+		if bytes.Equal(common.HexToAddress(a).Bytes(), _address.Bytes()) {
 			return true
 		}
 	}

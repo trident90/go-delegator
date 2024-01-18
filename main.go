@@ -6,14 +6,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
-	"go-delegator/metaresolver"
-
+	"go-delegator/config"
 	"go-delegator/crypto"
 	_ "go-delegator/ipfs"
 	"go-delegator/json"
 	"go-delegator/log"
+	"go-delegator/metaresolver"
 	"go-delegator/metaservice"
 	"go-delegator/rpc"
 
@@ -95,41 +94,19 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func help() {
-	fmt.Println("USAGE")
-	fmt.Println("  Option 1. key path only as argument")
-	fmt.Println("    $> proxy [path]")
-	fmt.Println("  Option 2. key path and passphrase as argument")
-	fmt.Println("    $> .proxy [path] [passphrase]")
-	fmt.Println("  Option 3. key path and passphrase as environment variable")
-	fmt.Println("    $> export KEY_PATH=[path]")
-	fmt.Println("    $> export KEY_PASSPHRASE=[passphrase]")
-	fmt.Println("    $> proxy")
+	fmt.Println("USAGE:")
+	fmt.Println("  delegator [config_path]")
 }
 
 func init() {
 	rpc.NetType = Targetnet
 
+	config.ReadConfig()
+
 	// Initialize Crypto with arguments
-	var path, passphrase string
-	if path = os.Getenv(crypto.Path); path != "" {
-		passphrase = os.Getenv(crypto.Passphrase)
-		os.Setenv(crypto.Path, "")
-		os.Setenv(crypto.Passphrase, "")
-	} else if len(os.Args) > 1 && !strings.HasPrefix(os.Args[1], "-") && os.Args[1] != "help" {
-		path = os.Args[1]
-		if len(os.Args) > 2 && !strings.HasPrefix(os.Args[2], "-") {
-			passphrase = os.Args[2]
-		} else {
-			fmt.Printf("Passphrase: ")
-			fmt.Scanln(&passphrase)
-		}
-	} else {
-		help()
-		log.Panic("Please refer above help")
-	}
 	go func() {
-		crypto.PathChan <- path
-		crypto.PassphraseChan <- passphrase
+		crypto.PathChan <- config.Config.AccountPath
+		crypto.PassphraseChan <- config.Config.AccountPassword
 	}()
 	crypto.GetInstance()
 }

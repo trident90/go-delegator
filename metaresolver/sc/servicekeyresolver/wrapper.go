@@ -6,12 +6,14 @@ import (
 	"math/big"
 	"sync"
 
+	"go-delegator/config"
 	"go-delegator/log"
+
+	"go-delegator/crypto"
+	"go-delegator/rpc"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"go-delegator/crypto"
-	"go-delegator/rpc"
 )
 
 var (
@@ -20,7 +22,7 @@ var (
 	glimit = uint64(2000000)
 )
 
-//GetInstance get Servicekeyresolver Instance
+// GetInstance get Servicekeyresolver Instance
 func GetInstance(address common.Address) (*Servicekeyresolver, error) {
 	_rpc := rpc.GetInstance()
 	client := _rpc.GetEthClient()
@@ -38,7 +40,7 @@ func GetInstance(address common.Address) (*Servicekeyresolver, error) {
 	return instance, nil
 }
 
-//CallAddKeyDelegated addKeyDelegated function call
+// CallAddKeyDelegated addKeyDelegated function call
 func CallAddKeyDelegated(reqID uint64, instance *Servicekeyresolver, associatedAddress common.Address, key common.Address, symbol string, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 	var trx *types.Transaction
 	var err error
@@ -75,7 +77,7 @@ func CallAddKeyDelegated(reqID uint64, instance *Servicekeyresolver, associatedA
 
 }
 
-//CallRemoveKeyDelegated RemoveKeyDelegated function call
+// CallRemoveKeyDelegated RemoveKeyDelegated function call
 func CallRemoveKeyDelegated(reqID uint64, instance *Servicekeyresolver, associatedAddress common.Address, key common.Address, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 	var trx *types.Transaction
 	var err error
@@ -113,7 +115,7 @@ func CallRemoveKeyDelegated(reqID uint64, instance *Servicekeyresolver, associat
 
 }
 
-//CallRemoveKeysDelegated RemoveKeysDelegated function call
+// CallRemoveKeysDelegated RemoveKeysDelegated function call
 func CallRemoveKeysDelegated(reqID uint64, instance *Servicekeyresolver, associatedAddress common.Address, v uint8, r [32]byte, s [32]byte, timestamp *big.Int) (*types.Transaction, error) {
 	var trx *types.Transaction
 	var err error
@@ -152,20 +154,25 @@ func CallRemoveKeysDelegated(reqID uint64, instance *Servicekeyresolver, associa
 
 }
 
-//GetAddress return current ServiceKeyResolver contract address
+// GetAddress return current ServiceKeyResolver contract address
 func GetAddress() *common.Address {
-	return &skrAddress
+	skrAddr := common.HexToAddress(config.Config.ServieKeyResolverAddresses[0])
+	return &skrAddr
 }
 
-//GetAddressList Return all old and current ServiceKeyResolver contract address list
+// GetAddressList Return all old and current ServiceKeyResolver contract address list
 func GetAddressList() []common.Address {
-	return allSkrAddress
+	var skrAddrs []common.Address
+	for _, addr := range config.Config.ServieKeyResolverAddresses {
+		skrAddrs = append(skrAddrs, common.HexToAddress(addr))
+	}
+	return skrAddrs
 }
 
 func ContainsInAddresses(_address common.Address) bool {
 
-	for _, a := range allSkrAddress {
-		if bytes.Equal(a.Bytes(), _address.Bytes()) {
+	for _, a := range config.Config.ServieKeyResolverAddresses {
+		if bytes.Equal(common.HexToAddress(a).Bytes(), _address.Bytes()) {
 			return true
 		}
 	}

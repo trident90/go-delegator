@@ -1,0 +1,13 @@
+{
+    "mainnet_urls": ["https://api.metadium.com/prod"],
+    "testnet_urls": ["https://api.metadium.com/dev"],
+    "account_path": "/home/trident/go/src/go-delegator/.keystore/account1-provider",
+    "account_password": "demo",
+    "provider_addrs": ["0xa7321b7713fe7cabea95f691856ae6a67c5b0614"],
+    "identity_registry_addr": "0xBE2bB3d7085fF04BdE4B3F177a730a826f05cB70",
+    "publickey_resolver_addrs": ["0x81c638aec7d323d4cd0114a5d5407be241b25d0a"],
+    "servicekey_resolver_addrs": ["0xe96473a2ba7a4bf4bb02da0fbad24bd1ceac6bf6", "0x43fe3710e701730151c5fad21d205a4b9f68caf3", "0xf4f9790205ee559a379c519e04042b20560eefad"],
+    "use_recaptcha": false,
+    "recaptcha_secret": "[REPLACE WITH YOUR SECRET KEY]",
+    "recaptcha_url": "https://www.google.com/recaptcha/api/siteverify"
+}
