@@ -22,7 +22,7 @@ type Configuration struct {
 	ReCaptchaURL               string   `json:"recaptcha_url"`
 }
 
-const configFile = "/home/trident/go/src/go-delegator/config.json"
+const configFile = "./conf/config.json"
 
 var Config Configuration
 
