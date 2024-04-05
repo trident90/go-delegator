@@ -1,7 +1,7 @@
 {
     "mainnet_urls": ["https://api.metadium.com/prod"],
     "testnet_urls": ["https://api.metadium.com/dev"],
-    "account_path": "./.keystore/account1-provider",
+    "account_path": "./conf/.keystore/account1-provider",
     "account_password": "demo",
     "provider_addrs": ["0xa7321b7713fe7cabea95f691856ae6a67c5b0614"],
     "identity_registry_addr": "0x162bE0a728FbC5d200240cf5d72af3D25C801012",
